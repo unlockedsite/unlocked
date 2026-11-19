@@ -2,7 +2,7 @@ import games from "../docs/games.json" with { type: "json" };
 import ports from "./ports.json" with { type: "json" };
 import { matches, normalize } from "../docs/search.mjs";
 
-const ORIGIN = "https://unblocker0.github.io";
+const ORIGIN = "https://unlockedsite.github.io";
 const encoder = new TextEncoder();
 const bodyLimit = 4800;
 const byId = new Map(games.map(game => [game.id, game]));

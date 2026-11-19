@@ -1,7 +1,7 @@
 # unlocked
 The unlocked vault of all your favorite games.
 
-[Play Unlocked](https://unblocker0.github.io/unlocked/)
+[Play Unlocked](https://unlockedsite.github.io/unlocked/)
 
 The arcade is published from `main /docs` on GitHub Pages. Minecraft: Story Mode is featured. The library sorts titles alphabetically, saves bookmarks and appearance on the current device, and loads a game only when someone starts it. The Chromebook spec labels are estimates. Individual ports determine their own controls, save support, and touch compatibility.
 

@@ -5,7 +5,7 @@ import { readdir, readFile } from "node:fs/promises";
 import { createHash, randomBytes } from "node:crypto";
 import service from "../service/index.mjs";
 
-const origin="https://unblocker0.github.io";
+const origin="https://unlockedsite.github.io";
 const migrationDir=new URL("../service/drizzle/",import.meta.url);
 const files=(await readdir(migrationDir)).filter(name=>name.endsWith(".sql")).sort();
 const migrations=await Promise.all(files.map(name=>readFile(new URL(name,migrationDir),"utf8")));
