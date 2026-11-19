@@ -16,3 +16,9 @@ export const plays = sqliteTable("plays", {
   game: text("game").primaryKey(),
   count: integer("count").notNull()
 });
+
+export const presence = sqliteTable("presence", {
+  session: text("session").primaryKey(),
+  game: text("game").notNull(),
+  seen: integer("seen").notNull()
+}, table => [index("presence_seen").on(table.seen)]);

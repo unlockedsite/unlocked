@@ -1,4 +1,4 @@
-import { icon } from "./icons.mjs";
+import { icon } from "./icons.mjs?v=2";
 import { matches, normalize } from "./search.mjs";
 
 const API = "https://unlocked-arcade-service.persistingthoughts0.chatgpt.site";
@@ -6,12 +6,14 @@ const $ = selector => document.querySelector(selector);
 const main = $("#content"), search = $("#search"), guide = $("#guide");
 const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const relativeAsset = id => "./assets/covers/" + encodeURIComponent(id) + ".webp";
+const posterAsset = id => "./assets/posters/" + encodeURIComponent(id) + ".webp";
 const featureId = "minecraft-story-mode";
 const podium = ["geometry-dash", "among-us", "bendy"];
+const highlighted = new Set([featureId, ...podium]);
 const levels = { low: "Low", medium: "Medium", high: "High" };
 const levelTips = { low: "Lightweight, targets around 60 FPS.", medium: "Moderate load, targets around 30 FPS.", high: "Demanding. May struggle or fail on an entry-level Chromebook." };
 const categories = { loading:"Game won’t load", performance:"Slow or choppy", controls:"Controls", fullscreen:"Fullscreen", sound:"Audio", other:"Something else" };
-const collate = new Intl.Collator("en", {numeric:true, sensitivity:"base"});
+const collate = new Intl.Collator("en", {numeric:true, sensitivity:"base", ignorePunctuation:true});
 const dl = (key, fallback, session = false) => {
   try { return (session ? sessionStorage : localStorage).getItem("unlocked."+key) ?? fallback; } catch { return fallback; }
 };
@@ -26,7 +28,8 @@ let games = [], byId = new Map(), genre = "", level = "", q = "", navigation = 0
 let current = {page:"library",id:"",params:new URLSearchParams()}, tourStep=0, toastTimer;
 let ticket=dl("session","",true), inviteHidden=dl("tour","")==="seen";
 let currentLaunch=null, topCache=null, currentReport="", searchMessage="", sendingSearch="", lastSearchKey="";
-let rankedCounts={}, chartState="loading", chartRequest=null, chartTimer;
+let rankedCounts={}, activeCounts={}, chartState="loading", chartRequest=null, chartTimer;
+let playSession=null, heartbeatTimer;
 const receivedQueries = new Set();
 const alphabetical = (a,b) => collate.compare(a.title,b.title);
 const bookmarkText = id => saved.has(id) ? "Saved" : "Save game";
@@ -68,9 +71,18 @@ function bookmark(id,compact=false,hero=false){
   const active=saved.has(id), name=byId.get(id)?.title || "game";
   return '<button type="button" data-save="'+esc(id)+'" aria-pressed="'+active+'" title="'+(active?"Remove from saved":"Save game")+'" aria-label="'+esc((active?"Remove ":"Save ")+name+(active?" from saved":""))+'" class="'+(compact?"save-mini":hero?"ghost-btn":"secondary-btn")+savedClass(id)+'">'+icon("bookmark")+(compact?"":"<span>"+bookmarkText(id)+"</span>")+'</button>';
 }
+function activeText(id) {
+  if(chartState!=="live")return "—";
+  const count=id==="all" ? Object.values(activeCounts).reduce((total,n)=>total+n,0) : (activeCounts[id] || 0);
+  return count.toLocaleString();
+}
+function presence(id) {
+  return '<span class="presence" title="Game sessions active on Unlocked in the last 90 seconds">'+icon("users")+'<span data-active="'+id+'">'+activeText(id)+'</span> playing now</span>';
+}
 function card(g, {rank=0,count=0}={}) {
-  const fact=rank && chartState==="live" ? g.genre+" · "+count.toLocaleString()+" "+(count===1?"launch":"launches") : g.genre;
-  return '<article class="card"><a href="#/game/'+g.id+'"><div class="cover"><img src="'+relativeAsset(g.id)+'" alt="" width="480" height="270" loading="lazy" decoding="async">'+specBadge(g.load)+(rank?'<span class="rank">#'+rank+'</span>':"")+'</div><div class="card-copy"><h3>'+esc(g.title)+'</h3><p>'+esc(fact)+'</p></div></a>'+bookmark(g.id,true)+'</article>';
+  const title=esc(g.title);
+  const starts=rank && chartState==="live"?'<span class="poster-plays">'+count.toLocaleString()+' '+(count===1?'launch':'launches')+'</span>':'';
+  return '<article class="card"><a href="#/game/'+g.id+'" aria-label="'+title+'"><div class="cover"><img src="'+posterAsset(g.id)+'" alt="" width="320" height="480" loading="lazy" decoding="async">'+specBadge(g.load)+(rank?'<span class="rank">#'+rank+'</span>':'')+'</div><div class="card-copy"><span class="poster-genre">'+esc(g.genre)+'</span><h3>'+title+'</h3><div class="poster-numbers">'+presence(g.id)+starts+'</div></div></a>'+bookmark(g.id,true)+'</article>';
 }
 const grid = (rows) => '<div class="grid">'+rows.map(g=>card(g)).join("")+'</div>';
 const titleBar = (tag,title,count,aside="") => '<div class="shelf-head"><div class="shelf-title"><'+tag+'>'+esc(title)+'</'+tag+'><span class="count" aria-label="'+count+' games">'+count+'</span></div>'+aside+'</div>';
@@ -89,6 +101,9 @@ function hero(){
 function invite(){
   return inviteHidden?"":'<aside class="tour-invite">'+icon("gamepad")+'<strong>First time in the vault?</strong><button class="tour-open" data-action="tour">Take the quick tour</button><button class="tour-skip" data-action="skip-tour">Skip</button></aside>';
 }
+function communityBar(){
+  return '<div class="community-bar"><a class="join-discord" href="https://discord.gg/AezupBCtns" target="_blank" rel="noopener noreferrer">'+icon("discord")+'<span><small>Join us on</small><strong>Discord</strong></span>'+icon("forward")+'</a><div class="community-online">'+presence("all")+'</div></div>';
+}
 function currentRanks(){
   const fixed=podium.map(id=>byId.get(id)).filter(Boolean);
   return [...fixed,...games.filter(g=>!podium.includes(g.id)).sort((a,b)=>(rankedCounts[b.id]||0)-(rankedCounts[a.id]||0)||alphabetical(a,b))];
@@ -101,16 +116,17 @@ function chartPanel(){
   const ranks=currentRanks().slice(0,3);
   return '<aside class="chart-panel" id="home-chart" aria-label="Top games"><div class="chart-title"><h2>'+icon("trophy")+'Top games</h2>'+chartStatus()+'</div><ol class="mini-chart">'+ranks.map((g,i)=>{
     const plays=Number(rankedCounts[g.id])||0;
-    return '<li><a href="#/game/'+g.id+'"><span class="position">'+String(i+1).padStart(2,"0")+'</span><img src="'+relativeAsset(g.id)+'" alt="" width="96" height="62" decoding="async"><span class="chart-copy"><strong>'+esc(g.title)+'</strong><small>'+esc(g.genre)+(chartState==="live"?' · '+plays.toLocaleString()+' '+(plays===1?'launch':'launches'):'')+'</small></span></a></li>';
+    const countText=chartState==="live"?'<span class="chart-plays">'+plays.toLocaleString()+' '+(plays===1?'launch':'launches')+'</span>':"";
+    return '<li><a href="#/game/'+g.id+'"><span class="position">'+String(i+1).padStart(2,"0")+'</span><img src="'+relativeAsset(g.id)+'" alt="" width="96" height="62" decoding="async"><span class="chart-copy"><strong>'+esc(g.title)+'</strong><small><span class="chart-genre">'+esc(g.genre)+(countText?' · ':'')+'</span>'+countText+'</small></span></a></li>';
   }).join("")+'</ol><a class="chart-all" href="#/top">'+icon("grid")+'Full rankings</a></aside>';
 }
 function renderLibrary(){
   const searching=current.page==="search";
-  const full=searching && q?games.filter(g=>matches(g,q)):games;
+  const full=searching ? games.filter(g=>!q || matches(g,q)) : games.filter(g=>!highlighted.has(g.id));
   const rows=full.filter(g=>(!genre || g.genre===genre)&&(!level || g.load===level));
-  const label=searching && q ? "Search results" : "All games";
+  const label=searching ? "Search results" : "Game library";
   const aside='<div class="shelf-aside">'+(searching?"":invite())+'<span class="sort-label">A–Z</span></div>';
-  let html=searching?"":'<div class="spotlight">'+hero()+chartPanel()+'</div>';
+  let html=searching?"":'<div class="spotlight">'+hero()+chartPanel()+'</div>'+communityBar();
   html+=titleBar(searching?"h1":"h2",label,rows.length,aside)+filters();
   if(rows.length) html+=grid(rows);
   else if(full.length || !q) html+='<div class="empty">'+icon("filter")+'<h2>No games with those filters</h2><p>Try another genre or a different spec level.</p>'+btn("reset-filters","Clear filters","filter")+'</div>';
@@ -127,19 +143,20 @@ function renderSaved() {
 }
 function drawTop(){
   const ranks=currentRanks();
-  main.innerHTML='<section class="section-page"><div class="shelf-head"><div><h1>Top games</h1><p class="subcopy">The arcade’s three pinned picks lead the chart. Every other spot is ranked by launches.</p></div>'+chartStatus()+'</div>'+
+  main.innerHTML='<section class="section-page"><div class="shelf-head"><div><h1>Top games</h1><p class="subcopy">The first three places are pinned. The rest of the chart follows community launches.</p></div><div class="top-live">'+chartStatus()+presence("all")+'</div></div>'+
     (chartState==="offline"?'<p class="hint">Live counts are unavailable. The chart will retry automatically.</p>':"")+
     '<div class="grid">'+ranks.map((g,i)=>card(g,{rank:i+1,count:Number(rankedCounts[g.id])||0})).join("")+'</div></section>';
 }
 function refreshChart(force=false){
-  if(document.hidden || !["library","top"].includes(current.page) || (topCache && !force && Date.now()-topCache.time<25000)) return;
+  if(document.hidden || !["library","top","search","saved","game"].includes(current.page) || (topCache && !force && Date.now()-topCache.time<20000)) return;
   if(chartRequest)return chartRequest;
   const previousState=chartState,previousCounts=JSON.stringify(rankedCounts);
-  chartRequest=api("/v1/top").then(({plays})=>{
-    if(!plays || typeof plays!=="object")throw Error("Chart unavailable");
-    rankedCounts=plays;topCache={time:Date.now()};chartState="live";
+  chartRequest=api("/v1/top").then(({plays,active})=>{
+    if(!plays || !active || typeof plays!=="object" || typeof active!=="object")throw Error("Chart unavailable");
+    rankedCounts=plays;activeCounts=active;topCache={time:Date.now()};chartState="live";
   }).catch(()=>{chartState="offline";}).finally(()=>{
     chartRequest=null;
+    document.querySelectorAll("[data-active]").forEach(el=>{el.textContent=activeText(el.dataset.active);});
     if(previousState===chartState && previousCounts===JSON.stringify(rankedCounts))return;
     if(current.page==="top")drawTop();
     if(current.page==="library" && $("#home-chart"))$("#home-chart").outerHTML=chartPanel();
@@ -148,8 +165,8 @@ function refreshChart(force=false){
 }
 function scheduleChart(){
   clearInterval(chartTimer);
-  if(document.hidden || !["library","top"].includes(current.page))return;
-  refreshChart();chartTimer=setInterval(()=>refreshChart(true),45000);
+  if(document.hidden || !["library","top","search","saved","game"].includes(current.page))return;
+  refreshChart();chartTimer=setInterval(()=>refreshChart(true),30000);
 }
 function redrawSavedButtons(id){
   if(current.page==="saved"){renderSaved();return;}
@@ -189,9 +206,9 @@ function reportUrl(){
   return "#/report?"+p;
 }
 function gameLayout(g){
-  main.innerHTML='<a class="back" href="#/library">'+icon("back")+'All games</a><h1 class="game-title">'+esc(g.title)+'</h1><div class="game-meta">'+specBadge(g.load)+'<span>'+esc(g.genre)+'</span></div>'+
+  main.innerHTML='<a class="back" href="#/library">'+icon("back")+'All games</a><h1 class="game-title">'+esc(g.title)+'</h1><div class="game-meta">'+specBadge(g.load)+'<span>'+esc(g.genre)+'</span>'+(g.edition?'<span class="edition">'+esc(g.edition)+'</span>':'')+presence(g.id)+'</div>'+
     '<div id="stage" class="stage centered"><div class="stage-art" style="background-image:url(\''+(g.id===featureId?"./assets/minecraft-story-mode-hero.webp":relativeAsset(g.id))+'\')"></div><div class="startbox" id="startbox"><p role="status">Preparing the player…</p></div><button type="button" class="icon-btn exit-stage" data-action="fullscreen" title="Leave fullscreen" aria-label="Leave fullscreen">'+icon("close")+'</button></div>'+
-    '<div class="play-tools">'+(g.mode==="embed"?btn("fullscreen","Fullscreen","expand"):"")+'<span id="open-host"></span>'+bookmark(g.id)+'<a class="secondary-btn report-link" href="'+reportUrl()+'">'+icon("bug")+'Report a bug</a></div><div id="key-area"></div>'+
+    '<div class="play-tools">'+(g.mode==="embed"?btn("fullscreen","Fullscreen","expand"):"")+bookmark(g.id)+'<a class="secondary-btn report-link" href="'+reportUrl()+'">'+icon("bug")+'Report a bug</a></div><div id="key-area"></div>'+
     '<div class="details"><section class="pane"><h2>About this game</h2><p>'+esc(g.description)+'</p><details><summary>Port details &amp; sources</summary><ul>'+g.sources.map((u,i)=>'<li><a target="_blank" rel="noopener noreferrer" href="'+esc(u)+'">'+esc(u.includes("github.com/")?u.replace("https://github.com/",""):new URL(u).hostname)+(g.sources.length>1?" · source "+(i+1):"")+'</a></li>').join("")+'</ul><div id="other-ports"></div></details></section>'+
     '<section class="pane"><h2>Playing on a Chromebook</h2><p>'+esc(g.notes)+'</p><button class="text-link" data-action="specs">See the spec guide</button></section></div>';
 }
@@ -201,21 +218,19 @@ function safeGameUrl(value) {
   return u.href;
 }
 async function prepareGame(g, token, autoStart=false){
+  if(g.mode!=="embed"){
+    $("#startbox").innerHTML='<strong>In-page play unavailable</strong><p>'+esc(g.unavailable)+'</p>';
+    return;
+  }
   try{
     const launch=await api("/v1/launch/"+g.id,{});
     if(token!==navigation)return;
     const url=safeGameUrl(launch.url);
-    const playerUrl=g.id==="simpsons-hit-and-run"?new URL("./imports/hit-and-run/index.html",document.baseURI).href:url;
+    const playerUrl=g.id==="simpsons-hit-and-run"?new URL("./imports/hit-and-run/index.html",document.baseURI).href:g.id==="happy-wheels"?new URL("./imports/happy-wheels/",document.baseURI).href:url;
     currentLaunch={id:g.id,url:playerUrl};
     $("#key-area").replaceChildren();
-    const external='<a class="secondary-btn" href="'+esc(url)+'" target="_blank" rel="noopener noreferrer" data-standalone="'+g.id+'">'+icon("external")+'Open in new tab</a>';
-    if(g.mode==="embed"){
-      $("#startbox").innerHTML=btn("start-game","Play game","play","btn");
-      $("#open-host").innerHTML=external;
-      if(autoStart) startGame(g);
-    } else {
-      $("#startbox").innerHTML='<a class="btn" target="_blank" rel="noopener noreferrer" data-standalone="'+g.id+'" href="'+esc(url)+'">'+icon("external")+'Open game</a><p>This port plays in its own tab. Use its fullscreen control if available.</p>';
-    }
+    $("#startbox").innerHTML=btn("start-game",g.edition==="Classic demo"?"Play demo":"Play game","play","btn");
+    if(autoStart) startGame(g);
     if(launch.alternates?.length) $("#other-ports").innerHTML=launch.alternates.map(a=>'<a class="text-link" href="'+esc(safeGameUrl(a.url))+'" rel="noopener noreferrer" target="_blank">'+esc(a.label)+'</a>').join(" · ");
   }catch(error){
     if(token!==navigation)return;
@@ -228,9 +243,33 @@ async function prepareGame(g, token, autoStart=false){
     }
   }
 }
+function signalPresence(gameplay,state){
+  return fetch(API+"/v1/presence",{
+    method:"POST",mode:"cors",credentials:"omit",keepalive:state==="left",referrerPolicy:"no-referrer",
+    headers:{"Content-Type":"application/json"},body:JSON.stringify({game:gameplay.id,session:gameplay.session,state})
+  }).catch(()=>{});
+}
+function scheduleHeartbeat(){
+  clearInterval(heartbeatTimer);
+  if(document.hidden || !playSession?.registered)return;
+  const gameplay=playSession;
+  signalPresence(gameplay,"active");
+  heartbeatTimer=setInterval(()=>signalPresence(gameplay,"active"),30000);
+}
+function endPlay(){
+  clearInterval(heartbeatTimer);
+  if(playSession?.registered)signalPresence(playSession,"left");
+  playSession=null;
+}
 function recordPlay(id){
   topCache=null;
-  api("/v1/play/"+id,{}).then(()=>refreshChart(true)).catch(()=>{ /* A rankings outage must not interrupt the player. */ });
+  const gameplay={id,session:crypto.randomUUID(),registered:false};
+  playSession=gameplay;
+  api("/v1/play/"+id,{session:gameplay.session}).then(()=>{
+    gameplay.registered=true;
+    if(playSession!==gameplay){signalPresence(gameplay,"left");return;}
+    scheduleHeartbeat();refreshChart(true);
+  }).catch(()=>{ /* Play continues if the count service is offline. */ });
 }
 function startGame(g){
   const stage=$("#stage");
@@ -281,18 +320,19 @@ async function submitReport(form){
   const body={game:$("#report-game").value,page:form.dataset.from,kind:$("#kind").value,detail:$("#detail").value,device:$("#share-device").checked?deviceLabel():""};
   button.disabled=true;feedback("#report-result","Sending your report…");
   try{
-    await api("/v1/reports",body);if(navigation!==token)return;
-    form.innerHTML='<h2>Report received</h2><p>The arcade team has your report and a suggested first check for this issue.</p><a class="btn" href="'+(body.game?"#/game/"+body.game:"#/library")+'">Back to '+(body.game?"game":"all games")+'</a>';
+    const result=await api("/v1/reports",body);if(navigation!==token)return;
+    form.innerHTML='<h2>Report received</h2><p>Delivered to the arcade team on Discord.</p><p>'+esc(result.hint)+'</p><p class="hint">Receipt '+esc(result.receipt)+'</p><a class="btn" href="'+(body.game?"#/game/"+body.game:"#/library")+'">Back to '+(body.game?"game":"all games")+'</a>';
   }catch(e){if(navigation===token){feedback("#report-result",e.message);button.disabled=false;}}
 }
 async function showCredits(token){
   main.innerHTML='<section class="narrow section-page"><a class="back" href="#/library">'+icon("back")+'All games</a><h1 class="panel-title">Credits</h1><p class="subcopy">Game art belongs to the artists and publishers listed below. Each game page links to its port.</p><div id="credits-list" class="pane">Loading credits…</div></section>';
   try {
-    const data=await readJson("./credits.json");if(token!==navigation)return;
-    $("#credits-list").innerHTML='<ul class="credits-list">'+data.map(x=>'<li><a href="'+esc(x.source)+'" target="_blank" rel="noopener noreferrer">'+esc(x.title)+'</a> · '+esc(x.credit)+'</li>').join("")+'</ul><p class="hint">Interface typefaces: <a class="text-link" href="./assets/fonts/dm-sans-OFL.txt">DM Sans</a> and <a class="text-link" href="./assets/fonts/barlow-condensed-OFL.txt">Barlow Condensed</a>.</p>';
+    const data=await readJson("./credits.json?v=2");if(token!==navigation)return;
+    $("#credits-list").innerHTML='<ul class="credits-list">'+data.map(x=>'<li><a href="'+esc(x.source)+'" target="_blank" rel="noopener noreferrer">'+esc(x.title)+'</a> · '+esc(x.credit)+(x.posterSource?' · <a href="'+esc(x.posterSource)+'" target="_blank" rel="noopener noreferrer">Poster art</a>':'')+'</li>').join("")+'</ul><p class="hint">Interface typefaces include <a class="text-link" href="./assets/fonts/dm-sans-OFL.txt">DM Sans</a> and <a class="text-link" href="./assets/fonts/barlow-condensed-OFL.txt">Barlow Condensed</a>.</p>';
   }catch{if(token===navigation)feedback("#credits-list","Couldn’t load the credits. Refresh to try again.");}
 }
 function route({scroll=true}={}){
+  endPlay();
   const token=++navigation;current=readRoute();currentLaunch=null;currentReport="";
   document.body.classList.remove("player-expanded");
   const isSearch=current.page==="search";
@@ -352,7 +392,9 @@ function setup(){
   search.addEventListener("input",()=>{if(games.length)searchView(search.value);});
   $("#search-form").addEventListener("submit",e=>{e.preventDefault();if(games.length)requestMissing();});
   window.addEventListener("hashchange",()=>route());
-  document.addEventListener("visibilitychange",scheduleChart);
+  document.addEventListener("visibilitychange",()=>{scheduleHeartbeat();scheduleChart();});
+  window.addEventListener("pagehide",e=>{if(!e.persisted)endPlay();clearInterval(heartbeatTimer);});
+  window.addEventListener("pageshow",e=>{if(e.persisted){scheduleHeartbeat();scheduleChart();}});
   document.querySelector(".skip").addEventListener("click",e=>{e.preventDefault();main.focus();});
   document.addEventListener("keydown",e=>{
     if(e.key==="/" && !guide.open && !["INPUT","TEXTAREA","SELECT","IFRAME"].includes(document.activeElement?.tagName)){e.preventDefault();search.focus();}
@@ -362,7 +404,6 @@ function setup(){
     if(!e.target.closest(".preferences")){$("#theme-panel").hidden=true;$("#theme-button").setAttribute("aria-expanded","false");}
     const save=e.target.closest("[data-save]");if(save){rememberGame(save.dataset.save);return;}
     const filter=e.target.closest("[data-genre]");if(filter){genre=filter.dataset.genre;renderLibrary();document.querySelector('[data-genre="'+genre+'"]')?.focus({preventScroll:true});return;}
-    const standalone=e.target.closest("[data-standalone]");if(standalone)recordPlay(standalone.dataset.standalone);
     const link=e.target.closest("a[data-page],a.brand");
     if(link && link.getAttribute("href")==="#/library"){genre="";level="";if(current.page==="library")renderLibrary();}
     const footerBug=e.target.closest('.footer a[href="#/report"]');if(footerBug && current.page!=="report"){e.preventDefault();location.hash=reportUrl();}
@@ -397,5 +438,5 @@ async function readJson(path){
   return res.json();
 }
 setup();
-try {games=(await readJson("./games.json")).sort(alphabetical);byId=new Map(games.map(g=>[g.id,g]));route({scroll:false});}
+try {games=(await readJson("./games.json?v=2")).sort(alphabetical);byId=new Map(games.map(g=>[g.id,g]));route({scroll:false});}
 catch {main.innerHTML='<div class="empty"><h1>Couldn’t open the vault</h1><p>Reload this page to fetch the game catalog.</p><a class="btn" href="./">Reload</a></div>';}

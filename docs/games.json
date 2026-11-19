@@ -37,7 +37,8 @@
     "load": "high",
     "mode": "embed",
     "sources": [
-      "https://github.com/genizy/web-port/tree/main/bendy"
+      "https://github.com/genizy/web-port/tree/main/bendy",
+      "https://github.com/gn-math/html/blob/main/215-fix2.html"
     ],
     "aliases": [
       "batim",
@@ -54,7 +55,8 @@
     "load": "high",
     "mode": "embed",
     "sources": [
-      "https://github.com/genizy/web-port/tree/main/buckshot-roulette"
+      "https://github.com/genizy/web-port/tree/main/buckshot-roulette",
+      "https://github.com/gn-math/html/blob/main/205-fix2.html"
     ],
     "aliases": [
       "buckshot",
@@ -68,7 +70,7 @@
     "title": "Call of Duty: Black Ops Zombies",
     "genre": "Shooter",
     "load": "high",
-    "mode": "external",
+    "mode": "unavailable",
     "sources": [
       "https://vel.gg/bsz"
     ],
@@ -82,7 +84,8 @@
       "BO1"
     ],
     "description": "Hold the barricades and survive another round on classic Black Ops Zombies maps.",
-    "notes": "Desktop keyboard and mouse required. The port needs a 64-bit browser, WebGL 2, and a 1.5 GiB game heap plus graphics and audio memory."
+    "notes": "Desktop keyboard and mouse required. The port needs a 64-bit browser, WebGL 2, and a 1.5 GiB game heap plus graphics and audio memory.",
+    "unavailable": "This build needs an isolated browser window with shared memory. The GitHub Pages player can’t provide that environment."
   },
   {
     "id": "deltatraveler",
@@ -91,7 +94,8 @@
     "load": "medium",
     "mode": "embed",
     "sources": [
-      "https://github.com/genizy/web-port/tree/main/deltatraveler"
+      "https://github.com/genizy/web-port/tree/main/deltatraveler",
+      "https://github.com/gn-math/html/blob/main/560-fix2.html"
     ],
     "aliases": [
       "delta traveler",
@@ -141,9 +145,10 @@
     "title": "Duke Nukem 3D",
     "genre": "Shooter",
     "load": "low",
-    "mode": "external",
+    "mode": "embed",
     "sources": [
-      "https://midzer.de/wasm/duke3d/"
+      "https://midzer.de/wasm/duke3d/",
+      "https://archive.org/details/3dduke13SW"
     ],
     "aliases": [
       "Duke 3D",
@@ -151,39 +156,42 @@
       "Duke Nukem"
     ],
     "description": "Fight through alien-occupied Los Angeles in a classic first-person shooter.",
-    "notes": "The game host opens in its own tab. Select “Click here to load” for its roughly 19 MB classic shooter build."
+    "notes": "Launch the original shareware episode in DOSBox. Click the player to capture the keyboard and mouse.",
+    "edition": "Shareware episode"
   },
   {
     "id": "fallout",
     "title": "Fallout",
     "genre": "RPG",
     "load": "medium",
-    "mode": "external",
+    "mode": "embed",
     "sources": [
-      "https://github.com/midzer/fallout1-ce"
+      "https://github.com/midzer/fallout1-ce",
+      "https://rerunreactor.com/handbook/getting-started/"
     ],
     "aliases": [
       "fallout 1",
       "fallout community edition"
     ],
     "description": "Leave Vault 13 and cross the wasteland in search of a replacement water chip.",
-    "notes": "The Community Edition engine requires a copy of Fallout. Open the port in its own tab."
+    "notes": "Choose Fallout 1 in the engine and import your own installation folder, ZIP, or original disc image. Files and saves use this browser’s local storage."
   },
   {
     "id": "fallout-2",
     "title": "Fallout 2",
     "genre": "RPG",
     "load": "medium",
-    "mode": "external",
+    "mode": "embed",
     "sources": [
-      "https://github.com/roginvs/fallout2-ce"
+      "https://github.com/roginvs/fallout2-ce",
+      "https://termit.dev/f2ce/"
     ],
     "aliases": [
       "fallout ii",
       "fallout 2 community edition"
     ],
     "description": "Lead the Chosen One across post-nuclear California in search of a way to save Arroyo.",
-    "notes": "Choose your Fallout 2 installation folder in the player. Game files stay in your browser."
+    "notes": "Choose the folder from your own Fallout 2 installation. Game files and saves stay in browser storage. Allow local site storage in your browser to use this player."
   },
   {
     "id": "fears-to-fathom",
@@ -193,7 +201,8 @@
     "mode": "embed",
     "sources": [
       "https://github.com/genizy/web-port/tree/main/fears-to-fathom",
-      "https://github.com/slqntdevss/FTFHAPort"
+      "https://github.com/slqntdevss/FTFHAPort",
+      "https://github.com/gn-math/html/blob/main/460-fix2.html"
     ],
     "aliases": [
       "fears to fathom",
@@ -210,14 +219,15 @@
     "load": "high",
     "mode": "embed",
     "sources": [
-      "https://github.com/Reeyuki/FeedAndGrowFishPort"
+      "https://github.com/Reeyuki/FeedAndGrowFishPort",
+      "https://github.com/gn-math/html/blob/main/881.html"
     ],
     "aliases": [
       "feed & grow fish",
       "feed and grow"
     ],
     "description": "Start as a small fish and work your way up the underwater food chain.",
-    "notes": "Swim, hunt, and grow. The Unity browser port is a work in progress."
+    "notes": "Swim, hunt, and grow. The Unity browser port is a work in progress. This browser build is credited to AlexBoops."
   },
   {
     "id": "fnaf-1",
@@ -348,7 +358,8 @@
     "load": "high",
     "mode": "embed",
     "sources": [
-      "https://github.com/genizy/web-port/tree/main/getting-over-it"
+      "https://github.com/genizy/web-port/tree/main/getting-over-it",
+      "https://github.com/gn-math/html/blob/main/557-fix2.html"
     ],
     "aliases": [
       "getting over it",
@@ -382,7 +393,8 @@
     "sources": [
       "https://github.com/web-ports/granny",
       "https://github.com/aukak/Granny",
-      "https://github.com/woahhcrackers/GrannyWeb"
+      "https://github.com/woahhcrackers/GrannyWeb",
+      "https://github.com/gn-math/html/blob/main/90-fix3.html"
     ],
     "aliases": [
       "granny 1",
@@ -414,7 +426,8 @@
     "load": "high",
     "mode": "embed",
     "sources": [
-      "https://github.com/web-ports/granny-2"
+      "https://github.com/web-ports/granny-2",
+      "https://github.com/gn-math/html/blob/main/125-fix2.html"
     ],
     "aliases": [
       "granny 2",
@@ -429,15 +442,17 @@
     "title": "Happy Wheels",
     "genre": "Racing",
     "load": "medium",
-    "mode": "external",
+    "mode": "embed",
     "sources": [
-      "https://github.com/Nawsif/host/tree/main/HappyWheels"
+      "https://github.com/Nawsif/host/tree/main/HappyWheels",
+      "https://www.newgrounds.com/portal/view/547504"
     ],
     "aliases": [
       "happywheels"
     ],
     "description": "Pilot a cast of unlikely riders through ragdoll obstacle courses.",
-    "notes": "Ride through obstacle courses on the original developer’s browser player."
+    "notes": "Play Jim Bonacci’s original browser demo with the arrow keys. Space, Shift, and Ctrl perform character actions. The full game and its online level browser are separate releases.",
+    "edition": "Classic demo"
   },
   {
     "id": "minecraft-story-mode",
@@ -465,7 +480,8 @@
     "load": "medium",
     "mode": "embed",
     "sources": [
-      "https://github.com/genizy/web-port/tree/main/people-playground"
+      "https://github.com/genizy/web-port/tree/main/people-playground",
+      "https://github.com/gn-math/html/blob/main/194-fix2.html"
     ],
     "aliases": [
       "people playground",
@@ -481,7 +497,8 @@
     "load": "high",
     "mode": "embed",
     "sources": [
-      "https://github.com/genizy/web-port/tree/main/repo"
+      "https://github.com/genizy/web-port/tree/main/repo",
+      "https://github.com/gn-math/html/blob/main/195-fix2.html"
     ],
     "aliases": [
       "repo",
@@ -497,7 +514,8 @@
     "load": "medium",
     "mode": "embed",
     "sources": [
-      "https://github.com/genizy/web-port/tree/main/raft"
+      "https://github.com/genizy/web-port/tree/main/raft",
+      "https://github.com/gn-math/html/blob/main/457-fix2.html"
     ],
     "aliases": [
       "raft survival"
@@ -580,7 +598,8 @@
     "load": "high",
     "mode": "embed",
     "sources": [
-      "https://github.com/genizy/web-port/tree/main/yandere-simulator"
+      "https://github.com/genizy/web-port/tree/main/yandere-simulator",
+      "https://github.com/gn-math/html/blob/main/554-fix2.html"
     ],
     "aliases": [
       "yandere sim",

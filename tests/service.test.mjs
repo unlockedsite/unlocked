@@ -1,15 +1,18 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { DatabaseSync } from "node:sqlite";
-import { readFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import { createHash, randomBytes } from "node:crypto";
 import service from "../service/index.mjs";
 
 const origin="https://unblocker0.github.io";
-const migration=await readFile(new URL("../service/drizzle/0000_keen_iron_lad.sql",import.meta.url),"utf8");
+const migrationDir=new URL("../service/drizzle/",import.meta.url);
+const files=(await readdir(migrationDir)).filter(name=>name.endsWith(".sql")).sort();
+const migrations=await Promise.all(files.map(name=>readFile(new URL(name,migrationDir),"utf8")));
+const messageId="123456789012345678";
 function fixture(t) {
   const sqlite=new DatabaseSync(":memory:");
-  sqlite.exec(migration);
+  for(const migration of migrations)sqlite.exec(migration);
   t.after(()=>sqlite.close());
   function statement(sql,args=[]) {
     const query=sqlite.prepare(sql);
@@ -20,12 +23,14 @@ function fixture(t) {
       all:async()=>({results:query.all(...args)})
     };
   }
-  const env={ DB:{prepare:statement,batch:statements=>Promise.all(statements.map(s=>s.run()))},
+  const env={ DB:{prepare:statement,batch:statements=>Promise.all(statements.map(s=>s.all()))},
     RATE_SALT:"only-a-test-salt", BUG_HOOK:"https://unit.invalid/report",REQUEST_HOOK:"https://unit.invalid/request" };
   const messages=[];
   t.mock.method(globalThis,"fetch",async (url,options)=>{
+    assert.equal(options.redirect,"manual");
+    assert.equal(new URL(url).searchParams.get("wait"),"true");
     messages.push({url,payload:JSON.parse(options.body)});
-    return new Response(null,{status:204});
+    return Response.json({id:messageId});
   });
   async function call(path,data,headers={}) {
     const args={headers:{Origin:origin,"Content-Type":"application/json",...headers}};
@@ -37,7 +42,7 @@ function fixture(t) {
 }
 test("only missing game submissions reach the request webhook, duplicates are acknowledged once",async t=>{
   const {call,messages}=fixture(t);
-  for(const query of ["mcsm","FNAF 6","DOOM","repo"]){
+  for(const query of ["mcsm","Geometry Dash","amongus","bendy","FNAF 6","DOOM","repo"]){
     assert.equal((await call("/v1/requests",{query})).data.status,"found");
   }
   assert.equal(messages.length,0);
@@ -45,7 +50,7 @@ test("only missing game submissions reach the request webhook, duplicates are ac
     assert.equal((await call("/v1/requests",{query})).data.status,"received");
   }
   assert.equal(messages.length,1);
-  assert.equal(messages[0].url,"https://unit.invalid/request");
+  assert.equal(messages[0].url,"https://unit.invalid/request?wait=true");
   assert.deepEqual(messages[0].payload.allowed_mentions,{parse:[]});
 });
 test("wrong origins are refused and reports include page, game and a relevant troubleshooting hint",async t=>{
@@ -53,8 +58,8 @@ test("wrong origins are refused and reports include page, game and a relevant tr
   const data={game:"minecraft-story-mode",page:"game",kind:"fullscreen",detail:"Fullscreen will not open on click.",device:"ChromeOS · Chrome 134"};
   assert.equal((await call("/v1/reports",data,{Origin:"https://example.org"})).status,403);
   assert.equal(messages.length,0);
-  assert.equal((await call("/v1/reports",data)).status,200);
-  assert.equal(messages[0].url,"https://unit.invalid/report");
+  assert.equal((await call("/v1/reports",data)).data.receipt,messageId);
+  assert.equal(messages[0].url,"https://unit.invalid/report?wait=true");
   assert.match(JSON.stringify(messages[0].payload),/#\/game\/minecraft-story-mode/);
   assert.match(JSON.stringify(messages[0].payload),/fullscreen delegation/);
   for(let i=0;i<4;i++)assert.equal((await call("/v1/reports",data)).status,200);
@@ -64,7 +69,33 @@ test("failed delivery stays retryable and never acknowledges an undelivered requ
   const {call}=fixture(t);
   globalThis.fetch.mock.mockImplementationOnce(async()=>new Response(null,{status:429}));
   assert.equal((await call("/v1/requests",{query:"Unlisted Puzzle"})).status,429);
-  assert.equal((await call("/v1/requests",{query:"Unlisted Puzzle"})).data.status,"received");
+  globalThis.fetch.mock.mockImplementationOnce(async()=>new Response(null,{status:204}));
+  assert.equal((await call("/v1/requests",{query:"Unlisted Puzzle"})).status,502);
+  assert.equal((await call("/v1/requests",{query:"Unlisted Puzzle"})).data.receipt,messageId);
+});
+test("only launched game sessions count, renew while playing, expire, and can leave immediately",async t=>{
+  const {call}=fixture(t);
+  const session=crypto.randomUUID();
+  const active=async()=>(await call("/v1/top")).data.active;
+  const ping=(state,game="doom")=>call("/v1/presence",{session,state,game});
+  t.mock.timers.enable({apis:["Date"],now:Date.now()});
+  await ping("active");
+  await call("/v1/launch/doom",{});
+  assert.deepEqual(await active(),{});
+  assert.equal((await call("/v1/play/doom",{session})).status,200);
+  assert.deepEqual(await active(),{doom:1});
+  t.mock.timers.tick(60000);
+  await ping("active");
+  t.mock.timers.tick(60000);
+  await ping("left","bendy");
+  assert.deepEqual(await active(),{doom:1});
+  t.mock.timers.tick(31000);
+  assert.deepEqual(await active(),{});
+  await ping("active");
+  assert.deepEqual(await active(),{doom:1});
+  await ping("left");
+  assert.deepEqual(await active(),{});
+  assert.deepEqual((await call("/v1/top")).data.plays,{doom:1});
 });
 test("opening a details page is separate from a counted launch",async t=>{
   const {call}=fixture(t);

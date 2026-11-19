@@ -63,17 +63,28 @@ async function limit(request, env, action, perHour, perSite) {
 
 async function deliver(url, title, fields, color) {
   if (!url) reject(503, "Delivery is unavailable. Please try again later.");
-  let result;
+  const destination = new URL(url);
+  if (destination.hostname === "canary.discord.com") destination.hostname = "discord.com";
+  destination.searchParams.set("wait", "true");
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 8500);
   try {
-    result = await fetch(url, {
-      method: "POST", redirect: "error", signal: AbortSignal.timeout(6500),
+    // workerd supports manual/follow. Manual also keeps the secret on its original endpoint.
+    const result = await fetch(destination.href, {
+      method: "POST", redirect: "manual", signal: controller.signal,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ allowed_mentions: { parse: [] }, embeds: [{
         title, fields, color, timestamp: new Date().toISOString(), footer: { text: "Unlocked Arcade" }
       }] })
     });
-  } catch { reject(502, "Discord could not be reached. Please try again."); }
-  if (!result.ok) reject(result.status === 429 ? 429 : 502, "Discord did not accept this yet. Please try again later.");
+    if (!result.ok) reject(result.status === 429 ? 429 : 502, "Discord did not accept this yet. Please try again later.");
+    const receipt = await result.json();
+    if (!/^\d{15,21}$/.test(receipt?.id || "")) reject(502, "Discord did not confirm delivery. Please try again.");
+    return receipt.id;
+  } catch (error) {
+    if (error instanceof ApiError) throw error;
+    reject(502, "Discord could not confirm delivery. Please try again.");
+  } finally { clearTimeout(timer); }
 }
 const field = (name, value, inline = false) => ({ name, value: value || "Unspecified", inline });
 
@@ -92,8 +103,9 @@ async function missing(request, env, data) {
     if (prior?.state === "sent") return { status: "received" };
     reject(409, "This request is being delivered. Try again in a moment.");
   }
+  let receipt;
   try {
-    await deliver(env.REQUEST_HOOK, "Missing game request", [
+    receipt = await deliver(env.REQUEST_HOOK, "Missing game request", [
       field("Requested title", title), field("From", ORIGIN + "/unlocked/ · Arcade search")
     ], 0x85aaff);
   } catch (error) {
@@ -101,7 +113,7 @@ async function missing(request, env, data) {
     throw error;
   }
   await env.DB.prepare("UPDATE request_receipts SET state='sent',expires=? WHERE key=?").bind(now + 86400, key).run();
-  return { status: "received" };
+  return { status: "received", receipt };
 }
 
 async function bug(request, env, data) {
@@ -114,12 +126,31 @@ async function bug(request, env, data) {
   const platform = /^(ChromeOS|Windows|macOS|Android|iOS|Linux|Other) · (Chrome|Edge|Firefox|Safari|Other)( \d{1,3})?$/.test(device) ? device : "Not shared";
   const source = ORIGIN + "/unlocked/#/" + (route === "game" && game ? "game/" + game.id : route);
   await limit(request, env, "bug", 5, 100);
-  await deliver(env.BUG_HOOK, "Arcade bug report", [
+  const receipt = await deliver(env.BUG_HOOK, "Arcade bug report", [
     field("Page", pages[route] + " · " + source), field("Game", game?.title || "Arcade website", true),
     field("Issue", data.kind, true), field("Device", platform, true),
     field("What happened", detail), field("Suggested first check", hints[data.kind])
   ], 0xffb95b);
-  return { status: "received", hint: hints[data.kind] };
+  return { status: "received", receipt, hint: hints[data.kind] };
+}
+
+const presenceWindow = 90;
+async function sessionKey(value, env) {
+  if (typeof value !== "string" || !/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(value)) reject(400, "Invalid game session.");
+  if (!env.RATE_SALT) reject(503, "Player counts are temporarily unavailable.");
+  return digest(env.RATE_SALT + ":presence:" + value);
+}
+async function updatePresence(env, data) {
+  const key = await sessionKey(data.session, env);
+  if (!byId.has(data.game)) reject(400, "Unknown game.");
+  if (data.state === "left") {
+    await env.DB.prepare("DELETE FROM presence WHERE session=? AND game=?").bind(key, data.game).run();
+  } else if (data.state === "active") {
+    // Heartbeats can renew an existing launch but cannot manufacture a new player.
+    await env.DB.prepare("UPDATE presence SET seen=? WHERE session=? AND game=? AND seen < ?")
+      .bind(seconds(), key, data.game, seconds() - 10).run();
+  } else reject(400, "Unknown session state.");
+  return { ok: true };
 }
 
 function accessMode(env) {
@@ -156,16 +187,21 @@ async function authorizeLaunch(request, env) {
 async function routes(request, env, ctx) {
   const path = new URL(request.url).pathname;
   if (path === "/v1/health" && request.method === "GET") {
-    const schema = await env.DB?.prepare("SELECT count(*) AS n FROM sqlite_master WHERE type='table' AND name IN ('counters','request_receipts','plays')").first();
-    return { ready: Boolean(schema?.n === 3 && env.BUG_HOOK && env.REQUEST_HOOK && env.RATE_SALT), mode: accessMode(env) };
+    const schema = await env.DB?.prepare("SELECT count(*) AS n FROM sqlite_master WHERE type='table' AND name IN ('counters','request_receipts','plays','presence')").first();
+    return { ready: Boolean(schema?.n === 4 && env.BUG_HOOK && env.REQUEST_HOOK && env.RATE_SALT), mode: accessMode(env) };
   }
   if (path === "/v1/top" && request.method === "GET") {
-    const { results } = await env.DB.prepare("SELECT game,count FROM plays ORDER BY count DESC,game ASC LIMIT 100").all();
-    return { plays: Object.fromEntries(results.filter(r => byId.has(r.game)).map(r => [r.game, r.count])) };
+    const [totals, online] = await env.DB.batch([
+      env.DB.prepare("SELECT game,count FROM plays ORDER BY count DESC,game ASC LIMIT 100"),
+      env.DB.prepare("SELECT game,COUNT(*) AS count FROM presence WHERE seen>? GROUP BY game").bind(seconds()-presenceWindow)
+    ]);
+    const counts = rows => Object.fromEntries(rows.filter(row => byId.has(row.game)).map(row => [row.game, row.count]));
+    return { plays: counts(totals.results), active: counts(online.results), windowSeconds: presenceWindow };
   }
   if (request.method !== "POST") reject(404, "Page not found.");
   const data = await jsonBody(request);
   if (path === "/v1/redeem") return redeem(request, env, data);
+  if (path === "/v1/presence") return updatePresence(env, data);
   if (path === "/v1/reports" || path === "/v1/requests") {
     const result = path === "/v1/reports" ? await bug(request, env, data) : await missing(request, env, data);
     ctx?.waitUntil(env.DB.batch([
@@ -179,9 +215,16 @@ async function routes(request, env, ctx) {
     await authorizeLaunch(request, env);
     const game = byId.get(launch[2]), port = Object.hasOwn(ports, launch[2]) && ports[launch[2]];
     if (!game || !port?.url) reject(404, "This game has no browser launch available.");
+    if (game.mode === "unavailable") reject(409, game.unavailable);
     if (launch[1] === "play") {
       await limit(request, env, "play", 90, 30000);
-      await env.DB.prepare("INSERT INTO plays(game,count) VALUES (?,1) ON CONFLICT(game) DO UPDATE SET count=count+1").bind(game.id).run();
+      const updates = [env.DB.prepare("INSERT INTO plays(game,count) VALUES (?,1) ON CONFLICT(game) DO UPDATE SET count=count+1").bind(game.id)];
+      if (data.session) {
+        const key = await sessionKey(data.session, env);
+        updates.push(env.DB.prepare("INSERT INTO presence(session,game,seen) VALUES (?,?,?) ON CONFLICT(session) DO UPDATE SET game=excluded.game,seen=excluded.seen").bind(key, game.id, seconds()));
+        updates.push(env.DB.prepare("DELETE FROM presence WHERE seen < ?").bind(seconds() - 86400));
+      }
+      await env.DB.batch(updates);
       return { recorded: true };
     }
     return { url: port.url, alternates: port.alternates || [] };

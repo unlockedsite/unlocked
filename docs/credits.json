@@ -27,7 +27,8 @@
   {
     "title": "DELTATRAVELER",
     "credit": "VyletBunni / Team Cinnabun",
-    "source": "https://vyletbunni.itch.io/deltatraveler"
+    "source": "https://vyletbunni.itch.io/deltatraveler",
+    "posterSource": "https://www.youtube.com/watch?v=x9G27jyXWdY"
   },
   {
     "title": "Doki Doki Literature Club!",
@@ -37,7 +38,8 @@
   {
     "title": "DOOM (Shareware)",
     "credit": "id Software / Night Dive Studios / Romero Games Ltd / MachineGames / Bethesda Softworks",
-    "source": "https://store.steampowered.com/app/2280/"
+    "source": "https://store.steampowered.com/app/2280/",
+    "posterSource": "https://news.xbox.com/en-us/2019/07/29/doom-1993-doom-ii-classic-and-doom-3-are-now-available-for-xbox-one/"
   },
   {
     "title": "Duke Nukem 3D",
@@ -67,27 +69,32 @@
   {
     "title": "Five Nights at Freddy's",
     "credit": "Scott Cawthon",
-    "source": "https://store.steampowered.com/app/319510/"
+    "source": "https://store.steampowered.com/app/319510/",
+    "posterSource": "https://www.xbox.com/en-US/games/store/_/9N5253J559LR"
   },
   {
     "title": "Five Nights at Freddy's 2",
     "credit": "Scott Cawthon",
-    "source": "https://store.steampowered.com/app/332800/"
+    "source": "https://store.steampowered.com/app/332800/",
+    "posterSource": "https://www.xbox.com/en-US/games/store/_/9NBR2ZSD99FX"
   },
   {
     "title": "Five Nights at Freddy's 3",
     "credit": "Scott Cawthon",
-    "source": "https://store.steampowered.com/app/354140/"
+    "source": "https://store.steampowered.com/app/354140/",
+    "posterSource": "https://www.xbox.com/en-US/games/store/_/9P6N7LQ4HZFD"
   },
   {
     "title": "Five Nights at Freddy's 4",
     "credit": "Scott Cawthon",
-    "source": "https://store.steampowered.com/app/388090/"
+    "source": "https://store.steampowered.com/app/388090/",
+    "posterSource": "https://www.xbox.com/en-US/games/store/_/9PLDLMPLR7JV"
   },
   {
     "title": "Freddy Fazbear's Pizzeria Simulator",
     "credit": "Scott Cawthon",
-    "source": "https://store.steampowered.com/app/738060/"
+    "source": "https://store.steampowered.com/app/738060/",
+    "posterSource": "https://www.xbox.com/en-US/games/store/_/9NJ5VQGQH7K1"
   },
   {
     "title": "Gang Beasts",
@@ -132,7 +139,8 @@
   {
     "title": "Minecraft: Story Mode",
     "credit": "Telltale Games",
-    "source": "https://store.steampowered.com/app/376870/"
+    "source": "https://store.steampowered.com/app/376870/",
+    "posterSource": "https://www.xbox.com/en-US/games/store/_/C27H79BD0N2J"
   },
   {
     "title": "People Playground",
@@ -152,12 +160,14 @@
   {
     "title": "Skate 3 (Fan Game)",
     "credit": "EA Black Box / Electronic Arts",
-    "source": "https://www.xbox.com/en-US/play/games/skate-3/BNKDKQXMXRR2"
+    "source": "https://www.xbox.com/en-US/play/games/skate-3/BNKDKQXMXRR2",
+    "posterSource": "https://www.xbox.com/en-US/games/store/_/BNKDKQXMXRR2"
   },
   {
     "title": "The Simpsons: Hit & Run",
     "credit": "Radical Entertainment / The Simpsons; web recreation screenshot by vheissu",
-    "source": "https://github.com/vheissu/hit-and-run-web"
+    "source": "https://github.com/vheissu/hit-and-run-web",
+    "posterSource": "https://en.wikipedia.org/wiki/File:The_Simpsons_Hit_and_Run_cover.png"
   },
   {
     "title": "UNDERTALE",
@@ -172,7 +182,8 @@
   {
     "title": "Yandere Simulator",
     "credit": "Shyua / Yandere Simulator",
-    "source": "https://yanderesimulator.com/wallpapers/"
+    "source": "https://yanderesimulator.com/wallpapers/",
+    "posterSource": "https://yanderesimulator.com/"
   },
   {
     "title": "Featured backdrop",
