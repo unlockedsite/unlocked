@@ -1,0 +1,592 @@
+[
+  {
+    "id": "among-us",
+    "title": "Among Us",
+    "genre": "Social deduction",
+    "load": "high",
+    "mode": "embed",
+    "sources": [
+      "https://wasm.rip/files/amongus/latest/"
+    ],
+    "aliases": [
+      "amongus",
+      "amogus"
+    ],
+    "description": "Finish tasks on the ship while keeping an eye on the rest of the crew.",
+    "notes": "A Unity web build with about 865 MB of game files listed by the loader. Close other tabs before the first launch."
+  },
+  {
+    "id": "beatblock",
+    "title": "Beatblock",
+    "genre": "Rhythm",
+    "load": "medium",
+    "mode": "embed",
+    "sources": [
+      "https://github.com/SomeRandomFella/portsandrips/tree/master/blockblast-port"
+    ],
+    "aliases": [
+      "beat block"
+    ],
+    "description": "Swing a paddle around Cranky and catch the blocks on the beat.",
+    "notes": "Move the paddle around the circle in time with the music. Mouse or trackpad recommended."
+  },
+  {
+    "id": "bendy",
+    "title": "Bendy and the Ink Machine",
+    "genre": "Horror",
+    "load": "high",
+    "mode": "embed",
+    "sources": [
+      "https://github.com/genizy/web-port/tree/main/bendy"
+    ],
+    "aliases": [
+      "batim",
+      "bendy",
+      "bendy ink machine"
+    ],
+    "description": "Return to an abandoned cartoon studio and follow the trail left by its ink machine.",
+    "notes": "Explore a deserted animation studio in this ink-stained horror adventure."
+  },
+  {
+    "id": "buckshot-roulette",
+    "title": "Buckshot Roulette",
+    "genre": "Horror",
+    "load": "high",
+    "mode": "embed",
+    "sources": [
+      "https://github.com/genizy/web-port/tree/main/buckshot-roulette"
+    ],
+    "aliases": [
+      "buckshot",
+      "buckshot roulette"
+    ],
+    "description": "Take a seat across from the Dealer in a grim tabletop game of chance.",
+    "notes": "A tabletop horror game set in the back room of a nightclub."
+  },
+  {
+    "id": "black-ops-zombies",
+    "title": "Call of Duty: Black Ops Zombies",
+    "genre": "Shooter",
+    "load": "high",
+    "mode": "external",
+    "sources": [
+      "https://vel.gg/bsz"
+    ],
+    "aliases": [
+      "Black Ops Zombies",
+      "BO1 Zombies",
+      "Black Ops 1 Zombies",
+      "Call of Duty Zombies",
+      "COD Zombies",
+      "Kino der Toten",
+      "BO1"
+    ],
+    "description": "Hold the barricades and survive another round on classic Black Ops Zombies maps.",
+    "notes": "Desktop keyboard and mouse required. The port needs a 64-bit browser, WebGL 2, and a 1.5 GiB game heap plus graphics and audio memory."
+  },
+  {
+    "id": "deltatraveler",
+    "title": "DELTATRAVELER",
+    "genre": "RPG",
+    "load": "medium",
+    "mode": "embed",
+    "sources": [
+      "https://github.com/genizy/web-port/tree/main/deltatraveler"
+    ],
+    "aliases": [
+      "delta traveler",
+      "deltarune fangame"
+    ],
+    "description": "Guide Kris, Susie, and Noelle through worlds beyond their own in this turn-based fan RPG.",
+    "notes": "Kris and Susie cross unfamiliar worlds in this turn-based fan adventure."
+  },
+  {
+    "id": "ddlc",
+    "title": "Doki Doki Literature Club!",
+    "genre": "Visual novel",
+    "load": "medium",
+    "mode": "embed",
+    "sources": [
+      "https://github.com/EmeraldGreenR/EmeraldGreenR.github.io"
+    ],
+    "aliases": [
+      "ddlc",
+      "doki doki"
+    ],
+    "description": "Join the school literature club and share poems in a visual novel that turns into psychological horror.",
+    "notes": "A psychological horror visual novel. The porter recommends Chrome and reports a possible progression limit in Act 3."
+  },
+  {
+    "id": "doom",
+    "title": "DOOM (Shareware)",
+    "genre": "Shooter",
+    "load": "low",
+    "mode": "embed",
+    "sources": [
+      "https://raz0red.github.io/webprboom/"
+    ],
+    "aliases": [
+      "Doom 1",
+      "Doom 1993",
+      "WebPrBoom",
+      "PrBoom",
+      "FreeDoom",
+      "The Ultimate Doom shareware"
+    ],
+    "description": "Storm the Phobos base in the original shareware episode. WebPrBoom also includes two Freedoom campaigns.",
+    "notes": "WebPrBoom includes the original shareware episode and both Freedoom campaigns. Use a keyboard and mouse or a gamepad."
+  },
+  {
+    "id": "duke-nukem-3d",
+    "title": "Duke Nukem 3D",
+    "genre": "Shooter",
+    "load": "low",
+    "mode": "external",
+    "sources": [
+      "https://midzer.de/wasm/duke3d/"
+    ],
+    "aliases": [
+      "Duke 3D",
+      "Duke3D",
+      "Duke Nukem"
+    ],
+    "description": "Fight through alien-occupied Los Angeles in a classic first-person shooter.",
+    "notes": "The game host opens in its own tab. Select “Click here to load” for its roughly 19 MB classic shooter build."
+  },
+  {
+    "id": "fallout",
+    "title": "Fallout",
+    "genre": "RPG",
+    "load": "medium",
+    "mode": "external",
+    "sources": [
+      "https://github.com/midzer/fallout1-ce"
+    ],
+    "aliases": [
+      "fallout 1",
+      "fallout community edition"
+    ],
+    "description": "Leave Vault 13 and cross the wasteland in search of a replacement water chip.",
+    "notes": "The Community Edition engine requires a copy of Fallout. Open the port in its own tab."
+  },
+  {
+    "id": "fallout-2",
+    "title": "Fallout 2",
+    "genre": "RPG",
+    "load": "medium",
+    "mode": "external",
+    "sources": [
+      "https://github.com/roginvs/fallout2-ce"
+    ],
+    "aliases": [
+      "fallout ii",
+      "fallout 2 community edition"
+    ],
+    "description": "Lead the Chosen One across post-nuclear California in search of a way to save Arroyo.",
+    "notes": "Choose your Fallout 2 installation folder in the player. Game files stay in your browser."
+  },
+  {
+    "id": "fears-to-fathom",
+    "title": "Fears to Fathom: Home Alone",
+    "genre": "Horror",
+    "load": "high",
+    "mode": "embed",
+    "sources": [
+      "https://github.com/genizy/web-port/tree/main/fears-to-fathom",
+      "https://github.com/slqntdevss/FTFHAPort"
+    ],
+    "aliases": [
+      "fears to fathom",
+      "home alone",
+      "ftfha"
+    ],
+    "description": "An ordinary evening home alone takes a turn in the first episode of Fears to Fathom.",
+    "notes": "Episode one of the horror anthology. A teenager is home alone for the evening."
+  },
+  {
+    "id": "feed-and-grow-fish",
+    "title": "Feed and Grow: Fish",
+    "genre": "Simulation",
+    "load": "high",
+    "mode": "embed",
+    "sources": [
+      "https://github.com/Reeyuki/FeedAndGrowFishPort"
+    ],
+    "aliases": [
+      "feed & grow fish",
+      "feed and grow"
+    ],
+    "description": "Start as a small fish and work your way up the underwater food chain.",
+    "notes": "Swim, hunt, and grow. The Unity browser port is a work in progress."
+  },
+  {
+    "id": "fnaf-1",
+    "title": "Five Nights at Freddy's",
+    "genre": "Horror",
+    "load": "medium",
+    "mode": "embed",
+    "sources": [
+      "https://github.com/irv77/hd_fnaf/tree/main/1"
+    ],
+    "aliases": [
+      "fnaf 1",
+      "fnaf1",
+      "fnaf",
+      "five nights at freddys 1"
+    ],
+    "description": "Keep watch over Freddy Fazbear’s Pizza. Cameras and doors share the same dwindling power supply.",
+    "notes": "The port downloads a split game archive when you launch it. The first load can take a moment."
+  },
+  {
+    "id": "fnaf-2",
+    "title": "Five Nights at Freddy's 2",
+    "genre": "Horror",
+    "load": "medium",
+    "mode": "embed",
+    "sources": [
+      "https://github.com/irv77/hd_fnaf/tree/main/2"
+    ],
+    "aliases": [
+      "fnaf 2",
+      "fnaf2"
+    ],
+    "description": "Check the vents, wind the music box, and keep your Freddy mask close.",
+    "notes": "The port downloads a split game archive when you launch it. The first load can take a moment."
+  },
+  {
+    "id": "fnaf-3",
+    "title": "Five Nights at Freddy's 3",
+    "genre": "Horror",
+    "load": "medium",
+    "mode": "embed",
+    "sources": [
+      "https://github.com/irv77/hd_fnaf/tree/main/3"
+    ],
+    "aliases": [
+      "fnaf 3",
+      "fnaf3"
+    ],
+    "description": "Follow Springtrap through the security cameras of Fazbear’s Fright.",
+    "notes": "The port downloads a split game archive when you launch it. The first load can take a moment."
+  },
+  {
+    "id": "fnaf-4",
+    "title": "Five Nights at Freddy's 4",
+    "genre": "Horror",
+    "load": "high",
+    "mode": "embed",
+    "sources": [
+      "https://github.com/irv77/hd_fnaf/tree/main/4"
+    ],
+    "aliases": [
+      "fnaf 4",
+      "fnaf4"
+    ],
+    "description": "Listen at the bedroom doors and check the closet before the lights go out.",
+    "notes": "The port downloads a split game archive when you launch it. The first load can take a moment."
+  },
+  {
+    "id": "fnaf-ps",
+    "title": "Freddy Fazbear's Pizzeria Simulator",
+    "genre": "Horror",
+    "load": "high",
+    "mode": "embed",
+    "sources": [
+      "https://github.com/irv77/hd_fnaf/tree/main/ps"
+    ],
+    "aliases": [
+      "fnaf 6",
+      "fnaf 6 pizzeria simulator",
+      "fnaf ps",
+      "fnaf pizzeria simulator",
+      "freddy fazbear pizzeria simulator",
+      "ffps",
+      "FNAF 6",
+      "Pizzeria Simulator",
+      "FFPS"
+    ],
+    "description": "Build a pizzeria by day and keep a close ear on the vents after closing.",
+    "notes": "The port downloads a split game archive when you launch it. The first load can take a moment."
+  },
+  {
+    "id": "gang-beasts",
+    "title": "Gang Beasts",
+    "genre": "Fighting",
+    "load": "high",
+    "mode": "embed",
+    "sources": [
+      "https://github.com/jmhq20120212-cmd/GangBeast-WebPort"
+    ],
+    "aliases": [
+      "gang beast",
+      "gangbeasts"
+    ],
+    "description": "Grapple, stumble, and throw your way through the hazards of Beef City.",
+    "notes": "A physics brawler with a large first download. The port targets desktop WebGL."
+  },
+  {
+    "id": "geometry-dash",
+    "title": "Geometry Dash",
+    "genre": "Rhythm",
+    "load": "low",
+    "mode": "embed",
+    "sources": [
+      "https://gd-webport.pages.dev/"
+    ],
+    "aliases": [
+      "GD",
+      "GD Webport",
+      "Geometry Dash Webport"
+    ],
+    "description": "Jump to the beat through spikes, portals, and obstacles.",
+    "notes": "An unofficial WebAssembly port. Very complex custom levels can run more slowly than the main levels."
+  },
+  {
+    "id": "getting-over-it",
+    "title": "Getting Over It with Bennett Foddy",
+    "genre": "Platformer",
+    "load": "high",
+    "mode": "embed",
+    "sources": [
+      "https://github.com/genizy/web-port/tree/main/getting-over-it"
+    ],
+    "aliases": [
+      "getting over it",
+      "bennett foddy"
+    ],
+    "description": "Swing a sledgehammer from inside a cauldron and find a way up a very unforgiving mountain.",
+    "notes": "Climb with a sledgehammer. A mouse or trackpad gives you precise control."
+  },
+  {
+    "id": "gorilla-tag",
+    "title": "Gorilla Tag",
+    "genre": "Action",
+    "load": "high",
+    "mode": "embed",
+    "sources": [
+      "https://github.com/web-ports/gorilla-tag"
+    ],
+    "aliases": [
+      "gtag",
+      "gorilla tag web"
+    ],
+    "description": "Use your arms to move between trees in this browser adaptation of Gorilla Tag.",
+    "notes": "Move through the forest in Boolonx’s browser adaptation."
+  },
+  {
+    "id": "granny",
+    "title": "Granny",
+    "genre": "Horror",
+    "load": "medium",
+    "mode": "embed",
+    "sources": [
+      "https://github.com/web-ports/granny",
+      "https://github.com/aukak/Granny",
+      "https://github.com/woahhcrackers/GrannyWeb"
+    ],
+    "aliases": [
+      "granny 1",
+      "granny original"
+    ],
+    "description": "Unlock the way out of Granny’s house. Every dropped object gives away your position.",
+    "notes": "Find a way out of Granny’s house and keep the noise down."
+  },
+  {
+    "id": "granny-3",
+    "title": "Granny 3",
+    "genre": "Horror",
+    "load": "high",
+    "mode": "embed",
+    "sources": [
+      "https://github.com/mynamescrax/gamesforaetheris/tree/main/granny3"
+    ],
+    "aliases": [
+      "granny iii",
+      "granny chapter 3"
+    ],
+    "description": "Explore a new house and its grounds while staying out of sight of its residents.",
+    "notes": "Explore a larger house guarded by Granny and Grandpa."
+  },
+  {
+    "id": "granny-2",
+    "title": "Granny: Chapter Two",
+    "genre": "Horror",
+    "load": "high",
+    "mode": "embed",
+    "sources": [
+      "https://github.com/web-ports/granny-2"
+    ],
+    "aliases": [
+      "granny 2",
+      "granny chapter 2",
+      "granny ii"
+    ],
+    "description": "Search for an escape route while Granny and Grandpa patrol the house.",
+    "notes": "Escape the house while Granny and Grandpa are on patrol."
+  },
+  {
+    "id": "happy-wheels",
+    "title": "Happy Wheels",
+    "genre": "Racing",
+    "load": "medium",
+    "mode": "external",
+    "sources": [
+      "https://github.com/Nawsif/host/tree/main/HappyWheels"
+    ],
+    "aliases": [
+      "happywheels"
+    ],
+    "description": "Pilot a cast of unlikely riders through ragdoll obstacle courses.",
+    "notes": "Ride through obstacle courses on the original developer’s browser player."
+  },
+  {
+    "id": "minecraft-story-mode",
+    "title": "Minecraft: Story Mode",
+    "genre": "Adventure",
+    "load": "high",
+    "mode": "embed",
+    "sources": [
+      "https://mcsm-web.pages.dev/"
+    ],
+    "aliases": [
+      "Minecraft Story Mode",
+      "MCSM",
+      "Minecraft Storymode",
+      "Story Mode",
+      "Telltale Minecraft"
+    ],
+    "description": "Lead Jesse and friends through a block-built adventure where your choices shape the story.",
+    "notes": "Try the in-game Low (720p) or Minimum (540p) preset on a Chromebook. Opening the game site can enable multithreading on supported devices."
+  },
+  {
+    "id": "people-playground",
+    "title": "People Playground",
+    "genre": "Simulation",
+    "load": "medium",
+    "mode": "embed",
+    "sources": [
+      "https://github.com/genizy/web-port/tree/main/people-playground"
+    ],
+    "aliases": [
+      "people playground",
+      "ppg"
+    ],
+    "description": "Build strange contraptions and experiment with the interactions between their parts.",
+    "notes": "Build, connect, and experiment with objects in a physics sandbox."
+  },
+  {
+    "id": "repo",
+    "title": "R.E.P.O.",
+    "genre": "Horror",
+    "load": "high",
+    "mode": "embed",
+    "sources": [
+      "https://github.com/genizy/web-port/tree/main/repo"
+    ],
+    "aliases": [
+      "repo",
+      "r e p o"
+    ],
+    "description": "Carry fragile valuables to safety while creatures stalk the rooms around you.",
+    "notes": "Retrieve fragile valuables in this physics-based horror game. Browser features can differ from the desktop release."
+  },
+  {
+    "id": "raft",
+    "title": "Raft",
+    "genre": "Survival",
+    "load": "medium",
+    "mode": "embed",
+    "sources": [
+      "https://github.com/genizy/web-port/tree/main/raft"
+    ],
+    "aliases": [
+      "raft survival"
+    ],
+    "description": "Haul flotsam aboard, craft supplies, and turn a tiny raft into a home.",
+    "notes": "Catch debris and expand your raft as it drifts across the sea."
+  },
+  {
+    "id": "skate-3",
+    "title": "Skate 3 (Fan Game)",
+    "genre": "Sports",
+    "load": "high",
+    "mode": "embed",
+    "sources": [
+      "https://skate.aaddpp.lol/"
+    ],
+    "aliases": [
+      "Skate 3",
+      "Skate III",
+      "skate3",
+      "skate. 3"
+    ],
+    "description": "Take a fan-built skate engine onto the streets with your own converted copy of Skate 3.",
+    "notes": "Bring your own converted copy of Skate 3 and a WebGPU-capable browser. The fan engine hosts no game data."
+  },
+  {
+    "id": "simpsons-hit-and-run",
+    "title": "The Simpsons: Hit & Run",
+    "genre": "Driving",
+    "load": "medium",
+    "mode": "embed",
+    "sources": [
+      "https://vheissu.github.io/hit-and-run-web/"
+    ],
+    "aliases": [
+      "Simpsons Hit and Run",
+      "The Simpsons Hit and Run",
+      "Hit & Run",
+      "Springfield Run"
+    ],
+    "description": "Drive through Springfield, pick up missions, and explore on foot in this browser reconstruction.",
+    "notes": "A browser reconstruction with touch driving controls. Turn off High Quality in the game if needed."
+  },
+  {
+    "id": "undertale",
+    "title": "UNDERTALE",
+    "genre": "RPG",
+    "load": "low",
+    "mode": "embed",
+    "sources": [
+      "https://github.com/genizy/web-port/tree/main/undertale"
+    ],
+    "aliases": [
+      "under tale"
+    ],
+    "description": "Find a path through the Underground in a fan-made browser interpretation of UNDERTALE.",
+    "notes": "This alternate fan port supports keyboard and touch. The originally requested game folder is offline."
+  },
+  {
+    "id": "whos-your-daddy",
+    "title": "Who's Your Daddy?!",
+    "genre": "Simulation",
+    "load": "high",
+    "mode": "embed",
+    "sources": [
+      "https://github.com/Reeyuki/daddygame"
+    ],
+    "aliases": [
+      "whos your daddy",
+      "whose your daddy",
+      "daddygame"
+    ],
+    "description": "A curious baby and a very busy parent turn an ordinary house into a physics playground.",
+    "notes": "The original browser port opens a Unity playfield. Keyboard and mouse recommended."
+  },
+  {
+    "id": "yandere-simulator",
+    "title": "Yandere Simulator",
+    "genre": "Simulation",
+    "load": "high",
+    "mode": "embed",
+    "sources": [
+      "https://github.com/genizy/web-port/tree/main/yandere-simulator"
+    ],
+    "aliases": [
+      "yandere sim",
+      "yansim"
+    ],
+    "description": "Learn the school’s routines and plan your moves in this stealth simulation.",
+    "notes": "A stealth simulation with a large WebGL build. Desktop controls are recommended."
+  }
+]

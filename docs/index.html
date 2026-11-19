@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#11151b">
+  <meta name="description" content="Explore Unlocked, a browser arcade with fullscreen games, Chromebook performance guides, and a vault of favorites.">
+  <title>Unlocked — Game vault</title>
+  <link rel="icon" href="./assets/unlocked.png" type="image/png">
+  <link rel="stylesheet" href="./style.css">
+  <script src="./theme.js"></script>
+  <script type="module" src="./app.mjs"></script>
+</head>
+<body>
+  <a href="#content" class="skip">Skip to games</a>
+  <header class="mast">
+    <div class="mast-inner wrap">
+      <a class="brand" aria-label="Unlocked home" href="#/library"><span class="brand-mark" aria-hidden="true"><i></i></span><span>UNLOCKED</span></a>
+      <nav aria-label="Main navigation" class="primary-nav">
+        <a href="#/library" data-page="library">All games</a>
+        <a href="#/top" data-page="top">Top games</a>
+        <a href="#/saved" data-page="saved">Saved</a>
+      </nav>
+      <form id="search-form" class="search-box" role="search">
+        <button class="search-submit" type="submit" aria-label="Submit game search"><span data-icon="search"></span></button>
+        <input id="search" type="search" maxlength="80" aria-label="Search games" placeholder="Search games" autocomplete="off" enterkeyhint="search">
+        <kbd aria-hidden="true">/</kbd>
+      </form>
+      <div class="preferences">
+        <button type="button" class="icon-btn" id="theme-button" title="Change theme" aria-label="Change theme" aria-expanded="false" aria-controls="theme-panel"><span data-icon="monitor"></span></button>
+        <div id="theme-panel" class="popover" hidden>
+          <label for="theme">Appearance</label>
+          <select id="theme"><option value="system">Use device setting</option><option value="light">Light</option><option value="dark">Dark</option></select>
+        </div>
+      </div>
+    </div>
+  </header>
+  <main id="content" tabindex="-1" class="wrap">
+    <div class="loading" role="status">Opening the game vault…</div>
+    <noscript>Enable JavaScript to browse the arcade and launch a game.</noscript>
+  </main>
+  <footer class="wrap footer">
+    <a class="footer-brand" href="#/library">UNLOCKED</a>
+    <nav aria-label="Help"><button data-action="tour">Quick tour</button><a href="#/report">Report a bug</a><a href="#/credits">Credits</a></nav>
+  </footer>
+  <dialog id="guide" aria-labelledby="guide-title"><div id="guide-body"></div></dialog>
+  <div id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

@@ -1,0 +1,401 @@
+import { icon } from "./icons.mjs";
+import { matches, normalize } from "./search.mjs";
+
+const API = "https://unlocked-arcade-service.persistingthoughts0.chatgpt.site";
+const $ = selector => document.querySelector(selector);
+const main = $("#content"), search = $("#search"), guide = $("#guide");
+const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const relativeAsset = id => "./assets/covers/" + encodeURIComponent(id) + ".webp";
+const featureId = "minecraft-story-mode";
+const podium = ["geometry-dash", "among-us", "bendy"];
+const levels = { low: "Low", medium: "Medium", high: "High" };
+const levelTips = { low: "Lightweight, targets around 60 FPS.", medium: "Moderate load, targets around 30 FPS.", high: "Demanding. May struggle or fail on an entry-level Chromebook." };
+const categories = { loading:"Game won’t load", performance:"Slow or choppy", controls:"Controls", fullscreen:"Fullscreen", sound:"Audio", other:"Something else" };
+const collate = new Intl.Collator("en", {numeric:true, sensitivity:"base"});
+const dl = (key, fallback, session = false) => {
+  try { return (session ? sessionStorage : localStorage).getItem("unlocked."+key) ?? fallback; } catch { return fallback; }
+};
+function saveValue(key, value, session=false) {
+  try {(session?sessionStorage:localStorage).setItem("unlocked."+key,value);} catch { /* In-memory state remains usable. */ }
+}
+function savedIds() {
+  try {const list=JSON.parse(dl("saved","[]"));return new Set(Array.isArray(list)?list.filter(id=>typeof id==="string"):[]);} catch{return new Set();}
+}
+const saved = savedIds();
+let games = [], byId = new Map(), genre = "", level = "", q = "", navigation = 0;
+let current = {page:"library",id:"",params:new URLSearchParams()}, tourStep=0, toastTimer;
+let ticket=dl("session","",true), inviteHidden=dl("tour","")==="seen";
+let currentLaunch=null, topCache=null, currentReport="", searchMessage="", sendingSearch="", lastSearchKey="";
+let rankedCounts={}, chartState="loading", chartRequest=null, chartTimer;
+const receivedQueries = new Set();
+const alphabetical = (a,b) => collate.compare(a.title,b.title);
+const bookmarkText = id => saved.has(id) ? "Saved" : "Save game";
+const savedClass = id => saved.has(id) ? " active-save" : "";
+const feedback = (selector, msg) => {const tag=$(selector);if(tag) tag.textContent=msg;};
+const btn = (action, label, glyph, cls="secondary-btn") => '<button type="button" class="'+cls+'" data-action="'+action+'">'+(glyph?icon(glyph):"")+esc(label)+'</button>';
+
+class NetworkError extends Error {
+  constructor(status, message) {super(message);this.status=status;}
+}
+async function api(path, body) {
+  const headers = {}, options = {headers, credentials:"omit", referrerPolicy:"no-referrer", signal:AbortSignal.timeout(14000)};
+  if(body !== undefined){options.method="POST";headers["Content-Type"]="application/json";options.body=JSON.stringify(body);}
+  if(ticket && (/^\/v1\/(?:launch|play)\//).test(path)) headers.Authorization="Bearer "+ticket;
+  let res;
+  try {res=await fetch(API+path,options);} catch {throw new NetworkError(0,"Couldn’t reach the arcade service. Check your connection and try again.");}
+  let data;
+  try {data=await res.json();} catch {throw new NetworkError(res.status,"The arcade service couldn’t complete this request.");}
+  if(!res.ok) throw new NetworkError(res.status,data.error || "Please try again later.");
+  return data;
+}
+function toast(msg){clearTimeout(toastTimer);$("#toast").textContent=msg;toastTimer=setTimeout(()=>{$("#toast").textContent="";},2400);}
+function readRoute(){
+  const [path,query=""] = location.hash.slice(1).replace(/^\//,"").split("?");
+  const [slug="library",id=""] = path.split("/");
+  const page=slug || "library";
+  return {page,id,params:new URLSearchParams(query)};
+}
+function setNav(){
+  document.querySelectorAll(".primary-nav a").forEach(a=>{
+    if(a.dataset.page===current.page || (a.dataset.page==="library" && current.page==="search")) a.setAttribute("aria-current","page");
+    else a.removeAttribute("aria-current");
+  });
+}
+function specBadge(key){
+  return '<span class="load load-'+key+'" title="'+esc(levelTips[key])+'"><span class="meter" aria-hidden="true"><i></i><i></i><i></i></span>'+levels[key]+'<span class="sr-only"> hardware demand estimate</span></span>';
+}
+function bookmark(id,compact=false,hero=false){
+  const active=saved.has(id), name=byId.get(id)?.title || "game";
+  return '<button type="button" data-save="'+esc(id)+'" aria-pressed="'+active+'" title="'+(active?"Remove from saved":"Save game")+'" aria-label="'+esc((active?"Remove ":"Save ")+name+(active?" from saved":""))+'" class="'+(compact?"save-mini":hero?"ghost-btn":"secondary-btn")+savedClass(id)+'">'+icon("bookmark")+(compact?"":"<span>"+bookmarkText(id)+"</span>")+'</button>';
+}
+function card(g, {rank=0,count=0}={}) {
+  const fact=rank && chartState==="live" ? g.genre+" · "+count.toLocaleString()+" "+(count===1?"launch":"launches") : g.genre;
+  return '<article class="card"><a href="#/game/'+g.id+'"><div class="cover"><img src="'+relativeAsset(g.id)+'" alt="" width="480" height="270" loading="lazy" decoding="async">'+specBadge(g.load)+(rank?'<span class="rank">#'+rank+'</span>':"")+'</div><div class="card-copy"><h3>'+esc(g.title)+'</h3><p>'+esc(fact)+'</p></div></a>'+bookmark(g.id,true)+'</article>';
+}
+const grid = (rows) => '<div class="grid">'+rows.map(g=>card(g)).join("")+'</div>';
+const titleBar = (tag,title,count,aside="") => '<div class="shelf-head"><div class="shelf-title"><'+tag+'>'+esc(title)+'</'+tag+'><span class="count" aria-label="'+count+' games">'+count+'</span></div>'+aside+'</div>';
+function filters(){
+  const quick=["","Action","Adventure","Horror","RPG","Simulation"];
+  const all=[...new Set(games.map(g=>g.genre))].sort(collate.compare);
+  const select = (id, label, options) => '<span class="selectbox"><select class="filter-select" id="'+id+'" aria-label="'+label+'">'+options+'</select>'+icon("chevron")+'</span>';
+  return '<div class="filters" aria-label="Game filters">'+quick.map(g=>'<button class="chip" data-genre="'+g+'" aria-pressed="'+(g===genre)+'">'+(g || "All genres")+'</button>').join("")+
+    select("more-genres","More genres",'<option value="" '+(quick.includes(genre)?"selected":"")+'>More genres</option>'+all.filter(g=>!quick.includes(g)).map(g=>'<option '+(g===genre?"selected ":"")+'value="'+esc(g)+'">'+esc(g)+'</option>').join(""))+
+    '<span class="spec-control">'+select("demand","Chromebook hardware demand",'<option value="">Any spec</option>'+Object.keys(levels).map(k=>'<option '+(level===k?"selected ":"")+'value="'+k+'">'+levels[k]+' spec</option>').join(""))+
+    '<button class="spec-help" data-action="specs" title="What do the spec labels mean?" aria-label="Explain spec estimates">'+icon("info")+'</button></span></div>';
+}
+function hero(){
+  return '<section class="hero" aria-labelledby="feature-title"><img class="hero-bg" src="./assets/minecraft-story-mode-hero.webp" width="1440" height="810" alt="" fetchpriority="high"><div class="hero-body"><div class="eyebrow feature-tag">'+icon("star")+'Featured game</div><h1 id="feature-title"><img class="hero-logo" src="./assets/minecraft-story-mode-logo.webp" alt="Minecraft: Story Mode"></h1><p>Join Jesse and Reuben on a quest to find the Order of the Stone. You choose how the story unfolds.</p><div class="actions"><a class="btn" href="#/game/'+featureId+'?start=1">'+icon("play")+'Play game</a>'+bookmark(featureId,false,true)+'</div></div><span class="hero-meta">'+icon("gamepad")+'Story adventure</span></section>';
+}
+function invite(){
+  return inviteHidden?"":'<aside class="tour-invite">'+icon("gamepad")+'<strong>First time in the vault?</strong><button class="tour-open" data-action="tour">Take the quick tour</button><button class="tour-skip" data-action="skip-tour">Skip</button></aside>';
+}
+function currentRanks(){
+  const fixed=podium.map(id=>byId.get(id)).filter(Boolean);
+  return [...fixed,...games.filter(g=>!podium.includes(g.id)).sort((a,b)=>(rankedCounts[b.id]||0)-(rankedCounts[a.id]||0)||alphabetical(a,b))];
+}
+function chartStatus(){
+  if(chartState==="live") return '<span class="live-state"><i aria-hidden="true"></i>Live</span>';
+  return '<span class="quiet-state">'+(chartState==="loading"?"Updating":"Arcade picks")+'</span>';
+}
+function chartPanel(){
+  const ranks=currentRanks().slice(0,3);
+  return '<aside class="chart-panel" id="home-chart" aria-label="Top games"><div class="chart-title"><h2>'+icon("trophy")+'Top games</h2>'+chartStatus()+'</div><ol class="mini-chart">'+ranks.map((g,i)=>{
+    const plays=Number(rankedCounts[g.id])||0;
+    return '<li><a href="#/game/'+g.id+'"><span class="position">'+String(i+1).padStart(2,"0")+'</span><img src="'+relativeAsset(g.id)+'" alt="" width="96" height="62" decoding="async"><span class="chart-copy"><strong>'+esc(g.title)+'</strong><small>'+esc(g.genre)+(chartState==="live"?' · '+plays.toLocaleString()+' '+(plays===1?'launch':'launches'):'')+'</small></span></a></li>';
+  }).join("")+'</ol><a class="chart-all" href="#/top">'+icon("grid")+'Full rankings</a></aside>';
+}
+function renderLibrary(){
+  const searching=current.page==="search";
+  const full=searching && q?games.filter(g=>matches(g,q)):games;
+  const rows=full.filter(g=>(!genre || g.genre===genre)&&(!level || g.load===level));
+  const label=searching && q ? "Search results" : "All games";
+  const aside='<div class="shelf-aside">'+(searching?"":invite())+'<span class="sort-label">A–Z</span></div>';
+  let html=searching?"":'<div class="spotlight">'+hero()+chartPanel()+'</div>';
+  html+=titleBar(searching?"h1":"h2",label,rows.length,aside)+filters();
+  if(rows.length) html+=grid(rows);
+  else if(full.length || !q) html+='<div class="empty">'+icon("filter")+'<h2>No games with those filters</h2><p>Try another genre or a different spec level.</p>'+btn("reset-filters","Clear filters","filter")+'</div>';
+  else {
+    const sent=receivedQueries.has(normalize(q));
+    html+='<div class="empty">'+icon("search")+'<h2>'+ (sent?"Request received":"No games found") +'</h2><p>'+(sent?"Aw shucks! We don’t seem to have that game yet, however we saw your search, and will attempt to add it soon!":"There’s no match for “"+esc(q)+"”. Submit this title to send it to the arcade’s game requests on Discord.")+'</p>'+
+    (sent?"":'<button class="btn" data-action="request" '+(sendingSearch===normalize(q)?"disabled":"")+'>'+ (sendingSearch===normalize(q)?"Sending…":"Request this game")+'</button>')+'<p class="feedback" role="status" id="request-feedback">'+esc(searchMessage)+'</p></div>';
+  }
+  main.innerHTML=html;
+}
+function renderSaved() {
+  const rows=games.filter(g=>saved.has(g.id));
+  main.innerHTML='<section class="section-page">'+titleBar("h1","Saved games",rows.length)+(rows.length?grid(rows):'<div class="empty">'+icon("bookmark")+'<h2>Your saved shelf is empty</h2><p>Use the bookmark on a game to keep it here on this device.</p><a class="btn" href="#/library">Browse games</a></div>')+'</section>';
+}
+function drawTop(){
+  const ranks=currentRanks();
+  main.innerHTML='<section class="section-page"><div class="shelf-head"><div><h1>Top games</h1><p class="subcopy">The arcade’s three pinned picks lead the chart. Every other spot is ranked by launches.</p></div>'+chartStatus()+'</div>'+
+    (chartState==="offline"?'<p class="hint">Live counts are unavailable. The chart will retry automatically.</p>':"")+
+    '<div class="grid">'+ranks.map((g,i)=>card(g,{rank:i+1,count:Number(rankedCounts[g.id])||0})).join("")+'</div></section>';
+}
+function refreshChart(force=false){
+  if(document.hidden || !["library","top"].includes(current.page) || (topCache && !force && Date.now()-topCache.time<25000)) return;
+  if(chartRequest)return chartRequest;
+  const previousState=chartState,previousCounts=JSON.stringify(rankedCounts);
+  chartRequest=api("/v1/top").then(({plays})=>{
+    if(!plays || typeof plays!=="object")throw Error("Chart unavailable");
+    rankedCounts=plays;topCache={time:Date.now()};chartState="live";
+  }).catch(()=>{chartState="offline";}).finally(()=>{
+    chartRequest=null;
+    if(previousState===chartState && previousCounts===JSON.stringify(rankedCounts))return;
+    if(current.page==="top")drawTop();
+    if(current.page==="library" && $("#home-chart"))$("#home-chart").outerHTML=chartPanel();
+  });
+  return chartRequest;
+}
+function scheduleChart(){
+  clearInterval(chartTimer);
+  if(document.hidden || !["library","top"].includes(current.page))return;
+  refreshChart();chartTimer=setInterval(()=>refreshChart(true),45000);
+}
+function redrawSavedButtons(id){
+  if(current.page==="saved"){renderSaved();return;}
+  document.querySelectorAll('[data-save="'+id+'"]').forEach(el=>{
+    el.outerHTML=bookmark(id,el.classList.contains("save-mini"),el.classList.contains("ghost-btn"));
+  });
+}
+function rememberGame(id){
+  if(!byId.has(id))return;
+  if(saved.has(id))saved.delete(id);else saved.add(id);
+  saveValue("saved",JSON.stringify([...saved]));redrawSavedButtons(id);
+  toast(saved.has(id)?"Added to saved games":"Removed from saved games");
+}
+function rememberTour(){inviteHidden=true;saveValue("tour","seen");$(".tour-invite")?.remove();}
+function displayDialog(html){
+  $("#guide-body").innerHTML=html;
+  if(!guide.open)guide.showModal();
+}
+function guidePage(){
+  const steps=[
+    ["Find your game","Search by title or nickname. Filter by genre or Chromebook spec to narrow the vault."],
+    ["Pick a good fit","Low aims for 60 FPS. Medium aims for 30. High-demand ports may struggle on a Chromebook. These are estimates."],
+    ["Keep your favorites","Bookmark a game to save it here. Top games ranks community launches, and the player has a fullscreen control."],
+    ["What’s your favorite game?","Search the vault for a favorite, or browse our arcade picks. Missing games can be requested from the results."]
+  ];
+  const [title,body]=steps[tourStep];
+  displayDialog('<div class="guide-steps" aria-label="Step '+(tourStep+1)+' of 4">'+steps.map((_,i)=>'<i class="'+(i<=tourStep?"on":"")+'"></i>').join("")+'</div><h2 id="guide-title">'+title+'</h2><p>'+body+'</p>'+
+    (tourStep===3?'<form class="guide-search" id="guide-search"><input aria-label="Favorite game title" placeholder="Favorite game" maxlength="80"><button class="btn">Search</button></form>':"")+
+    '<div class="actions"><button class="tour-skip" data-action="close-guide">'+(tourStep===3?"Done":"Skip tour")+'</button>'+btn(tourStep===3?"see-top":"next-guide",tourStep===3?"View top games":"Next",null,"btn")+'</div>');
+}
+function showSpecs(){
+  displayDialog('<h2 id="guide-title">Chromebook spec guide</h2><dl class="spec-list">'+Object.keys(levels).map(k=>'<dt>'+specBadge(k)+'</dt><dd>'+levelTips[k]+'</dd>').join("")+'</dl><p>Estimates depend on your device, the scene, and the game’s graphics settings.</p>'+btn("close-guide","Got it",null,"btn"));
+}
+function reportUrl(){
+  const p=new URLSearchParams({from:current.page});
+  if(current.page==="game")p.set("game",current.id);
+  return "#/report?"+p;
+}
+function gameLayout(g){
+  main.innerHTML='<a class="back" href="#/library">'+icon("back")+'All games</a><h1 class="game-title">'+esc(g.title)+'</h1><div class="game-meta">'+specBadge(g.load)+'<span>'+esc(g.genre)+'</span></div>'+
+    '<div id="stage" class="stage centered"><div class="stage-art" style="background-image:url(\''+(g.id===featureId?"./assets/minecraft-story-mode-hero.webp":relativeAsset(g.id))+'\')"></div><div class="startbox" id="startbox"><p role="status">Preparing the player…</p></div><button type="button" class="icon-btn exit-stage" data-action="fullscreen" title="Leave fullscreen" aria-label="Leave fullscreen">'+icon("close")+'</button></div>'+
+    '<div class="play-tools">'+(g.mode==="embed"?btn("fullscreen","Fullscreen","expand"):"")+'<span id="open-host"></span>'+bookmark(g.id)+'<a class="secondary-btn report-link" href="'+reportUrl()+'">'+icon("bug")+'Report a bug</a></div><div id="key-area"></div>'+
+    '<div class="details"><section class="pane"><h2>About this game</h2><p>'+esc(g.description)+'</p><details><summary>Port details &amp; sources</summary><ul>'+g.sources.map((u,i)=>'<li><a target="_blank" rel="noopener noreferrer" href="'+esc(u)+'">'+esc(u.includes("github.com/")?u.replace("https://github.com/",""):new URL(u).hostname)+(g.sources.length>1?" · source "+(i+1):"")+'</a></li>').join("")+'</ul><div id="other-ports"></div></details></section>'+
+    '<section class="pane"><h2>Playing on a Chromebook</h2><p>'+esc(g.notes)+'</p><button class="text-link" data-action="specs">See the spec guide</button></section></div>';
+}
+function safeGameUrl(value) {
+  const u=new URL(value,location.href);
+  if(u.protocol!=="https:" && u.origin!==location.origin)throw Error("Invalid game link.");
+  return u.href;
+}
+async function prepareGame(g, token, autoStart=false){
+  try{
+    const launch=await api("/v1/launch/"+g.id,{});
+    if(token!==navigation)return;
+    const url=safeGameUrl(launch.url);
+    const playerUrl=g.id==="simpsons-hit-and-run"?new URL("./imports/hit-and-run/index.html",document.baseURI).href:url;
+    currentLaunch={id:g.id,url:playerUrl};
+    $("#key-area").replaceChildren();
+    const external='<a class="secondary-btn" href="'+esc(url)+'" target="_blank" rel="noopener noreferrer" data-standalone="'+g.id+'">'+icon("external")+'Open in new tab</a>';
+    if(g.mode==="embed"){
+      $("#startbox").innerHTML=btn("start-game","Play game","play","btn");
+      $("#open-host").innerHTML=external;
+      if(autoStart) startGame(g);
+    } else {
+      $("#startbox").innerHTML='<a class="btn" target="_blank" rel="noopener noreferrer" data-standalone="'+g.id+'" href="'+esc(url)+'">'+icon("external")+'Open game</a><p>This port plays in its own tab. Use its fullscreen control if available.</p>';
+    }
+    if(launch.alternates?.length) $("#other-ports").innerHTML=launch.alternates.map(a=>'<a class="text-link" href="'+esc(safeGameUrl(a.url))+'" rel="noopener noreferrer" target="_blank">'+esc(a.label)+'</a>').join(" · ");
+  }catch(error){
+    if(token!==navigation)return;
+    if(error.status===401){
+      ticket="";saveValue("session","",true);
+      $("#startbox").innerHTML='<p>Enter your arcade key below to launch.</p>';
+      $("#key-area").innerHTML='<form class="keybox" id="redeem"><label for="access-key">Arcade access key</label><input id="access-key" type="password" autocomplete="off" maxlength="128" required><div class="actions"><button class="btn">Unlock player</button></div><p class="feedback" role="status" id="key-result"></p></form>';
+    }else{
+      $("#startbox").innerHTML='<p>'+esc(error.message)+'</p>'+btn("retry-game","Try again","play","btn");
+    }
+  }
+}
+function recordPlay(id){
+  topCache=null;
+  api("/v1/play/"+id,{}).then(()=>refreshChart(true)).catch(()=>{ /* A rankings outage must not interrupt the player. */ });
+}
+function startGame(g){
+  const stage=$("#stage");
+  if(!currentLaunch || currentLaunch.id!==g.id || stage?.querySelector("iframe") || g.mode!=="embed")return;
+  const frame=document.createElement("iframe");
+  frame.title=g.title+" game player";
+  frame.allow="fullscreen; autoplay; gamepad; encrypted-media";
+  // Same-origin imports run in an opaque frame. Third-party ports may use their own storage.
+  const local=new URL(currentLaunch.url).origin===location.origin;
+  frame.setAttribute("sandbox","allow-scripts allow-pointer-lock allow-presentation allow-downloads allow-forms"+(local?"":" allow-same-origin"));
+  frame.setAttribute("allowfullscreen","");
+  frame.referrerPolicy="no-referrer";
+  frame.src=currentLaunch.url;
+  $("#startbox").hidden=true;stage.classList.remove("centered");
+  stage.prepend(frame);
+  frame.focus();
+  recordPlay(g.id);
+}
+function setExpanded(stage,flag){
+  stage.classList.toggle("expanded",flag);
+  document.body.classList.toggle("player-expanded",flag);
+  if(!flag) $('[data-action="fullscreen"]:not(.exit-stage)')?.focus();
+}
+async function fullScreen(){
+  const stage=$("#stage");if(!stage)return;
+  if(document.fullscreenElement){await document.exitFullscreen().catch(()=>{});return;}
+  if(stage.classList.contains("expanded")){setExpanded(stage,false);return;}
+  if(stage.requestFullscreen){
+    try{await stage.requestFullscreen();return;}catch{ /* Use an in-page player on browsers without element fullscreen. */ }
+  }
+  setExpanded(stage,true);stage.querySelector(".exit-stage").focus();
+}
+function renderReport(){
+  const selected=byId.get(current.params.get("game")), page=current.params.get("from") || "report";
+  const from=["game","library","saved","top"].includes(page)?page:"report";
+  const option=(value,label,choose=false)=>'<option '+(choose?"selected ":"")+'value="'+esc(value)+'">'+esc(label)+'</option>';
+  main.innerHTML='<section class="narrow section-page"><a class="back" href="'+(selected?"#/game/"+selected.id:"#/library")+'">'+icon("back")+(selected?esc(selected.title):"All games")+'</a><h1 class="panel-title">Report a bug</h1><p class="subcopy">Tell the arcade team what happened and how to reproduce it.</p><form class="form" id="report-form" data-from="'+from+'"><div class="row"><div class="field"><label for="report-game">Game or page</label><span class="selectbox"><select id="report-game">'+option("","Arcade website")+games.map(g=>option(g.id,g.title,g===selected)).join("")+'</select>'+icon("chevron")+'</span></div><div class="field"><label for="kind">Issue type</label><span class="selectbox"><select id="kind">'+Object.entries(categories).map(([k,v])=>option(k,v)).join("")+'</select>'+icon("chevron")+'</span></div></div><div class="field"><label for="detail">What happened?</label><textarea id="detail" placeholder="What did you click, what did you expect, and what happened instead?" minlength="10" maxlength="1000" required></textarea></div><div class="field"><label class="check"><input id="share-device" type="checkbox" checked> Include my browser and operating system</label><p class="hint">This sends your report, game, and arcade page to the team’s Discord.</p></div><button class="btn" type="submit">'+icon("bug")+'Send report</button><p id="report-result" class="feedback" role="status" aria-live="polite">'+esc(currentReport)+'</p></form></section>';
+}
+function deviceLabel(){
+  const ua=navigator.userAgent, os=/CrOS/.test(ua)?"ChromeOS":/Android/.test(ua)?"Android":/iPad|iPhone|iPod/.test(ua) || (/Macintosh/.test(ua)&&navigator.maxTouchPoints>1)?"iOS":/Windows/.test(ua)?"Windows":/Mac/.test(ua)?"macOS":/Linux/.test(ua)?"Linux":"Other";
+  const engine=[["Edge",/Edg(?:A|iOS)?\/(\d+)/],["Firefox",/(?:Firefox|FxiOS)\/(\d+)/],["Chrome",/(?:Chrome|CriOS)\/(\d+)/],["Safari",/Version\/(\d+).*Safari/]].map(([name,re])=>[name,ua.match(re)?.[1]]).find(([,version])=>version);
+  return os+" · "+(engine?engine.join(" "):"Other");
+}
+async function submitReport(form){
+  if(!form.reportValidity()) return;
+  const token=navigation, button=form.querySelector("button[type=submit]");
+  if(button.disabled)return;
+  const body={game:$("#report-game").value,page:form.dataset.from,kind:$("#kind").value,detail:$("#detail").value,device:$("#share-device").checked?deviceLabel():""};
+  button.disabled=true;feedback("#report-result","Sending your report…");
+  try{
+    await api("/v1/reports",body);if(navigation!==token)return;
+    form.innerHTML='<h2>Report received</h2><p>The arcade team has your report and a suggested first check for this issue.</p><a class="btn" href="'+(body.game?"#/game/"+body.game:"#/library")+'">Back to '+(body.game?"game":"all games")+'</a>';
+  }catch(e){if(navigation===token){feedback("#report-result",e.message);button.disabled=false;}}
+}
+async function showCredits(token){
+  main.innerHTML='<section class="narrow section-page"><a class="back" href="#/library">'+icon("back")+'All games</a><h1 class="panel-title">Credits</h1><p class="subcopy">Game art belongs to the artists and publishers listed below. Each game page links to its port.</p><div id="credits-list" class="pane">Loading credits…</div></section>';
+  try {
+    const data=await readJson("./credits.json");if(token!==navigation)return;
+    $("#credits-list").innerHTML='<ul class="credits-list">'+data.map(x=>'<li><a href="'+esc(x.source)+'" target="_blank" rel="noopener noreferrer">'+esc(x.title)+'</a> · '+esc(x.credit)+'</li>').join("")+'</ul><p class="hint">Interface typefaces: <a class="text-link" href="./assets/fonts/dm-sans-OFL.txt">DM Sans</a> and <a class="text-link" href="./assets/fonts/barlow-condensed-OFL.txt">Barlow Condensed</a>.</p>';
+  }catch{if(token===navigation)feedback("#credits-list","Couldn’t load the credits. Refresh to try again.");}
+}
+function route({scroll=true}={}){
+  const token=++navigation;current=readRoute();currentLaunch=null;currentReport="";
+  document.body.classList.remove("player-expanded");
+  const isSearch=current.page==="search";
+  q=isSearch?(current.params.get("q") || "").slice(0,80):"";search.value=q;
+  searchMessage="";
+  setNav();$("#theme-panel").hidden=true;$("#theme-button").setAttribute("aria-expanded","false");
+  if(guide.open)guide.close();
+  const game=current.page==="game" && byId.get(current.id);
+  const titles={library:"Game vault",top:"Top games",saved:"Saved games",report:"Report a bug",credits:"Credits",search:"Search"};
+  document.title=(game?.title || titles[current.page] || "Page not found")+" · Unlocked";
+  if(current.page==="library" || isSearch)renderLibrary();
+  else if(current.page==="saved")renderSaved();
+  else if(current.page==="top")drawTop();
+  else if(game){gameLayout(game);prepareGame(game,token,current.params.get("start")==="1");}
+  else if(current.page==="report")renderReport();
+  else if(current.page==="credits")showCredits(token);
+  else main.innerHTML='<div class="empty"><h1>Page not found</h1><a class="btn" href="#/library">Browse games</a></div>';
+  scheduleChart();
+  if(scroll){window.scrollTo(0,0);main.focus({preventScroll:true});}
+}
+function searchView(value){
+  const raw=value.slice(0,80), next=raw.trim();searchMessage="";
+  if(next===q && current.page==="search")return;
+  const hash=next?"#/search?"+new URLSearchParams({q:next}):"#/library";
+  if(current.page!=="search") {genre="";level="";lastSearchKey="";}
+  if(current.page==="search")history.replaceState(null,"",hash);
+  else if(location.hash!==hash)history.pushState(null,"",hash);
+  route({scroll:false});search.value=raw;
+}
+async function requestMissing(){
+  const term=search.value.trim(),key=normalize(term);
+  if(!term)return;
+  if(current.page!=="search" || q!==term)searchView(term);
+  if(games.some(g=>matches(g,term))) {if(genre||level){genre="";level="";renderLibrary();}return;}
+  if(!key){searchMessage="Enter a game title with at least two letters or numbers.";renderLibrary();return;}
+  if(receivedQueries.has(key) || sendingSearch===key)return;
+  lastSearchKey=key;sendingSearch=key;searchMessage="";renderLibrary();
+  try{
+    const result=await api("/v1/requests",{query:term});
+    if(result.status==="received")receivedQueries.add(key);
+    else if(lastSearchKey===key)searchMessage="That title is already in the vault. Refresh to see the latest catalog.";
+  }catch(e){if(lastSearchKey===key)searchMessage=e.message;}
+  finally{if(sendingSearch===key)sendingSearch="";if(current.page==="search" && normalize(q)===key)renderLibrary();}
+}
+function updateTheme(value){
+  if(value==="system")delete document.documentElement.dataset.theme;
+  else document.documentElement.dataset.theme=value;
+  const symbol={system:"monitor",dark:"moon",light:"sun"}[value];
+  $("#theme").value=value;$("#theme-button").innerHTML=icon(symbol);
+  $("#theme-button").title="Appearance: "+value;$("#theme-button").setAttribute("aria-label","Change theme. Current setting: "+value);
+}
+function setup(){
+  document.querySelectorAll("[data-icon]").forEach(el=>el.innerHTML=icon(el.dataset.icon));
+  updateTheme(document.documentElement.dataset.theme || "system");
+  $("#theme-button").addEventListener("click",()=>{const panel=$("#theme-panel");panel.hidden=!panel.hidden;$("#theme-button").setAttribute("aria-expanded",String(!panel.hidden));if(!panel.hidden)$("#theme").focus();});
+  $("#theme").addEventListener("change",e=>{saveValue("theme",e.target.value);updateTheme(e.target.value);$("#theme-panel").hidden=true;$("#theme-button").setAttribute("aria-expanded","false");$("#theme-button").focus();});
+  search.addEventListener("input",()=>{if(games.length)searchView(search.value);});
+  $("#search-form").addEventListener("submit",e=>{e.preventDefault();if(games.length)requestMissing();});
+  window.addEventListener("hashchange",()=>route());
+  document.addEventListener("visibilitychange",scheduleChart);
+  document.querySelector(".skip").addEventListener("click",e=>{e.preventDefault();main.focus();});
+  document.addEventListener("keydown",e=>{
+    if(e.key==="/" && !guide.open && !["INPUT","TEXTAREA","SELECT","IFRAME"].includes(document.activeElement?.tagName)){e.preventDefault();search.focus();}
+    if(e.key==="Escape"){const stage=$("#stage");if(stage?.classList.contains("expanded"))setExpanded(stage,false);$("#theme-panel").hidden=true;$("#theme-button").setAttribute("aria-expanded","false");}
+  });
+  document.addEventListener("click",e=>{
+    if(!e.target.closest(".preferences")){$("#theme-panel").hidden=true;$("#theme-button").setAttribute("aria-expanded","false");}
+    const save=e.target.closest("[data-save]");if(save){rememberGame(save.dataset.save);return;}
+    const filter=e.target.closest("[data-genre]");if(filter){genre=filter.dataset.genre;renderLibrary();document.querySelector('[data-genre="'+genre+'"]')?.focus({preventScroll:true});return;}
+    const standalone=e.target.closest("[data-standalone]");if(standalone)recordPlay(standalone.dataset.standalone);
+    const link=e.target.closest("a[data-page],a.brand");
+    if(link && link.getAttribute("href")==="#/library"){genre="";level="";if(current.page==="library")renderLibrary();}
+    const footerBug=e.target.closest('.footer a[href="#/report"]');if(footerBug && current.page!=="report"){e.preventDefault();location.hash=reportUrl();}
+    const action=e.target.closest("[data-action]")?.dataset.action;
+    switch(action){
+      case "tour":tourStep=0;rememberTour();guidePage();break;
+      case "skip-tour":rememberTour();break;
+      case "next-guide":tourStep=Math.min(3,tourStep+1);guidePage();break;
+      case "close-guide":guide.close();break;
+      case "see-top":guide.close();location.hash="#/top";break;
+      case "specs":showSpecs();break;
+      case "reset-filters":genre="";level="";renderLibrary();break;
+      case "request":requestMissing();break;
+      case "start-game":startGame(byId.get(current.id));break;
+      case "retry-game":gameLayout(byId.get(current.id));prepareGame(byId.get(current.id),navigation);break;
+      case "fullscreen":fullScreen();break;
+    }
+  });
+  document.addEventListener("change",e=>{
+    if(e.target.id==="more-genres"){genre=e.target.value;renderLibrary();$("#more-genres").focus({preventScroll:true});}
+    if(e.target.id==="demand"){level=e.target.value;renderLibrary();$("#demand").focus({preventScroll:true});}
+  });
+  document.addEventListener("submit",async e=>{
+    const form=e.target;
+    if(form.id==="guide-search"){e.preventDefault();const str=form.querySelector("input").value.trim();if(str){guide.close();searchView(str);search.focus();}return;}
+    if(form.id==="report-form"){e.preventDefault();submitReport(form);return;}
+    if(form.id==="redeem"){e.preventDefault();const token=navigation;try{const result=await api("/v1/redeem",{key:$("#access-key").value});if(token!==navigation)return;ticket=result.token || "";saveValue("session",ticket,true);await prepareGame(byId.get(current.id),token);}catch(error){if(token===navigation)feedback("#key-result",error.message);}}
+  });
+}
+async function readJson(path){
+  const res=await fetch(path,{credentials:"omit"});if(!res.ok)throw Error("File unavailable");
+  return res.json();
+}
+setup();
+try {games=(await readJson("./games.json")).sort(alphabetical);byId=new Map(games.map(g=>[g.id,g]));route({scroll:false});}
+catch {main.innerHTML='<div class="empty"><h1>Couldn’t open the vault</h1><p>Reload this page to fetch the game catalog.</p><a class="btn" href="./">Reload</a></div>';}

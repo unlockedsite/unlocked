@@ -1,0 +1,113 @@
+{
+  "among-us": {
+    "url": "https://wasm.rip/files/amongus/latest/"
+  },
+  "beatblock": {
+    "url": "https://somerandomfella.github.io/portsandrips/blockblast-port/game.html",
+    "alternates": [
+      {
+        "label": "Alternate port",
+        "url": "https://wasm.rip/files/beatblock/index.html"
+      }
+    ]
+  },
+  "bendy": {
+    "url": "https://gn-math.dev/games.html?id=215"
+  },
+  "buckshot-roulette": {
+    "url": "https://gn-math.dev/games.html?id=205"
+  },
+  "black-ops-zombies": {
+    "url": "https://vel.gg/bsz"
+  },
+  "deltatraveler": {
+    "url": "https://gn-math.dev/games.html?id=560"
+  },
+  "ddlc": {
+    "url": "https://emeraldgreenr.github.io/"
+  },
+  "doom": {
+    "url": "https://raz0red.github.io/webprboom/"
+  },
+  "duke-nukem-3d": {
+    "url": "https://midzer.de/wasm/duke3d/"
+  },
+  "fallout": {
+    "url": "https://midzer.de/wasm/fallout/"
+  },
+  "fallout-2": {
+    "url": "https://termit.dev/f2ce/"
+  },
+  "fears-to-fathom": {
+    "url": "https://gn-math.dev/games.html?id=460"
+  },
+  "feed-and-grow-fish": {
+    "url": "https://gn-math.dev/games.html?id=881"
+  },
+  "fnaf-1": {
+    "url": "https://irv77.github.io/hd_fnaf/1/"
+  },
+  "fnaf-2": {
+    "url": "https://irv77.github.io/hd_fnaf/2/"
+  },
+  "fnaf-3": {
+    "url": "https://irv77.github.io/hd_fnaf/3/"
+  },
+  "fnaf-4": {
+    "url": "https://irv77.github.io/hd_fnaf/4/"
+  },
+  "fnaf-ps": {
+    "url": "https://irv77.github.io/hd_fnaf/ps/"
+  },
+  "gang-beasts": {
+    "url": "https://teaserlua.github.io/GangBeast-WebPort/"
+  },
+  "geometry-dash": {
+    "url": "https://gd-webport.pages.dev/"
+  },
+  "getting-over-it": {
+    "url": "https://gn-math.dev/games.html?id=557"
+  },
+  "gorilla-tag": {
+    "url": "https://gtagwebstorage.boolonx.com/index.html"
+  },
+  "granny": {
+    "url": "https://gn-math.dev/games.html?id=90"
+  },
+  "granny-3": {
+    "url": "https://wasm.rip/files/granny/granny3.html"
+  },
+  "granny-2": {
+    "url": "https://gn-math.dev/games.html?id=125"
+  },
+  "happy-wheels": {
+    "url": "https://totaljerkface.com/happy_wheels.tjf"
+  },
+  "minecraft-story-mode": {
+    "url": "https://mcsm-web.pages.dev/"
+  },
+  "people-playground": {
+    "url": "https://gn-math.dev/games.html?id=194"
+  },
+  "repo": {
+    "url": "https://gn-math.dev/games.html?id=195"
+  },
+  "raft": {
+    "url": "https://gn-math.dev/games.html?id=457"
+  },
+  "skate-3": {
+    "url": "https://skate.aaddpp.lol/"
+  },
+  "simpsons-hit-and-run": {
+    "url": "https://vheissu.github.io/hit-and-run-web/"
+  },
+  "undertale": {
+    "url": "https://goshdakirby.github.io/UTWeb/"
+  },
+  "whos-your-daddy": {
+    "url": "https://reeyuki.github.io/daddygame/"
+  },
+  "yandere-simulator": {
+    "url": "https://gn-math.dev/games.html?id=554"
+  }
+}
