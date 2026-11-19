@@ -508,22 +508,6 @@
     "notes": "Retrieve fragile valuables in this physics-based horror game. Browser features can differ from the desktop release."
   },
   {
-    "id": "raft",
-    "title": "Raft",
-    "genre": "Survival",
-    "load": "medium",
-    "mode": "embed",
-    "sources": [
-      "https://github.com/genizy/web-port/tree/main/raft",
-      "https://github.com/gn-math/html/blob/main/457-fix2.html"
-    ],
-    "aliases": [
-      "raft survival"
-    ],
-    "description": "Haul flotsam aboard, craft supplies, and turn a tiny raft into a home.",
-    "notes": "Catch debris and expand your raft as it drifts across the sea."
-  },
-  {
     "id": "skate-3",
     "title": "Skate 3 (Fan Game)",
     "genre": "Sports",

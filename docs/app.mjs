@@ -1,5 +1,6 @@
 import { icon } from "./icons.mjs?v=2";
 import { matches, normalize } from "./search.mjs";
+import { chromeOS, createPlayer } from "./player.mjs?v=3";
 
 const API = "https://unlocked-arcade-service.persistingthoughts0.chatgpt.site";
 const $ = selector => document.querySelector(selector);
@@ -29,7 +30,7 @@ let current = {page:"library",id:"",params:new URLSearchParams()}, tourStep=0, t
 let ticket=dl("session","",true), inviteHidden=dl("tour","")==="seen";
 let currentLaunch=null, topCache=null, currentReport="", searchMessage="", sendingSearch="", lastSearchKey="";
 let rankedCounts={}, activeCounts={}, chartState="loading", chartRequest=null, chartTimer;
-let playSession=null, heartbeatTimer;
+let playSession=null, heartbeatTimer, player=null;
 const receivedQueries = new Set();
 const alphabetical = (a,b) => collate.compare(a.title,b.title);
 const bookmarkText = id => saved.has(id) ? "Saved" : "Save game";
@@ -148,7 +149,7 @@ function drawTop(){
     '<div class="grid">'+ranks.map((g,i)=>card(g,{rank:i+1,count:Number(rankedCounts[g.id])||0})).join("")+'</div></section>';
 }
 function refreshChart(force=false){
-  if(document.hidden || !["library","top","search","saved","game"].includes(current.page) || (topCache && !force && Date.now()-topCache.time<20000)) return;
+  if(document.hidden || player?.expanded() || !["library","top","search","saved","game"].includes(current.page) || (topCache && !force && Date.now()-topCache.time<20000)) return;
   if(chartRequest)return chartRequest;
   const previousState=chartState,previousCounts=JSON.stringify(rankedCounts);
   chartRequest=api("/v1/top").then(({plays,active})=>{
@@ -165,7 +166,7 @@ function refreshChart(force=false){
 }
 function scheduleChart(){
   clearInterval(chartTimer);
-  if(document.hidden || !["library","top","search","saved","game"].includes(current.page))return;
+  if(document.hidden || player?.expanded() || !["library","top","search","saved","game"].includes(current.page))return;
   refreshChart();chartTimer=setInterval(()=>refreshChart(true),30000);
 }
 function redrawSavedButtons(id){
@@ -206,11 +207,17 @@ function reportUrl(){
   return "#/report?"+p;
 }
 function gameLayout(g){
+  const displayLabel=chromeOS?"Full tab":"Fullscreen";
+  const exitLabel=chromeOS?"Exit full tab":"Leave fullscreen";
   main.innerHTML='<a class="back" href="#/library">'+icon("back")+'All games</a><h1 class="game-title">'+esc(g.title)+'</h1><div class="game-meta">'+specBadge(g.load)+'<span>'+esc(g.genre)+'</span>'+(g.edition?'<span class="edition">'+esc(g.edition)+'</span>':'')+presence(g.id)+'</div>'+
-    '<div id="stage" class="stage centered"><div class="stage-art" style="background-image:url(\''+(g.id===featureId?"./assets/minecraft-story-mode-hero.webp":relativeAsset(g.id))+'\')"></div><div class="startbox" id="startbox"><p role="status">Preparing the player…</p></div><button type="button" class="icon-btn exit-stage" data-action="fullscreen" title="Leave fullscreen" aria-label="Leave fullscreen">'+icon("close")+'</button></div>'+
-    '<div class="play-tools">'+(g.mode==="embed"?btn("fullscreen","Fullscreen","expand"):"")+bookmark(g.id)+'<a class="secondary-btn report-link" href="'+reportUrl()+'">'+icon("bug")+'Report a bug</a></div><div id="key-area"></div>'+
+    '<div class="stage-slot"><div id="stage" class="stage centered"><div class="stage-art" style="background-image:url(\''+(g.id===featureId?"./assets/minecraft-story-mode-hero.webp":relativeAsset(g.id))+'\')"></div><div class="startbox" id="startbox"><p role="status">Preparing the player…</p></div><button type="button" class="icon-btn exit-stage" data-action="fullscreen" title="'+exitLabel+'" aria-label="'+exitLabel+'">'+icon("close")+'</button></div></div>'+
+    '<div class="play-tools">'+(g.mode==="embed"?btn("fullscreen",displayLabel,"expand"):"")+bookmark(g.id)+'<a class="secondary-btn report-link" href="'+reportUrl()+'">'+icon("bug")+'Report a bug</a></div><div id="key-area"></div>'+
     '<div class="details"><section class="pane"><h2>About this game</h2><p>'+esc(g.description)+'</p><details><summary>Port details &amp; sources</summary><ul>'+g.sources.map((u,i)=>'<li><a target="_blank" rel="noopener noreferrer" href="'+esc(u)+'">'+esc(u.includes("github.com/")?u.replace("https://github.com/",""):new URL(u).hostname)+(g.sources.length>1?" · source "+(i+1):"")+'</a></li>').join("")+'</ul><div id="other-ports"></div></details></section>'+
     '<section class="pane"><h2>Playing on a Chromebook</h2><p>'+esc(g.notes)+'</p><button class="text-link" data-action="specs">See the spec guide</button></section></div>';
+  if(g.mode==="embed"){
+    $(".play-tools [data-action=fullscreen]").disabled=true;
+    player=createPlayer($("#stage"),g.title,scheduleChart);
+  }
 }
 function safeGameUrl(value) {
   const u=new URL(value,location.href);
@@ -228,8 +235,11 @@ async function prepareGame(g, token, autoStart=false){
     const url=safeGameUrl(launch.url);
     const playerUrl=g.id==="simpsons-hit-and-run"?new URL("./imports/hit-and-run/index.html",document.baseURI).href:g.id==="happy-wheels"?new URL("./imports/happy-wheels/",document.baseURI).href:url;
     currentLaunch={id:g.id,url:playerUrl};
+    $(".play-tools [data-action=fullscreen]").disabled=false;
     $("#key-area").replaceChildren();
-    $("#startbox").innerHTML=btn("start-game",g.edition==="Classic demo"?"Play demo":"Play game","play","btn");
+    const resolutionOption=chromeOS && g.load==="high"
+      ? '<label class="resolution-option"><input id="limit-resolution" type="checkbox" checked> Limit player size to 1280 × 720</label>' : "";
+    $("#startbox").innerHTML=btn("start-game",g.edition==="Classic demo"?"Play demo":"Play game","play","btn")+resolutionOption;
     if(autoStart) startGame(g);
     if(launch.alternates?.length) $("#other-ports").innerHTML=launch.alternates.map(a=>'<a class="text-link" href="'+esc(safeGameUrl(a.url))+'" rel="noopener noreferrer" target="_blank">'+esc(a.label)+'</a>').join(" · ");
   }catch(error){
@@ -272,35 +282,8 @@ function recordPlay(id){
   }).catch(()=>{ /* Play continues if the count service is offline. */ });
 }
 function startGame(g){
-  const stage=$("#stage");
-  if(!currentLaunch || currentLaunch.id!==g.id || stage?.querySelector("iframe") || g.mode!=="embed")return;
-  const frame=document.createElement("iframe");
-  frame.title=g.title+" game player";
-  frame.allow="fullscreen; autoplay; gamepad; encrypted-media";
-  // Same-origin imports run in an opaque frame. Third-party ports may use their own storage.
-  const local=new URL(currentLaunch.url).origin===location.origin;
-  frame.setAttribute("sandbox","allow-scripts allow-pointer-lock allow-presentation allow-downloads allow-forms"+(local?"":" allow-same-origin"));
-  frame.setAttribute("allowfullscreen","");
-  frame.referrerPolicy="no-referrer";
-  frame.src=currentLaunch.url;
-  $("#startbox").hidden=true;stage.classList.remove("centered");
-  stage.prepend(frame);
-  frame.focus();
-  recordPlay(g.id);
-}
-function setExpanded(stage,flag){
-  stage.classList.toggle("expanded",flag);
-  document.body.classList.toggle("player-expanded",flag);
-  if(!flag) $('[data-action="fullscreen"]:not(.exit-stage)')?.focus();
-}
-async function fullScreen(){
-  const stage=$("#stage");if(!stage)return;
-  if(document.fullscreenElement){await document.exitFullscreen().catch(()=>{});return;}
-  if(stage.classList.contains("expanded")){setExpanded(stage,false);return;}
-  if(stage.requestFullscreen){
-    try{await stage.requestFullscreen();return;}catch{ /* Use an in-page player on browsers without element fullscreen. */ }
-  }
-  setExpanded(stage,true);stage.querySelector(".exit-stage").focus();
+  if(!player || !currentLaunch || currentLaunch.id!==g.id)return;
+  if(player.start(currentLaunch.url,$("#limit-resolution")?.checked)) recordPlay(g.id);
 }
 function renderReport(){
   const selected=byId.get(current.params.get("game")), page=current.params.get("from") || "report";
@@ -327,14 +310,14 @@ async function submitReport(form){
 async function showCredits(token){
   main.innerHTML='<section class="narrow section-page"><a class="back" href="#/library">'+icon("back")+'All games</a><h1 class="panel-title">Credits</h1><p class="subcopy">Game art belongs to the artists and publishers listed below. Each game page links to its port.</p><div id="credits-list" class="pane">Loading credits…</div></section>';
   try {
-    const data=await readJson("./credits.json?v=2");if(token!==navigation)return;
+    const data=await readJson("./credits.json?v=3");if(token!==navigation)return;
     $("#credits-list").innerHTML='<ul class="credits-list">'+data.map(x=>'<li><a href="'+esc(x.source)+'" target="_blank" rel="noopener noreferrer">'+esc(x.title)+'</a> · '+esc(x.credit)+(x.posterSource?' · <a href="'+esc(x.posterSource)+'" target="_blank" rel="noopener noreferrer">Poster art</a>':'')+'</li>').join("")+'</ul><p class="hint">Interface typefaces include <a class="text-link" href="./assets/fonts/dm-sans-OFL.txt">DM Sans</a> and <a class="text-link" href="./assets/fonts/barlow-condensed-OFL.txt">Barlow Condensed</a>.</p>';
   }catch{if(token===navigation)feedback("#credits-list","Couldn’t load the credits. Refresh to try again.");}
 }
 function route({scroll=true}={}){
   endPlay();
+  player?.dispose();player=null;
   const token=++navigation;current=readRoute();currentLaunch=null;currentReport="";
-  document.body.classList.remove("player-expanded");
   const isSearch=current.page==="search";
   q=isSearch?(current.params.get("q") || "").slice(0,80):"";search.value=q;
   searchMessage="";
@@ -398,7 +381,7 @@ function setup(){
   document.querySelector(".skip").addEventListener("click",e=>{e.preventDefault();main.focus();});
   document.addEventListener("keydown",e=>{
     if(e.key==="/" && !guide.open && !["INPUT","TEXTAREA","SELECT","IFRAME"].includes(document.activeElement?.tagName)){e.preventDefault();search.focus();}
-    if(e.key==="Escape"){const stage=$("#stage");if(stage?.classList.contains("expanded"))setExpanded(stage,false);$("#theme-panel").hidden=true;$("#theme-button").setAttribute("aria-expanded","false");}
+    if(e.key==="Escape"){$("#theme-panel").hidden=true;$("#theme-button").setAttribute("aria-expanded","false");}
   });
   document.addEventListener("click",e=>{
     if(!e.target.closest(".preferences")){$("#theme-panel").hidden=true;$("#theme-button").setAttribute("aria-expanded","false");}
@@ -418,8 +401,8 @@ function setup(){
       case "reset-filters":genre="";level="";renderLibrary();break;
       case "request":requestMissing();break;
       case "start-game":startGame(byId.get(current.id));break;
-      case "retry-game":gameLayout(byId.get(current.id));prepareGame(byId.get(current.id),navigation);break;
-      case "fullscreen":fullScreen();break;
+      case "retry-game":$("#startbox").innerHTML='<p role="status">Preparing the player…</p>';prepareGame(byId.get(current.id),navigation);break;
+      case "fullscreen":player?.toggle();break;
     }
   });
   document.addEventListener("change",e=>{
@@ -438,5 +421,5 @@ async function readJson(path){
   return res.json();
 }
 setup();
-try {games=(await readJson("./games.json?v=2")).sort(alphabetical);byId=new Map(games.map(g=>[g.id,g]));route({scroll:false});}
+try {games=(await readJson("./games.json?v=3")).sort(alphabetical);byId=new Map(games.map(g=>[g.id,g]));route({scroll:false});}
 catch {main.innerHTML='<div class="empty"><h1>Couldn’t open the vault</h1><p>Reload this page to fetch the game catalog.</p><a class="btn" href="./">Reload</a></div>';}
