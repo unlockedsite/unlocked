@@ -471,25 +471,6 @@
     "edition": "Classic demo"
   },
   {
-    "id": "minecraft-story-mode",
-    "title": "Minecraft: Story Mode",
-    "genre": "Adventure",
-    "load": "high",
-    "mode": "embed",
-    "sources": [
-      "https://mcsm-web.pages.dev/"
-    ],
-    "aliases": [
-      "Minecraft Story Mode",
-      "MCSM",
-      "Minecraft Storymode",
-      "Story Mode",
-      "Telltale Minecraft"
-    ],
-    "description": "Lead Jesse and friends through a block-built adventure where your choices shape the story.",
-    "notes": "Try the in-game Low (720p) or Minimum (540p) preset on a Chromebook. Opening the game site can enable multithreading on supported devices."
-  },
-  {
     "id": "people-playground",
     "title": "People Playground",
     "genre": "Simulation",

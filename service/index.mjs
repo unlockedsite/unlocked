@@ -143,13 +143,19 @@ async function sessionKey(value, env) {
 async function updatePresence(env, data) {
   const key = await sessionKey(data.session, env);
   if (!byId.has(data.game)) reject(400, "Unknown game.");
-  if (data.state === "left") {
-    await env.DB.prepare("DELETE FROM presence WHERE session=? AND game=?").bind(key, data.game).run();
-  } else if (data.state === "active") {
-    // Heartbeats can renew an existing launch but cannot manufacture a new player.
-    await env.DB.prepare("UPDATE presence SET seen=? WHERE session=? AND game=? AND seen < ?")
-      .bind(seconds(), key, data.game, seconds() - 10).run();
-  } else reject(400, "Unknown session state.");
+  if (!["left", "active", "paused"].includes(data.state)) reject(400, "Unknown session state.");
+  const now = seconds();
+  // The prefix keeps elapsed seconds separate from historical launch counts.
+  // D1 batches are atomic: simultaneous heartbeats cannot credit an interval twice.
+  const credit = env.DB.prepare(`INSERT INTO plays(game,count)
+    SELECT ?, ? - seen FROM presence WHERE session=? AND game=? AND seen BETWEEN ? AND ?
+    ON CONFLICT(game) DO UPDATE SET count=count+excluded.count`)
+    .bind("seconds:"+data.game, now, key, data.game, now-presenceWindow, now-1);
+  const update = data.state === "left"
+    ? env.DB.prepare("DELETE FROM presence WHERE session=? AND game=?").bind(key, data.game)
+    : env.DB.prepare("UPDATE presence SET seen=? WHERE session=? AND game=? AND abs(seen)<=?")
+      .bind(data.state === "paused" ? -now : now, key, data.game, now);
+  await env.DB.batch([credit, update]);
   return { ok: true };
 }
 
@@ -192,11 +198,11 @@ async function routes(request, env, ctx) {
   }
   if (path === "/v1/top" && request.method === "GET") {
     const [totals, online] = await env.DB.batch([
-      env.DB.prepare("SELECT game,count FROM plays ORDER BY count DESC,game ASC LIMIT 100"),
+      env.DB.prepare("SELECT substr(game,9) AS game,count FROM plays WHERE game LIKE 'seconds:%'"),
       env.DB.prepare("SELECT game,COUNT(*) AS count FROM presence WHERE seen>? GROUP BY game").bind(seconds()-presenceWindow)
     ]);
     const counts = rows => Object.fromEntries(rows.filter(row => byId.has(row.game)).map(row => [row.game, row.count]));
-    return { plays: counts(totals.results), active: counts(online.results), windowSeconds: presenceWindow };
+    return { playtimeSeconds: counts(totals.results), active: counts(online.results), windowSeconds: presenceWindow };
   }
   if (request.method !== "POST") reject(404, "Page not found.");
   const data = await jsonBody(request);
@@ -218,13 +224,13 @@ async function routes(request, env, ctx) {
     if (game.mode === "unavailable") reject(409, game.unavailable);
     if (launch[1] === "play") {
       await limit(request, env, "play", 90, 30000);
-      const updates = [env.DB.prepare("INSERT INTO plays(game,count) VALUES (?,1) ON CONFLICT(game) DO UPDATE SET count=count+1").bind(game.id)];
+      const updates = [];
       if (data.session) {
         const key = await sessionKey(data.session, env);
-        updates.push(env.DB.prepare("INSERT INTO presence(session,game,seen) VALUES (?,?,?) ON CONFLICT(session) DO UPDATE SET game=excluded.game,seen=excluded.seen").bind(key, game.id, seconds()));
-        updates.push(env.DB.prepare("DELETE FROM presence WHERE seen < ?").bind(seconds() - 86400));
+        updates.push(env.DB.prepare("INSERT INTO presence(session,game,seen) VALUES (?,?,?) ON CONFLICT(session) DO NOTHING").bind(key, game.id, seconds()));
+        updates.push(env.DB.prepare("DELETE FROM presence WHERE abs(seen) < ?").bind(seconds() - 86400));
       }
-      await env.DB.batch(updates);
+      if (updates.length) await env.DB.batch(updates);
       return { recorded: true };
     }
     return { url: port.url, alternates: port.alternates || [] };
