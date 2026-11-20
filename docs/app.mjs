@@ -110,9 +110,9 @@ function filters(){
 }
 function hero(){
   const g = byId.get(featured[featureIndex]);
-  const image = g.imported ? posterAsset(g.id) : relativeAsset(g.id);
+  const image = "./assets/featured/"+g.id+".webp";
   const bars = featured.map((id,i)=>'<button type="button" class="feature-bar" data-feature="'+i+'" aria-label="Show '+esc(byId.get(id).title)+'" aria-pressed="'+(i===featureIndex)+'"><span><i></i></span></button>').join("");
-  return '<section class="hero" aria-label="Featured game"><img class="feature-backdrop" src="'+image+'" alt=""><img class="hero-bg" src="'+image+'" alt=""><div class="hero-body"><div class="eyebrow feature-tag">'+icon("star")+'Featured game</div><h1>'+esc(g.title)+'</h1><p>'+esc(g.description || "Gather supplies and guide your family through life in a fallout shelter.")+'</p><div class="actions"><a class="btn" href="#/game/'+g.id+'?start=1">'+icon("play")+'Play game</a>'+bookmark(g.id,false,true)+'</div></div><div class="feature-bars" role="group" aria-label="Featured games">'+bars+'</div></section>';
+  return '<section class="hero" aria-label="Featured game"><img class="hero-bg" src="'+image+'" alt=""><div class="hero-body"><div class="eyebrow feature-tag">'+icon("star")+'Featured game</div><h1>'+esc(g.title)+'</h1><p>'+esc(g.description || "Gather supplies and guide your family through life in a fallout shelter.")+'</p><div class="actions"><a class="btn" href="#/game/'+g.id+'?start=1">'+icon("play")+'Play game</a>'+bookmark(g.id,false,true)+'</div></div><div class="feature-bars" role="group" aria-label="Featured games">'+bars+'</div></section>';
 }
 function nextFeature(index = (featureIndex + 1) % featured.length){
   const old = $(".spotlight .hero");
