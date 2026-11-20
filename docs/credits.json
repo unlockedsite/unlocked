@@ -42,11 +42,6 @@
     "posterSource": "https://news.xbox.com/en-us/2019/07/29/doom-1993-doom-ii-classic-and-doom-3-are-now-available-for-xbox-one/"
   },
   {
-    "title": "Duke Nukem 3D",
-    "credit": "3D Realms / Gearbox",
-    "source": "https://store.steampowered.com/app/434050/"
-  },
-  {
     "title": "Fallout",
     "credit": "Interplay Inc. / Bethesda Softworks",
     "source": "https://store.steampowered.com/app/38400/"
@@ -137,12 +132,6 @@
     "source": "https://store.steampowered.com/app/4705510/"
   },
   {
-    "title": "Minecraft: Story Mode",
-    "credit": "Telltale Games",
-    "source": "https://store.steampowered.com/app/376870/",
-    "posterSource": "https://www.xbox.com/en-US/games/store/_/C27H79BD0N2J"
-  },
-  {
     "title": "People Playground",
     "credit": "mestiez / Studio Minus",
     "source": "https://store.steampowered.com/app/1118200/"
@@ -184,11 +173,6 @@
     "title": "Featured backdrop",
     "credit": "Telltale Games / Mojang",
     "source": "https://store.steampowered.com/app/376870/"
-  },
-  {
-    "title": "Featured wordmark",
-    "credit": "Telltale Games / Mojang",
-    "source": "https://community.telltale.com/discussion/88513/telltale-and-mojang-developing-minecraft-story-mode-a-telltale-games-series-for-2015"
   },
   {
     "title": "Ultimate Catalog of Web Game Ports",

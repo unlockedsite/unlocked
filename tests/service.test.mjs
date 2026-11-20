@@ -42,7 +42,7 @@ function fixture(t) {
 }
 test("only missing game submissions reach the request webhook, duplicates are acknowledged once",async t=>{
   const {call,messages}=fixture(t);
-  for(const query of ["mcsm","Geometry Dash","amongus","bendy","FNAF 6","DOOM","repo"]){
+  for(const query of ["Geometry Dash","amongus","bendy","FNAF 6","DOOM","repo"]){
     assert.equal((await call("/v1/requests",{query})).data.status,"found");
   }
   assert.equal(messages.length,0);
@@ -55,12 +55,12 @@ test("only missing game submissions reach the request webhook, duplicates are ac
 });
 test("wrong origins are refused and reports include page, game and a relevant troubleshooting hint",async t=>{
   const {call,messages}=fixture(t);
-  const data={game:"minecraft-story-mode",page:"game",kind:"fullscreen",detail:"Fullscreen will not open on click.",device:"ChromeOS · Chrome 134"};
+  const data={game:"geometry-dash",page:"game",kind:"fullscreen",detail:"Fullscreen will not open on click.",device:"ChromeOS · Chrome 134"};
   assert.equal((await call("/v1/reports",data,{Origin:"https://example.org"})).status,403);
   assert.equal(messages.length,0);
   assert.equal((await call("/v1/reports",data)).data.receipt,messageId);
   assert.equal(messages[0].url,"https://unit.invalid/report?wait=true");
-  assert.match(JSON.stringify(messages[0].payload),/#\/game\/minecraft-story-mode/);
+  assert.match(JSON.stringify(messages[0].payload),/#\/game\/geometry-dash/);
   assert.match(JSON.stringify(messages[0].payload),/fullscreen delegation/);
   for(let i=0;i<4;i++)assert.equal((await call("/v1/reports",data)).status,200);
   assert.equal((await call("/v1/reports",data)).status,429);
@@ -95,14 +95,14 @@ test("only launched game sessions count, renew while playing, expire, and can le
   assert.deepEqual(await active(),{doom:1});
   await ping("left");
   assert.deepEqual(await active(),{});
-  assert.deepEqual((await call("/v1/top")).data.plays,{doom:1});
+  assert.deepEqual((await call("/v1/top")).data.playtimeSeconds,{doom:60});
 });
 test("opening a details page is separate from a counted launch",async t=>{
   const {call}=fixture(t);
   assert.match((await call("/v1/launch/doom",{})).data.url,/webprboom/);
-  assert.deepEqual((await call("/v1/top")).data.plays,{});
+  assert.deepEqual((await call("/v1/top")).data.playtimeSeconds,{});
   assert.equal((await call("/v1/play/doom",{})).status,200);
-  assert.deepEqual((await call("/v1/top")).data.plays,{doom:1});
+  assert.deepEqual((await call("/v1/top")).data.playtimeSeconds,{});
 });
 test("the optional gate enforces key validity, signed expiry, and revocation on the server",async t=>{
   const {env,call}=fixture(t);
@@ -122,4 +122,20 @@ test("the optional gate enforces key validity, signed expiry, and revocation on 
   assert.equal((await call("/v1/launch/doom",{},{Authorization:"Bearer "+token})).status,401);
   env.ACCESS_MODE="bad-config";
   assert.equal((await call("/v1/launch/doom",{})).status,503);
+});
+
+test("paused sessions exclude hidden time and retries cannot double-count playtime", async t => {
+  const {call} = fixture(t);
+  t.mock.timers.enable({apis:["Date"], now:Date.now()});
+  const session = crypto.randomUUID();
+  const ping = state => call("/v1/presence", {game:"doom", session, state});
+  await call("/v1/play/doom", {session});
+  t.mock.timers.tick(7000);
+  await ping("paused");
+  t.mock.timers.tick(48000);
+  await ping("active");
+  t.mock.timers.tick(9000);
+  await ping("left");
+  await ping("left");
+  assert.deepEqual((await call("/v1/top")).data.playtimeSeconds, {doom:16});
 });

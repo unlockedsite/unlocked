@@ -40,3 +40,19 @@ test("a free Pages release ships the same launch URLs as the service", () => {
   const file = new URL("../docs/free-launches.json", import.meta.url);
   if (existsSync(file)) assert.deepEqual(JSON.parse(readFileSync(file, "utf8")), ports);
 });
+
+test("every catalog game has a Chromebook hardware demand estimate", () => {
+  for (const game of games) assert.ok(["low", "medium", "high"].includes(game.load), game.id);
+});
+
+test("launch destinations belong to a current game and appear only once", () => {
+  const ids = new Set(games.map(game => game.id));
+  const destinations = new Set();
+  for (const [id, port] of Object.entries(ports)) {
+    assert.ok(ids.has(id), id);
+    const url = new URL(port.url);
+    url.pathname = url.pathname.replace(/\/index\.html?$/, "/");
+    assert.ok(!destinations.has(url.href), id);
+    destinations.add(url.href);
+  }
+});

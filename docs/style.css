@@ -279,3 +279,5 @@ dialog .actions{justify-content:space-between;margin-top:1rem}
 @media(prefers-reduced-motion:reduce){.card:hover,.card:hover .cover img{transform:none}}
 .more-games{display:flex;justify-content:center;margin:1.4rem 0}
 .stage-art{background-color:#182239}
+
+.hero-next{position:absolute;right:1rem;bottom:1rem;z-index:1}

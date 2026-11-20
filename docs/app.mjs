@@ -1,6 +1,6 @@
 import { icon } from "./icons.mjs?v=2";
 import { matches, normalize } from "./search.mjs";
-import { chromeOS, createPlayer } from "./player.mjs?v=4";
+import { chromeOS, createPlayer } from "./player.mjs?v=6";
 
 const API = "https://unlocked-arcade-service.persistingthoughts0.chatgpt.site";
 const $ = selector => document.querySelector(selector);
@@ -8,11 +8,10 @@ const main = $("#content"), search = $("#search"), guide = $("#guide");
 const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const relativeAsset = id => "./assets/covers/" + encodeURIComponent(id) + ".webp";
 const posterAsset = id => "./assets/posters/" + encodeURIComponent(id) + ".webp";
-const featureId = "minecraft-story-mode";
-const podium = ["geometry-dash", "among-us", "bendy"];
-const highlighted = new Set([featureId, ...podium]);
-const levels = { low: "Low", medium: "Medium", high: "High", unknown: "Unrated" };
-const levelTips = { unknown: "Hardware demand has not been measured.", low: "Lightweight, targets around 60 FPS.", medium: "Moderate load, targets around 30 FPS.", high: "Demanding. May struggle or fail on an entry-level Chromebook." };
+const featured = ["geometry-dash", "60-seconds", "repo"];
+let featureIndex = 0;
+const levels = { low: "Low", medium: "Medium", high: "High" };
+const levelTips = { low: "Lightweight, targets around 60 FPS.", medium: "Moderate load, targets around 30 FPS.", high: "Demanding. May struggle or fail on an entry-level Chromebook." };
 const categories = { loading:"Game won’t load", performance:"Slow or choppy", controls:"Controls", fullscreen:"Fullscreen", sound:"Audio", other:"Something else" };
 const collate = new Intl.Collator("en", {numeric:true, sensitivity:"base", ignorePunctuation:true});
 const dl = (key, fallback, session = false) => {
@@ -94,7 +93,7 @@ function moreButton(total) {
 }
 function card(g, {rank=0,count=0}={}) {
   const title=esc(g.title);
-  const starts=rank && chartState==="live"?'<span class="poster-plays">'+count.toLocaleString()+' '+(count===1?'launch':'launches')+'</span>':'';
+  const starts=rank && chartState==="live"?'<span class="poster-plays">'+playtime(count)+'</span>':'';
   return '<article class="card"><a href="#/game/'+g.id+'" aria-label="'+title+'"><div class="cover">'+poster(g)+specBadge(g.load)+(rank?'<span class="rank">#'+rank+'</span>':'')+'</div><div class="card-copy"><span class="poster-genre">'+esc(g.genre)+'</span><h3>'+title+'</h3><div class="poster-numbers">'+playStatus(g)+starts+'</div></div></a>'+bookmark(g.id,true)+'</article>';
 }
 const grid = (rows) => '<div class="grid">'+rows.map(g=>card(g)).join("")+'</div>';
@@ -110,7 +109,23 @@ function filters(){
     '<button class="spec-help" data-action="specs" title="What do the spec labels mean?" aria-label="Explain spec estimates">'+icon("info")+'</button></span></div>';
 }
 function hero(){
-  return '<section class="hero" aria-labelledby="feature-title"><img class="hero-bg" src="./assets/minecraft-story-mode-hero.webp" width="1440" height="810" alt="" fetchpriority="high"><div class="hero-body"><div class="eyebrow feature-tag">'+icon("star")+'Featured game</div><h1 id="feature-title"><img class="hero-logo" src="./assets/minecraft-story-mode-logo.webp" alt="Minecraft: Story Mode"></h1><p>Join Jesse and Reuben on a quest to find the Order of the Stone. You choose how the story unfolds.</p><div class="actions"><a class="btn" href="#/game/'+featureId+'?start=1">'+icon("play")+'Play game</a>'+bookmark(featureId,false,true)+'</div></div><span class="hero-meta">'+icon("gamepad")+'Story adventure</span></section>';
+  const g = byId.get(featured[featureIndex]);
+  const image = g.imported ? posterAsset(g.id) : relativeAsset(g.id);
+  return '<section class="hero" aria-label="Featured game"><img class="hero-bg" src="'+image+'" alt=""><div class="hero-body"><div class="eyebrow feature-tag">'+icon("star")+'Featured game</div><h1>'+esc(g.title)+'</h1><p>'+esc(g.description || "Gather supplies and guide your family through life in a fallout shelter.")+'</p><div class="actions"><a class="btn" href="#/game/'+g.id+'?start=1">'+icon("play")+'Play game</a>'+bookmark(g.id,false,true)+'</div></div><button class="hero-next secondary-btn" data-action="next-feature" aria-label="Next featured game">→</button></section>';
+}
+function nextFeature(){
+  const old = $(".spotlight .hero");
+  if (!old) return;
+  const refocus = old.querySelector(".hero-next") === document.activeElement;
+  featureIndex = (featureIndex + 1) % featured.length;
+  old.outerHTML = hero();
+  const slide = $(".spotlight .hero");
+  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    for (const el of slide.querySelectorAll(".hero-bg,.hero-body"))
+      el.animate([{transform:"translateX(-100%)"},{transform:"translateX(0)"}],{duration:500,easing:"ease-out"});
+  }
+  if (refocus) slide.querySelector(".hero-next").focus();
+
 }
 function invite(){
   return inviteHidden?"":'<aside class="tour-invite">'+icon("gamepad")+'<strong>First time in the vault?</strong><button class="tour-open" data-action="tour">Take the quick tour</button><button class="tour-skip" data-action="skip-tour">Skip</button></aside>';
@@ -119,8 +134,13 @@ function communityBar(){
   return '<div class="community-bar"><a class="join-discord" href="https://discord.gg/AezupBCtns" target="_blank" rel="noopener noreferrer">'+icon("discord")+'<span><small>Join us on</small><strong>Discord</strong></span>'+icon("forward")+'</a><div class="community-online">'+presence("all")+'</div></div>';
 }
 function currentRanks(){
-  const fixed=podium.map(id=>byId.get(id)).filter(Boolean);
-  return [...fixed,...games.filter(g=>g.mode==="embed" && !podium.includes(g.id)).sort((a,b)=>(rankedCounts[b.id]||0)-(rankedCounts[a.id]||0)||alphabetical(a,b))];
+  return games.filter(g=>g.mode==="embed").sort((a,b)=>(rankedCounts[b.id]||0)-(rankedCounts[a.id]||0)||alphabetical(a,b));
+}
+function playtime(seconds){
+  if (seconds < 60) return seconds+"s played";
+  const minutes = Math.floor(seconds/60);
+  return minutes < 60 ? minutes+"m played" : Math.floor(minutes/60)+"h "+minutes%60+"m played";
+
 }
 function chartStatus(){
   if(chartState==="live") return '<span class="live-state"><i aria-hidden="true"></i>Live</span>';
@@ -130,13 +150,13 @@ function chartPanel(){
   const ranks=currentRanks().slice(0,3);
   return '<aside class="chart-panel" id="home-chart" aria-label="Top games"><div class="chart-title"><h2>'+icon("trophy")+'Top games</h2>'+chartStatus()+'</div><ol class="mini-chart">'+ranks.map((g,i)=>{
     const plays=Number(rankedCounts[g.id])||0;
-    const countText=chartState==="live"?'<span class="chart-plays">'+plays.toLocaleString()+' '+(plays===1?'launch':'launches')+'</span>':"";
-    return '<li><a href="#/game/'+g.id+'"><span class="position">'+String(i+1).padStart(2,"0")+'</span><img src="'+relativeAsset(g.id)+'" alt="" width="96" height="62" decoding="async"><span class="chart-copy"><strong>'+esc(g.title)+'</strong><small><span class="chart-genre">'+esc(g.genre)+(countText?' · ':'')+'</span>'+countText+'</small></span></a></li>';
+    const countText=chartState==="live"?'<span class="chart-plays">'+playtime(plays)+'</span>':"";
+    return '<li><a href="#/game/'+g.id+'"><span class="position">'+String(i+1).padStart(2,"0")+'</span><img src="'+(g.imported?posterAsset(g.id):relativeAsset(g.id))+'" alt="" width="96" height="62" decoding="async"><span class="chart-copy"><strong>'+esc(g.title)+'</strong><small><span class="chart-genre">'+esc(g.genre)+(countText?' · ':'')+'</span>'+countText+'</small></span></a></li>';
   }).join("")+'</ol><a class="chart-all" href="#/top">'+icon("grid")+'Full rankings</a></aside>';
 }
 function renderLibrary(){
   const searching=current.page==="search";
-  const full=searching ? games.filter(g=>!q || matches(g,q)) : games.filter(g=>!highlighted.has(g.id));
+  const full=searching ? games.filter(g=>!q || matches(g,q)) : games;
   const rows=full.filter(g=>(!genre || g.genre===genre)&&(!level || g.load===level) && (availability==="all" || (g.mode==="embed")===(availability==="play")));
   const label=searching ? "Search results" : "Game library";
   const aside='<div class="shelf-aside">'+(searching?"":invite())+'<span class="sort-label">A–Z</span></div>';
@@ -157,7 +177,7 @@ function renderSaved() {
 }
 function drawTop(){
   const ranks=currentRanks();
-  main.innerHTML='<section class="section-page"><div class="shelf-head"><div><h1>Top games</h1><p class="subcopy">The first three places are pinned. The rest of the chart follows community launches.</p></div><div class="top-live">'+chartStatus()+presence("all")+'</div></div>'+
+  main.innerHTML='<section class="section-page"><div class="shelf-head"><div><h1>Top games</h1><p class="subcopy">Ranked by total time played across the arcade.</p></div><div class="top-live">'+chartStatus()+presence("all")+'</div></div>'+
     (chartState==="offline"?'<p class="hint">Live counts are unavailable. The chart will retry automatically.</p>':"")+
     '<div class="grid">'+ranks.slice(0,visibleCount).map((g,i)=>card(g,{rank:i+1,count:Number(rankedCounts[g.id])||0})).join("")+'</div>'+moreButton(ranks.length)+'</section>';
 }
@@ -165,7 +185,7 @@ function refreshChart(force=false){
   if(document.hidden || (playSession || player?.expanded()) || !["library","top","search","saved","game"].includes(current.page) || (topCache && !force && Date.now()-topCache.time<20000)) return;
   if(chartRequest)return chartRequest;
   const previousState=chartState,previousCounts=JSON.stringify(rankedCounts);
-  chartRequest=api("/v1/top").then(({plays,active})=>{
+  chartRequest=api("/v1/top").then(({playtimeSeconds:plays,active})=>{
     if(!plays || !active || typeof plays!=="object" || typeof active!=="object")throw Error("Chart unavailable");
     rankedCounts=plays;activeCounts=active;topCache={time:Date.now()};chartState="live";
   }).catch(()=>{chartState="offline";}).finally(()=>{
@@ -203,7 +223,7 @@ function guidePage(){
   const steps=[
     ["Find your game","Search by title or nickname. Filter by genre or Chromebook spec to narrow the vault."],
     ["Pick a good fit","Low aims for 60 FPS. Medium aims for 30. High-demand ports may struggle on a Chromebook. These are estimates."],
-    ["Keep your favorites","Bookmark a game to save it here. Top games ranks community launches, and the player has a fullscreen control."],
+    ["Keep your favorites","Bookmark a game to save it here. Top games ranks games by total playtime, and the player has a fullscreen control."],
     ["What’s your favorite game?","Search the vault for a favorite, or browse our arcade picks. Missing games can be requested from the results."]
   ];
   const [title,body]=steps[tourStep];
@@ -222,7 +242,7 @@ function reportUrl(){
 function gameLayout(g){
   const displayLabel="Fullscreen";
   const exitLabel="Leave fullscreen";
-  const stageImage=g.id===featureId?"./assets/minecraft-story-mode-hero.webp":g.imported?posterAsset(g.id):relativeAsset(g.id);
+  const stageImage=g.imported?posterAsset(g.id):relativeAsset(g.id);
   main.innerHTML='<a class="back" href="#/library">'+icon("back")+'All games</a><h1 class="game-title">'+esc(g.title)+'</h1><div class="game-meta">'+specBadge(g.load)+'<span>'+esc(g.genre)+'</span>'+(g.edition?'<span class="edition">'+esc(g.edition)+'</span>':'')+playStatus(g)+'</div>'+
     '<div class="stage-slot"><div id="stage" class="stage centered"><div class="stage-art" style="background-image:url(\''+stageImage+'\')" ></div><div class="startbox" id="startbox"><p role="status">Preparing the player…</p></div><button type="button" class="icon-btn exit-stage" data-action="fullscreen" title="'+exitLabel+'" aria-label="'+exitLabel+'">'+icon("close")+'</button></div></div>'+
     '<div class="play-tools">'+(g.mode==="embed"?btn("fullscreen",displayLabel,"expand"):"")+bookmark(g.id)+'<a class="secondary-btn report-link" href="'+reportUrl()+'">'+icon("bug")+'Report a bug</a></div><div id="key-area"></div>'+
@@ -242,7 +262,7 @@ async function getLaunch(id) {
   // Free releases ship their launch map alongside the catalog on Pages.
   // Gated releases omit the map and authorize each launch with the Worker.
   if (!launchCatalog) {
-    launchCatalog = fetch("./free-launches.json?v=4", {credentials:"omit",cache:"no-store"}).then(async response => {
+    launchCatalog = fetch("./free-launches.json?v=8", {credentials:"omit",cache:"no-store"}).then(async response => {
       if (response.status===404) return null;
       if (!response.ok) throw Error("Couldn’t load the launch catalog. Try again.");
       return response.json();
@@ -265,7 +285,8 @@ async function prepareGame(g, token, autoStart=false){
     currentLaunch={id:g.id,url:playerUrl};
     $(".play-tools [data-action=fullscreen]").disabled=false;
     $("#key-area").replaceChildren();
-    const resolutionOption=chromeOS && (g.load==="high" || g.load==="unknown")
+    const externalImport = g.imported && new URL(playerUrl).origin !== location.origin;
+    const resolutionOption=chromeOS && (g.load==="high" || externalImport)
       ? '<label class="resolution-option"><input id="limit-resolution" type="checkbox" '+(g.load==="high"?"checked":"")+'> Limit player size to 1280 × 720</label>' : "";
     $("#startbox").innerHTML=btn("start-game",g.edition==="Classic demo"?"Play demo":"Play game","play","btn")+resolutionOption;
     if(autoStart) startGame(g);
@@ -283,13 +304,14 @@ async function prepareGame(g, token, autoStart=false){
 }
 function signalPresence(gameplay,state){
   return fetch(API+"/v1/presence",{
-    method:"POST",mode:"cors",credentials:"omit",keepalive:state==="left",referrerPolicy:"no-referrer",
+    method:"POST",mode:"cors",credentials:"omit",keepalive:state!=="active",referrerPolicy:"no-referrer",
     headers:{"Content-Type":"application/json"},body:JSON.stringify({game:gameplay.id,session:gameplay.session,state})
   }).catch(()=>{});
 }
 function scheduleHeartbeat(){
   clearInterval(heartbeatTimer);
-  if(document.hidden || !playSession?.registered)return;
+  if(!playSession?.registered)return;
+  if(document.hidden){signalPresence(playSession,"paused");return;}
   const gameplay=playSession;
   signalPresence(gameplay,"active");
   heartbeatTimer=setInterval(()=>signalPresence(gameplay,"active"),30000);
@@ -339,7 +361,7 @@ async function submitReport(form){
 async function showCredits(token){
   main.innerHTML='<section class="narrow section-page"><a class="back" href="#/library">'+icon("back")+'All games</a><h1 class="panel-title">Credits</h1><p class="subcopy">Game art belongs to the artists and publishers listed below. Each game page links to its port.</p><div id="credits-list" class="pane">Loading credits…</div></section>';
   try {
-    const data=await readJson("./credits.json?v=4");if(token!==navigation)return;
+    const data=await readJson("./credits.json?v=8");if(token!==navigation)return;
     $("#credits-list").innerHTML='<ul class="credits-list">'+data.map(x=>'<li><a href="'+esc(x.source)+'" target="_blank" rel="noopener noreferrer">'+esc(x.title)+'</a> · '+esc(x.credit)+(x.posterSource?' · <a href="'+esc(x.posterSource)+'" target="_blank" rel="noopener noreferrer">Poster art</a>':'')+'</li>').join("")+'</ul><p class="hint">Interface typefaces include <a class="text-link" href="./assets/fonts/dm-sans-OFL.txt">DM Sans</a> and <a class="text-link" href="./assets/fonts/barlow-condensed-OFL.txt">Barlow Condensed</a>.</p>';
   }catch{if(token===navigation)feedback("#credits-list","Couldn’t load the credits. Refresh to try again.");}
 }
@@ -401,6 +423,10 @@ function updateTheme(value){
   $("#theme-button").title="Appearance: "+value;$("#theme-button").setAttribute("aria-label","Change theme. Current setting: "+value);
 }
 function setup(){
+  setInterval(()=>{
+    const slide = $(".spotlight .hero");
+    if (slide && !document.hidden && !guide.open && !slide.matches(":hover,:focus-within") && !matchMedia("(prefers-reduced-motion: reduce)").matches) nextFeature();
+  },6500);
   document.querySelectorAll("[data-icon]").forEach(el=>el.innerHTML=icon(el.dataset.icon));
   updateTheme(document.documentElement.dataset.theme || "system");
   $("#theme-button").addEventListener("click",()=>{const panel=$("#theme-panel");panel.hidden=!panel.hidden;$("#theme-button").setAttribute("aria-expanded",String(!panel.hidden));if(!panel.hidden)$("#theme").focus();});
@@ -409,7 +435,7 @@ function setup(){
   $("#search-form").addEventListener("submit",e=>{e.preventDefault();if(games.length)requestMissing();});
   window.addEventListener("hashchange",()=>route());
   document.addEventListener("visibilitychange",()=>{scheduleHeartbeat();scheduleChart();});
-  window.addEventListener("pagehide",e=>{if(!e.persisted)endPlay();clearInterval(heartbeatTimer);});
+  window.addEventListener("pagehide",e=>{if(!e.persisted)endPlay();else if(playSession?.registered)signalPresence(playSession,"paused");clearInterval(heartbeatTimer);});
   window.addEventListener("pageshow",e=>{if(e.persisted){scheduleHeartbeat();scheduleChart();}});
   document.querySelector(".skip").addEventListener("click",e=>{e.preventDefault();main.focus();});
   document.addEventListener("keydown",e=>{
@@ -418,6 +444,7 @@ function setup(){
   });
   document.addEventListener("click",e=>{
     if(!e.target.closest(".preferences")){$("#theme-panel").hidden=true;$("#theme-button").setAttribute("aria-expanded","false");}
+    if(e.target.closest("[data-action=next-feature]")){nextFeature();return;}
     const save=e.target.closest("[data-save]");if(save){rememberGame(save.dataset.save);return;}
     const filter=e.target.closest("[data-genre]");if(filter){genre=filter.dataset.genre;visibleCount=pageSize;renderLibrary();document.querySelector('[data-genre="'+genre+'"]')?.focus({preventScroll:true});return;}
     const link=e.target.closest("a[data-page],a.brand");
@@ -457,5 +484,5 @@ async function readJson(path){
   return res.json();
 }
 setup();
-try {games=(await readJson("./games.json?v=4")).sort(alphabetical);byId=new Map(games.map(g=>[g.id,g]));route({scroll:false});}
+try {games=(await readJson("./games.json?v=8")).sort(alphabetical);byId=new Map(games.map(g=>[g.id,g]));route({scroll:false});}
 catch {main.innerHTML='<div class="empty"><h1>Couldn’t open the vault</h1><p>Reload this page to fetch the game catalog.</p><a class="btn" href="./">Reload</a></div>';}

@@ -44,19 +44,27 @@ export function createPlayer(stage, title, onDisplayChange, onError) {
     }
   }
 
-  function sizeChromebookFrame(limitResolution) {
-    // Keep the game's CSS viewport fixed for this session. Only its presentation
-    // scales on resize, so an expanding tab doesn't request a larger game canvas.
-    const {clientWidth: width, clientHeight: height} = stage.parentElement;
-    const ratio = limitResolution ? Math.min(1, 1280 / width, 720 / height) : 1;
-    const gameWidth = Math.max(1, Math.round(width * ratio));
-    const gameHeight = Math.max(1, Math.round(height * ratio));
-    frame.classList.add("stable-viewport");
-    frame.style.width = gameWidth + "px";
-    frame.style.height = gameHeight + "px";
+  function sizeFrame(limitResolution) {
+    const slot = stage.parentElement;
+    const initialWidth = Math.max(1, slot.clientWidth);
+    const initialHeight = Math.max(1, slot.clientHeight);
     fitFrame = () => {
-      const scale = Math.min(stage.clientWidth / gameWidth, stage.clientHeight / gameHeight);
-      frame.style.setProperty("--player-scale", String(scale));
+      const expanded = Boolean(document.fullscreenElement || document.webkitFullscreenElement);
+      const scaled = chromeOS || expanded;
+      frame.classList.toggle("stable-viewport", scaled);
+      if (!scaled) {
+        frame.style.removeProperty("width");
+        frame.style.removeProperty("height");
+        return;
+      }
+      const width = Math.max(1, stage.clientWidth);
+      const height = Math.max(1, stage.clientHeight);
+      // Match the display's aspect ratio while keeping the game's render budget bounded.
+      const ratio = Math.min(1, initialWidth / width, initialHeight / height,
+        limitResolution ? 1280 / width : 1, limitResolution ? 720 / height : 1);
+      frame.style.width = width * ratio + "px";
+      frame.style.height = height * ratio + "px";
+      frame.style.setProperty("--player-scale", String(1 / ratio));
     };
     fitFrame();
     observer = new ResizeObserver(fitFrame);
@@ -82,7 +90,7 @@ export function createPlayer(stage, title, onDisplayChange, onError) {
     stage.querySelector(".startbox").hidden = true;
     stage.querySelector(".stage-art").remove();
     stage.classList.remove("centered");
-    if (chromeOS) sizeChromebookFrame(limitResolution);
+    sizeFrame(limitResolution);
     frame.src = url;
     stage.prepend(frame);
     focusPlayer();
