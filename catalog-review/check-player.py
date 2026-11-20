@@ -32,6 +32,7 @@ with sync_playwright() as p:
   page.get_by_role('button',name='Play game').click(timeout=6000)
   frame=page.frame_locator('iframe');frame.locator('.tile').first.wait_for()
   page.evaluate('window.originalFrame=document.querySelector("iframe")')
+  print("focus",page.evaluate('document.activeElement.tagName'),frame.locator('body').evaluate('el=>el.ownerDocument.hasFocus()'))
   old=frame.locator('.tile-container').inner_html()
   for key in ['ArrowDown','ArrowRight','ArrowDown','ArrowLeft']:page.keyboard.press(key);page.wait_for_timeout(120)
   assert old!=frame.locator('.tile-container').inner_html()

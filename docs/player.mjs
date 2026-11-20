@@ -10,6 +10,7 @@ export function createPlayer(stage, title, onDisplayChange, onError) {
   function focusPlayer() {
     const target = frame || stage.querySelector(".startbox button") || exitButton;
     if (document.activeElement !== target) target.focus({preventScroll: true});
+    if (target === frame) frame.contentWindow?.focus();
   }
 
   function fullscreenChanged() {
@@ -66,6 +67,12 @@ export function createPlayer(stage, title, onDisplayChange, onError) {
     if (frame || disposed) return false;
     frame = document.createElement("iframe");
     frame.title = title + " game player";
+    frame.tabIndex = 0;
+    // Navigation can reset focus after the launch click. Hand it to the loaded game
+    // unless the player has already moved to another control.
+    frame.addEventListener("load", () => {
+      if (!disposed && (document.activeElement === frame || document.activeElement === document.body)) focusPlayer();
+    }, {once: true});
     frame.allow = "fullscreen; autoplay; gamepad; encrypted-media";
     frame.allowFullscreen = true;
     // Local imports retain an opaque origin. Third-party games may use their own storage.
