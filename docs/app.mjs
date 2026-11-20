@@ -111,13 +111,14 @@ function filters(){
 function hero(){
   const g = byId.get(featured[featureIndex]);
   const image = g.imported ? posterAsset(g.id) : relativeAsset(g.id);
-  return '<section class="hero" aria-label="Featured game"><img class="hero-bg" src="'+image+'" alt=""><div class="hero-body"><div class="eyebrow feature-tag">'+icon("star")+'Featured game</div><h1>'+esc(g.title)+'</h1><p>'+esc(g.description || "Gather supplies and guide your family through life in a fallout shelter.")+'</p><div class="actions"><a class="btn" href="#/game/'+g.id+'?start=1">'+icon("play")+'Play game</a>'+bookmark(g.id,false,true)+'</div></div><button class="hero-next secondary-btn" data-action="next-feature" aria-label="Next featured game">→</button></section>';
+  const bars = featured.map((id,i)=>'<button type="button" class="feature-bar" data-feature="'+i+'" aria-label="Show '+esc(byId.get(id).title)+'" aria-pressed="'+(i===featureIndex)+'"><span><i></i></span></button>').join("");
+  return '<section class="hero" aria-label="Featured game"><img class="feature-backdrop" src="'+image+'" alt=""><img class="hero-bg" src="'+image+'" alt=""><div class="hero-body"><div class="eyebrow feature-tag">'+icon("star")+'Featured game</div><h1>'+esc(g.title)+'</h1><p>'+esc(g.description || "Gather supplies and guide your family through life in a fallout shelter.")+'</p><div class="actions"><a class="btn" href="#/game/'+g.id+'?start=1">'+icon("play")+'Play game</a>'+bookmark(g.id,false,true)+'</div></div><div class="feature-bars" role="group" aria-label="Featured games">'+bars+'</div></section>';
 }
-function nextFeature(){
+function nextFeature(index = (featureIndex + 1) % featured.length){
   const old = $(".spotlight .hero");
   if (!old) return;
-  const refocus = old.querySelector(".hero-next") === document.activeElement;
-  featureIndex = (featureIndex + 1) % featured.length;
+  const refocus = document.activeElement?.closest(".feature-bar") && old.contains(document.activeElement);
+  featureIndex = index;
   old.querySelector(".feature-outgoing")?.remove();
   old.insertAdjacentHTML("afterend", hero());
   const slide = old.nextElementSibling;
@@ -132,7 +133,7 @@ function nextFeature(){
     const fade = old.animate([{opacity:1},{opacity:0}], {duration:700, easing:"ease-in-out", fill:"forwards"});
     fade.finished.then(()=>old.remove(), ()=>old.remove());
   }
-  if (refocus) slide.querySelector(".hero-next").focus();
+  if (refocus) slide.querySelector('.feature-bar[aria-pressed="true"]').focus({preventScroll:true});
 
 }
 function invite(){
@@ -155,7 +156,7 @@ function chartStatus(){
   return '<span class="quiet-state">'+(chartState==="loading"?"Updating":"Arcade picks")+'</span>';
 }
 function chartPanel(){
-  const ranks=currentRanks().slice(0,3);
+  const ranks=currentRanks().filter(g=>!featured.includes(g.id)).slice(0,3);
   return '<aside class="chart-panel" id="home-chart" aria-label="Top games"><div class="chart-title"><h2>'+icon("trophy")+'Top games</h2>'+chartStatus()+'</div><ol class="mini-chart">'+ranks.map((g,i)=>{
     const plays=Number(rankedCounts[g.id])||0;
     const countText=chartState==="live"?'<span class="chart-plays">'+playtime(plays)+'</span>':"";
@@ -431,10 +432,12 @@ function updateTheme(value){
   $("#theme-button").title="Appearance: "+value;$("#theme-button").setAttribute("aria-label","Change theme. Current setting: "+value);
 }
 function setup(){
-  setInterval(()=>{
-    const slide = $(".spotlight .hero");
-    if (slide && !document.hidden && !guide.open && !slide.querySelector(":focus-visible")) nextFeature();
-  },6500);
+  document.addEventListener("animationend", e=>{
+    if (e.animationName==="feature-fill" && !e.target.closest(".feature-outgoing") && !document.hidden) nextFeature();
+  });
+  const pauseFeatures = () => document.documentElement.classList.toggle("feature-hidden",document.hidden);
+  document.addEventListener("visibilitychange",pauseFeatures);
+  pauseFeatures();
   document.querySelectorAll("[data-icon]").forEach(el=>el.innerHTML=icon(el.dataset.icon));
   updateTheme(document.documentElement.dataset.theme || "system");
   $("#theme-button").addEventListener("click",()=>{const panel=$("#theme-panel");panel.hidden=!panel.hidden;$("#theme-button").setAttribute("aria-expanded",String(!panel.hidden));if(!panel.hidden)$("#theme").focus();});
@@ -452,7 +455,8 @@ function setup(){
   });
   document.addEventListener("click",e=>{
     if(!e.target.closest(".preferences")){$("#theme-panel").hidden=true;$("#theme-button").setAttribute("aria-expanded","false");}
-    if(e.target.closest("[data-action=next-feature]")){nextFeature();return;}
+    const bar=e.target.closest("[data-feature]");
+    if(bar){nextFeature(Number(bar.dataset.feature));return;}
     const save=e.target.closest("[data-save]");if(save){rememberGame(save.dataset.save);return;}
     const filter=e.target.closest("[data-genre]");if(filter){genre=filter.dataset.genre;visibleCount=pageSize;renderLibrary();document.querySelector('[data-genre="'+genre+'"]')?.focus({preventScroll:true});return;}
     const link=e.target.closest("a[data-page],a.brand");
