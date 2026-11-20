@@ -30,7 +30,7 @@ let current = {page:"library",id:"",params:new URLSearchParams()}, tourStep=0, t
 let ticket=dl("session","",true), inviteHidden=dl("tour","")==="seen";
 let currentLaunch=null, topCache=null, currentReport="", searchMessage="", sendingSearch="", lastSearchKey="";
 let rankedCounts={}, activeCounts={}, chartState="loading", chartRequest=null, chartTimer;
-let playSession=null, heartbeatTimer, player=null;
+let playSession=null, heartbeatTimer, player=null, launchCatalog;
 const receivedQueries = new Set();
 const pageSize = 48;
 let visibleCount = pageSize;
@@ -238,21 +238,35 @@ function safeGameUrl(value) {
   if(u.protocol!=="https:" && u.origin!==location.origin)throw Error("Invalid game link.");
   return u.href;
 }
+async function getLaunch(id) {
+  // Free releases ship their launch map alongside the catalog on Pages.
+  // Gated releases omit the map and authorize each launch with the Worker.
+  if (!launchCatalog) {
+    launchCatalog = fetch("./free-launches.json?v=4", {credentials:"omit",cache:"no-store"}).then(async response => {
+      if (response.status===404) return null;
+      if (!response.ok) throw Error("Couldn’t load the launch catalog. Try again.");
+      return response.json();
+    }).catch(error => {launchCatalog=null;throw error;});
+  }
+  const catalog = await launchCatalog;
+  if (catalog && Object.hasOwn(catalog,id)) return catalog[id];
+  return api("/v1/launch/"+id,{});
+}
 async function prepareGame(g, token, autoStart=false){
   if(g.mode!=="embed"){
     $("#startbox").innerHTML='<strong>In-page play unavailable</strong><p>'+esc(g.unavailable)+'</p>'+(g.sources.length?'<a class="secondary-btn" target="_blank" rel="noopener noreferrer" href="'+esc(g.sources[0])+'">View source</a>':"");
     return;
   }
   try{
-    const launch=await api("/v1/launch/"+g.id,{});
+    const launch=await getLaunch(g.id);
     if(token!==navigation)return;
     const url=safeGameUrl(launch.url);
-    const playerUrl=g.id==="simpsons-hit-and-run"?new URL("./imports/hit-and-run/index.html",document.baseURI).href:g.id==="happy-wheels"?new URL("./imports/happy-wheels/",document.baseURI).href:url;
+    const playerUrl=g.id==="simpsons-hit-and-run"?new URL("./imports/hit-and-run/index.html",document.baseURI).href:g.id==="happy-wheels"?new URL("./imports/happy-wheels/",document.baseURI).href:g.id==="2048"?new URL("./imports/2048/",document.baseURI).href:url;
     currentLaunch={id:g.id,url:playerUrl};
     $(".play-tools [data-action=fullscreen]").disabled=false;
     $("#key-area").replaceChildren();
-    const resolutionOption=chromeOS && g.load==="high"
-      ? '<label class="resolution-option"><input id="limit-resolution" type="checkbox" checked> Limit player size to 1280 × 720</label>' : "";
+    const resolutionOption=chromeOS && (g.load==="high" || g.load==="unknown")
+      ? '<label class="resolution-option"><input id="limit-resolution" type="checkbox" '+(g.load==="high"?"checked":"")+'> Limit player size to 1280 × 720</label>' : "";
     $("#startbox").innerHTML=btn("start-game",g.edition==="Classic demo"?"Play demo":"Play game","play","btn")+resolutionOption;
     if(autoStart) startGame(g);
     if(launch.alternates?.length) $("#other-ports").innerHTML=launch.alternates.map(a=>'<a class="text-link" href="'+esc(safeGameUrl(a.url))+'" rel="noopener noreferrer" target="_blank">'+esc(a.label)+'</a>').join(" · ");
@@ -333,9 +347,11 @@ function route({scroll=true}={}){
   visibleCount=pageSize;
   endPlay();
   player?.dispose();player=null;
+  const previousPage=current.page;
   const token=++navigation;current=readRoute();currentLaunch=null;currentReport="";
   const isSearch=current.page==="search";
-  if(isSearch && !q)availability="all";
+  if(isSearch && previousPage!=="search")availability="all";
+  if(current.page==="library" && previousPage!=="library")availability="play";
   q=isSearch?(current.params.get("q") || "").slice(0,80):"";search.value=q;
   searchMessage="";
   setNav();$("#theme-panel").hidden=true;$("#theme-button").setAttribute("aria-expanded","false");

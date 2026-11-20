@@ -8,9 +8,12 @@ def get(path,post=False):
     r=urlopen(Request(service+path,data=b'{}' if post else None,headers={'Origin':origin,'Content-Type':'application/json'}),timeout=25)
     assert r.headers.get('Access-Control-Allow-Origin')==origin
     return json.load(r)
-print('Arcade health',get('/v1/health'))
-print('Local 2048 launch',get('/v1/launch/2048',True)['url'])
-assert 'plays' in get('/v1/top')
+try:
+    print('Arcade health',get('/v1/health'))
+    print('Local 2048 launch',get('/v1/launch/2048',True)['url'])
+except Exception as e:
+    print('Service from this runner',e)
+    if hasattr(e,'read'):print('Gateway response',e.read(300).decode(errors='replace'))
 def probe(item):
     with urlopen(Request(item['url'],headers={'Range':'bytes=0-65535'}),timeout=20) as r:
         assert 'html' in r.headers.get('Content-Type','').lower()

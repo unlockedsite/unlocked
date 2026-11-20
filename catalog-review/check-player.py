@@ -24,6 +24,7 @@ with sync_playwright() as p:
   errs=[];page.on('pageerror',lambda e:errs.append(str(e)))
   def mock(route):
    url=route.request.url
+   if '/launch/' in url:raise AssertionError('Free launches must work without the remote service')
    response={'plays':{},'active':{}} if '/top' in url else {'url':base+'/imports/2048/'} if '/launch/' in url else {'recorded':True}
    route.fulfill(json=response,headers={'Access-Control-Allow-Origin':'*'})
   page.route('https://unlocked-arcade-service.persistingthoughts0.chatgpt.site/**',mock)
