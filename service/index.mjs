@@ -1,3 +1,4 @@
+import { announce } from "./updates.mjs";
 import games from "../docs/games.json" with { type: "json" };
 import ports from "./ports.json" with { type: "json" };
 import { matches, normalize } from "../docs/search.mjs";
@@ -248,6 +249,8 @@ export default {
     };
     if (origin === ORIGIN) headers["Access-Control-Allow-Origin"] = ORIGIN;
     try {
+      const release = new URL(request.url).pathname.match(/^\/v1\/update-announcements\/(\d+)$/);
+      if (release && request.method === "POST" && !origin) return await announce(release[1], env);
       if ((origin && origin !== ORIGIN) || (request.method === "POST" && origin !== ORIGIN)) reject(403, "Arcade origin required.");
       if (request.method === "OPTIONS") return new Response(null, { status: 204, headers });
       return Response.json(await routes(request, env, ctx), { headers });

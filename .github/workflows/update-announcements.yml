@@ -1,0 +1,22 @@
+name: Announce published arcade updates
+on:
+  deployment_status:
+  workflow_dispatch:
+  schedule:
+    - cron: '13,43 * * * *'
+permissions:
+  deployments: read
+jobs:
+  announce:
+    if: github.event_name != 'deployment_status' || (github.event.deployment_status.state == 'success' && github.event.deployment.environment == 'github-pages')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Reconcile successful Pages releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          ids=$(gh api 'repos/unlockedsite/unlocked/deployments?environment=github-pages&per_page=100' --jq '[.[] | select(.ref=="main" and .id>7950404824)] | reverse | .[].id')
+          for id in $ids; do
+            curl --fail-with-body --retry 3 --retry-all-errors --max-time 30 -X POST "https://unlocked-arcade-service.persistingthoughts0.chatgpt.site/v1/update-announcements/$id"
+          done
