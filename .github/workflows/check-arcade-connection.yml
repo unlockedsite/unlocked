@@ -1,0 +1,14 @@
+name: Verify arcade connection and source builds
+on:
+  push:
+    branches: [catalog-preview-import]
+    paths: [catalog-review/probe.py]
+permissions:
+  contents: read
+jobs:
+  connections:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - run: python catalog-review/probe.py
