@@ -1,0 +1,22 @@
+name: Find additional game artwork
+on:
+  push:
+    branches: [catalog-preview-import]
+    paths: [catalog-review/store-input.json]
+permissions:
+  contents: write
+jobs:
+  covers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          python -m pip install Pillow --quiet
+          python catalog-review/store.py
+          git config user.name github-actions
+          git config user.email github-actions@users.noreply.github.com
+          git add catalog-review/store-result.json catalog-review/posters
+          git commit -m "Save matched publisher artwork for additional source builds"
+          git pull --rebase origin catalog-preview-import
+          git push origin HEAD:catalog-preview-import
