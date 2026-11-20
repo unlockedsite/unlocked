@@ -291,4 +291,4 @@ dialog .actions{justify-content:space-between;margin-top:1rem}
 @keyframes feature-fill{to{transform:scaleX(1)}}
 .feature-hidden .feature-bar i,.hero:has(:focus-visible) .feature-bar i,body:has(dialog[open]) .feature-bar i{animation-play-state:paused}
 @media(max-width:600px){.hero .hero-body{width:57%;padding:1rem .75rem 3rem}.hero .hero-bg{width:42%}.hero h1{font-size:clamp(1.9rem,8vw,3rem)}}
-@media(prefers-reduced-motion:reduce){.feature-bar[aria-pressed=true] i{animation:feature-fill 6.5s steps(1,end) forwards}}
+@media(prefers-reduced-motion:reduce){.feature-bar[aria-pressed=true] i{animation:feature-fill 6.5s steps(1,end) forwards!important}}
