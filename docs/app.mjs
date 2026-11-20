@@ -1,6 +1,6 @@
 import { icon } from "./icons.mjs?v=2";
 import { matches, normalize } from "./search.mjs";
-import { chromeOS, createPlayer } from "./player.mjs?v=3";
+import { chromeOS, createPlayer } from "./player.mjs?v=4";
 
 const API = "https://unlocked-arcade-service.persistingthoughts0.chatgpt.site";
 const $ = selector => document.querySelector(selector);
@@ -11,8 +11,8 @@ const posterAsset = id => "./assets/posters/" + encodeURIComponent(id) + ".webp"
 const featureId = "minecraft-story-mode";
 const podium = ["geometry-dash", "among-us", "bendy"];
 const highlighted = new Set([featureId, ...podium]);
-const levels = { low: "Low", medium: "Medium", high: "High" };
-const levelTips = { low: "Lightweight, targets around 60 FPS.", medium: "Moderate load, targets around 30 FPS.", high: "Demanding. May struggle or fail on an entry-level Chromebook." };
+const levels = { low: "Low", medium: "Medium", high: "High", unknown: "Unrated" };
+const levelTips = { unknown: "Hardware demand has not been measured.", low: "Lightweight, targets around 60 FPS.", medium: "Moderate load, targets around 30 FPS.", high: "Demanding. May struggle or fail on an entry-level Chromebook." };
 const categories = { loading:"Game won’t load", performance:"Slow or choppy", controls:"Controls", fullscreen:"Fullscreen", sound:"Audio", other:"Something else" };
 const collate = new Intl.Collator("en", {numeric:true, sensitivity:"base", ignorePunctuation:true});
 const dl = (key, fallback, session = false) => {
@@ -30,8 +30,11 @@ let current = {page:"library",id:"",params:new URLSearchParams()}, tourStep=0, t
 let ticket=dl("session","",true), inviteHidden=dl("tour","")==="seen";
 let currentLaunch=null, topCache=null, currentReport="", searchMessage="", sendingSearch="", lastSearchKey="";
 let rankedCounts={}, activeCounts={}, chartState="loading", chartRequest=null, chartTimer;
-let playSession=null, heartbeatTimer, player=null;
+let playSession=null, heartbeatTimer, player=null, launchCatalog;
 const receivedQueries = new Set();
+const pageSize = 48;
+let visibleCount = pageSize;
+let availability = "play";
 const alphabetical = (a,b) => collate.compare(a.title,b.title);
 const bookmarkText = id => saved.has(id) ? "Saved" : "Save game";
 const savedClass = id => saved.has(id) ? " active-save" : "";
@@ -80,10 +83,19 @@ function activeText(id) {
 function presence(id) {
   return '<span class="presence" title="Game sessions active on Unlocked in the last 90 seconds">'+icon("users")+'<span data-active="'+id+'">'+activeText(id)+'</span> playing now</span>';
 }
+function poster(g) {
+  return '<img src="'+posterAsset(g.id)+'" alt="" width="320" height="480" loading="lazy" decoding="async" referrerpolicy="no-referrer">';
+}
+function playStatus(g) {
+  return g.mode === "embed" ? presence(g.id) : '<span>In-page play unavailable</span>';
+}
+function moreButton(total) {
+  return total > visibleCount ? '<div class="more-games">'+btn("show-more","Show more games",null)+'</div>' : "";
+}
 function card(g, {rank=0,count=0}={}) {
   const title=esc(g.title);
   const starts=rank && chartState==="live"?'<span class="poster-plays">'+count.toLocaleString()+' '+(count===1?'launch':'launches')+'</span>':'';
-  return '<article class="card"><a href="#/game/'+g.id+'" aria-label="'+title+'"><div class="cover"><img src="'+posterAsset(g.id)+'" alt="" width="320" height="480" loading="lazy" decoding="async">'+specBadge(g.load)+(rank?'<span class="rank">#'+rank+'</span>':'')+'</div><div class="card-copy"><span class="poster-genre">'+esc(g.genre)+'</span><h3>'+title+'</h3><div class="poster-numbers">'+presence(g.id)+starts+'</div></div></a>'+bookmark(g.id,true)+'</article>';
+  return '<article class="card"><a href="#/game/'+g.id+'" aria-label="'+title+'"><div class="cover">'+poster(g)+specBadge(g.load)+(rank?'<span class="rank">#'+rank+'</span>':'')+'</div><div class="card-copy"><span class="poster-genre">'+esc(g.genre)+'</span><h3>'+title+'</h3><div class="poster-numbers">'+playStatus(g)+starts+'</div></div></a>'+bookmark(g.id,true)+'</article>';
 }
 const grid = (rows) => '<div class="grid">'+rows.map(g=>card(g)).join("")+'</div>';
 const titleBar = (tag,title,count,aside="") => '<div class="shelf-head"><div class="shelf-title"><'+tag+'>'+esc(title)+'</'+tag+'><span class="count" aria-label="'+count+' games">'+count+'</span></div>'+aside+'</div>';
@@ -92,6 +104,7 @@ function filters(){
   const all=[...new Set(games.map(g=>g.genre))].sort(collate.compare);
   const select = (id, label, options) => '<span class="selectbox"><select class="filter-select" id="'+id+'" aria-label="'+label+'">'+options+'</select>'+icon("chevron")+'</span>';
   return '<div class="filters" aria-label="Game filters">'+quick.map(g=>'<button class="chip" data-genre="'+g+'" aria-pressed="'+(g===genre)+'">'+(g || "All genres")+'</button>').join("")+
+    select("availability","Game availability",[["play","Ready to play"],["all","All catalog games"],["listed","Awaiting a build"]].map(([v,label])=>'<option value="'+v+'" '+(availability===v?"selected":"")+'>'+label+'</option>').join(""))+
     select("more-genres","More genres",'<option value="" '+(quick.includes(genre)?"selected":"")+'>More genres</option>'+all.filter(g=>!quick.includes(g)).map(g=>'<option '+(g===genre?"selected ":"")+'value="'+esc(g)+'">'+esc(g)+'</option>').join(""))+
     '<span class="spec-control">'+select("demand","Chromebook hardware demand",'<option value="">Any spec</option>'+Object.keys(levels).map(k=>'<option '+(level===k?"selected ":"")+'value="'+k+'">'+levels[k]+' spec</option>').join(""))+
     '<button class="spec-help" data-action="specs" title="What do the spec labels mean?" aria-label="Explain spec estimates">'+icon("info")+'</button></span></div>';
@@ -107,7 +120,7 @@ function communityBar(){
 }
 function currentRanks(){
   const fixed=podium.map(id=>byId.get(id)).filter(Boolean);
-  return [...fixed,...games.filter(g=>!podium.includes(g.id)).sort((a,b)=>(rankedCounts[b.id]||0)-(rankedCounts[a.id]||0)||alphabetical(a,b))];
+  return [...fixed,...games.filter(g=>g.mode==="embed" && !podium.includes(g.id)).sort((a,b)=>(rankedCounts[b.id]||0)-(rankedCounts[a.id]||0)||alphabetical(a,b))];
 }
 function chartStatus(){
   if(chartState==="live") return '<span class="live-state"><i aria-hidden="true"></i>Live</span>';
@@ -124,13 +137,13 @@ function chartPanel(){
 function renderLibrary(){
   const searching=current.page==="search";
   const full=searching ? games.filter(g=>!q || matches(g,q)) : games.filter(g=>!highlighted.has(g.id));
-  const rows=full.filter(g=>(!genre || g.genre===genre)&&(!level || g.load===level));
+  const rows=full.filter(g=>(!genre || g.genre===genre)&&(!level || g.load===level) && (availability==="all" || (g.mode==="embed")===(availability==="play")));
   const label=searching ? "Search results" : "Game library";
   const aside='<div class="shelf-aside">'+(searching?"":invite())+'<span class="sort-label">A–Z</span></div>';
   let html=searching?"":'<div class="spotlight">'+hero()+chartPanel()+'</div>'+communityBar();
   html+=titleBar(searching?"h1":"h2",label,rows.length,aside)+filters();
-  if(rows.length) html+=grid(rows);
-  else if(full.length || !q) html+='<div class="empty">'+icon("filter")+'<h2>No games with those filters</h2><p>Try another genre or a different spec level.</p>'+btn("reset-filters","Clear filters","filter")+'</div>';
+  if(rows.length) html+=grid(rows.slice(0,visibleCount))+moreButton(rows.length);
+  else if(full.length || !q) html+='<div class="empty">'+icon("filter")+'<h2>No games with those filters</h2><p>Clear filters to see every matching title.</p>'+btn("reset-filters","Clear filters","filter")+'</div>';
   else {
     const sent=receivedQueries.has(normalize(q));
     html+='<div class="empty">'+icon("search")+'<h2>'+ (sent?"Request received":"No games found") +'</h2><p>'+(sent?"Aw shucks! We don’t seem to have that game yet, however we saw your search, and will attempt to add it soon!":"There’s no match for “"+esc(q)+"”. Submit this title to send it to the arcade’s game requests on Discord.")+'</p>'+
@@ -140,16 +153,16 @@ function renderLibrary(){
 }
 function renderSaved() {
   const rows=games.filter(g=>saved.has(g.id));
-  main.innerHTML='<section class="section-page">'+titleBar("h1","Saved games",rows.length)+(rows.length?grid(rows):'<div class="empty">'+icon("bookmark")+'<h2>Your saved shelf is empty</h2><p>Use the bookmark on a game to keep it here on this device.</p><a class="btn" href="#/library">Browse games</a></div>')+'</section>';
+  main.innerHTML='<section class="section-page">'+titleBar("h1","Saved games",rows.length)+(rows.length?grid(rows.slice(0,visibleCount))+moreButton(rows.length):'<div class="empty">'+icon("bookmark")+'<h2>Your saved shelf is empty</h2><p>Use the bookmark on a game to keep it here on this device.</p><a class="btn" href="#/library">Browse games</a></div>')+'</section>';
 }
 function drawTop(){
   const ranks=currentRanks();
   main.innerHTML='<section class="section-page"><div class="shelf-head"><div><h1>Top games</h1><p class="subcopy">The first three places are pinned. The rest of the chart follows community launches.</p></div><div class="top-live">'+chartStatus()+presence("all")+'</div></div>'+
     (chartState==="offline"?'<p class="hint">Live counts are unavailable. The chart will retry automatically.</p>':"")+
-    '<div class="grid">'+ranks.map((g,i)=>card(g,{rank:i+1,count:Number(rankedCounts[g.id])||0})).join("")+'</div></section>';
+    '<div class="grid">'+ranks.slice(0,visibleCount).map((g,i)=>card(g,{rank:i+1,count:Number(rankedCounts[g.id])||0})).join("")+'</div>'+moreButton(ranks.length)+'</section>';
 }
 function refreshChart(force=false){
-  if(document.hidden || player?.expanded() || !["library","top","search","saved","game"].includes(current.page) || (topCache && !force && Date.now()-topCache.time<20000)) return;
+  if(document.hidden || (playSession || player?.expanded()) || !["library","top","search","saved","game"].includes(current.page) || (topCache && !force && Date.now()-topCache.time<20000)) return;
   if(chartRequest)return chartRequest;
   const previousState=chartState,previousCounts=JSON.stringify(rankedCounts);
   chartRequest=api("/v1/top").then(({plays,active})=>{
@@ -166,7 +179,7 @@ function refreshChart(force=false){
 }
 function scheduleChart(){
   clearInterval(chartTimer);
-  if(document.hidden || player?.expanded() || !["library","top","search","saved","game"].includes(current.page))return;
+  if(document.hidden || (playSession || player?.expanded()) || !["library","top","search","saved","game"].includes(current.page))return;
   refreshChart();chartTimer=setInterval(()=>refreshChart(true),30000);
 }
 function redrawSavedButtons(id){
@@ -207,16 +220,17 @@ function reportUrl(){
   return "#/report?"+p;
 }
 function gameLayout(g){
-  const displayLabel=chromeOS?"Full tab":"Fullscreen";
-  const exitLabel=chromeOS?"Exit full tab":"Leave fullscreen";
-  main.innerHTML='<a class="back" href="#/library">'+icon("back")+'All games</a><h1 class="game-title">'+esc(g.title)+'</h1><div class="game-meta">'+specBadge(g.load)+'<span>'+esc(g.genre)+'</span>'+(g.edition?'<span class="edition">'+esc(g.edition)+'</span>':'')+presence(g.id)+'</div>'+
-    '<div class="stage-slot"><div id="stage" class="stage centered"><div class="stage-art" style="background-image:url(\''+(g.id===featureId?"./assets/minecraft-story-mode-hero.webp":relativeAsset(g.id))+'\')"></div><div class="startbox" id="startbox"><p role="status">Preparing the player…</p></div><button type="button" class="icon-btn exit-stage" data-action="fullscreen" title="'+exitLabel+'" aria-label="'+exitLabel+'">'+icon("close")+'</button></div></div>'+
+  const displayLabel="Fullscreen";
+  const exitLabel="Leave fullscreen";
+  const stageImage=g.id===featureId?"./assets/minecraft-story-mode-hero.webp":g.imported?posterAsset(g.id):relativeAsset(g.id);
+  main.innerHTML='<a class="back" href="#/library">'+icon("back")+'All games</a><h1 class="game-title">'+esc(g.title)+'</h1><div class="game-meta">'+specBadge(g.load)+'<span>'+esc(g.genre)+'</span>'+(g.edition?'<span class="edition">'+esc(g.edition)+'</span>':'')+playStatus(g)+'</div>'+
+    '<div class="stage-slot"><div id="stage" class="stage centered"><div class="stage-art" style="background-image:url(\''+stageImage+'\')" ></div><div class="startbox" id="startbox"><p role="status">Preparing the player…</p></div><button type="button" class="icon-btn exit-stage" data-action="fullscreen" title="'+exitLabel+'" aria-label="'+exitLabel+'">'+icon("close")+'</button></div></div>'+
     '<div class="play-tools">'+(g.mode==="embed"?btn("fullscreen",displayLabel,"expand"):"")+bookmark(g.id)+'<a class="secondary-btn report-link" href="'+reportUrl()+'">'+icon("bug")+'Report a bug</a></div><div id="key-area"></div>'+
-    '<div class="details"><section class="pane"><h2>About this game</h2><p>'+esc(g.description)+'</p><details><summary>Port details &amp; sources</summary><ul>'+g.sources.map((u,i)=>'<li><a target="_blank" rel="noopener noreferrer" href="'+esc(u)+'">'+esc(u.includes("github.com/")?u.replace("https://github.com/",""):new URL(u).hostname)+(g.sources.length>1?" · source "+(i+1):"")+'</a></li>').join("")+'</ul><div id="other-ports"></div></details></section>'+
-    '<section class="pane"><h2>Playing on a Chromebook</h2><p>'+esc(g.notes)+'</p><button class="text-link" data-action="specs">See the spec guide</button></section></div>';
+    '<div class="details"><section class="pane"><h2>About this game</h2><p>'+esc(g.description || (g.mode==="embed"?"Browser build from the linked source project.":"Listed in the Ultimate Catalog of Web Game Ports."))+'</p><details><summary>Port details &amp; sources</summary><ul>'+g.sources.map((u,i)=>'<li><a target="_blank" rel="noopener noreferrer" href="'+esc(u)+'">'+esc(u.includes("github.com/")?u.replace("https://github.com/",""):new URL(u).hostname)+(g.sources.length>1?" · source "+(i+1):"")+'</a></li>').join("")+'</ul>'+(g.posterSource?'<a class="text-link" href="'+esc(g.posterSource)+'" target="_blank" rel="noopener noreferrer">Preview artwork</a>':'')+'<div id="other-ports"></div></details></section>'+
+    '<section class="pane"><h2>Playing on a Chromebook</h2><p>'+esc(g.notes || "Chromebook performance varies by port and device.")+'</p><button class="text-link" data-action="specs">See the spec guide</button></section></div>';
   if(g.mode==="embed"){
     $(".play-tools [data-action=fullscreen]").disabled=true;
-    player=createPlayer($("#stage"),g.title,scheduleChart);
+    player=createPlayer($("#stage"),g.title,scheduleChart,toast);
   }
 }
 function safeGameUrl(value) {
@@ -224,21 +238,35 @@ function safeGameUrl(value) {
   if(u.protocol!=="https:" && u.origin!==location.origin)throw Error("Invalid game link.");
   return u.href;
 }
+async function getLaunch(id) {
+  // Free releases ship their launch map alongside the catalog on Pages.
+  // Gated releases omit the map and authorize each launch with the Worker.
+  if (!launchCatalog) {
+    launchCatalog = fetch("./free-launches.json?v=4", {credentials:"omit",cache:"no-store"}).then(async response => {
+      if (response.status===404) return null;
+      if (!response.ok) throw Error("Couldn’t load the launch catalog. Try again.");
+      return response.json();
+    }).catch(error => {launchCatalog=null;throw error;});
+  }
+  const catalog = await launchCatalog;
+  if (catalog && Object.hasOwn(catalog,id)) return catalog[id];
+  return api("/v1/launch/"+id,{});
+}
 async function prepareGame(g, token, autoStart=false){
   if(g.mode!=="embed"){
-    $("#startbox").innerHTML='<strong>In-page play unavailable</strong><p>'+esc(g.unavailable)+'</p>';
+    $("#startbox").innerHTML='<strong>In-page play unavailable</strong><p>'+esc(g.unavailable)+'</p>'+(g.sources.length?'<a class="secondary-btn" target="_blank" rel="noopener noreferrer" href="'+esc(g.sources[0])+'">View source</a>':"");
     return;
   }
   try{
-    const launch=await api("/v1/launch/"+g.id,{});
+    const launch=await getLaunch(g.id);
     if(token!==navigation)return;
     const url=safeGameUrl(launch.url);
-    const playerUrl=g.id==="simpsons-hit-and-run"?new URL("./imports/hit-and-run/index.html",document.baseURI).href:g.id==="happy-wheels"?new URL("./imports/happy-wheels/",document.baseURI).href:url;
+    const playerUrl=g.id==="simpsons-hit-and-run"?new URL("./imports/hit-and-run/index.html",document.baseURI).href:g.id==="happy-wheels"?new URL("./imports/happy-wheels/",document.baseURI).href:g.id==="2048"?new URL("./imports/2048/",document.baseURI).href:url;
     currentLaunch={id:g.id,url:playerUrl};
     $(".play-tools [data-action=fullscreen]").disabled=false;
     $("#key-area").replaceChildren();
-    const resolutionOption=chromeOS && g.load==="high"
-      ? '<label class="resolution-option"><input id="limit-resolution" type="checkbox" checked> Limit player size to 1280 × 720</label>' : "";
+    const resolutionOption=chromeOS && (g.load==="high" || g.load==="unknown")
+      ? '<label class="resolution-option"><input id="limit-resolution" type="checkbox" '+(g.load==="high"?"checked":"")+'> Limit player size to 1280 × 720</label>' : "";
     $("#startbox").innerHTML=btn("start-game",g.edition==="Classic demo"?"Play demo":"Play game","play","btn")+resolutionOption;
     if(autoStart) startGame(g);
     if(launch.alternates?.length) $("#other-ports").innerHTML=launch.alternates.map(a=>'<a class="text-link" href="'+esc(safeGameUrl(a.url))+'" rel="noopener noreferrer" target="_blank">'+esc(a.label)+'</a>').join(" · ");
@@ -275,10 +303,11 @@ function recordPlay(id){
   topCache=null;
   const gameplay={id,session:crypto.randomUUID(),registered:false};
   playSession=gameplay;
+  clearInterval(chartTimer);
   api("/v1/play/"+id,{session:gameplay.session}).then(()=>{
     gameplay.registered=true;
     if(playSession!==gameplay){signalPresence(gameplay,"left");return;}
-    scheduleHeartbeat();refreshChart(true);
+    scheduleHeartbeat();
   }).catch(()=>{ /* Play continues if the count service is offline. */ });
 }
 function startGame(g){
@@ -310,15 +339,19 @@ async function submitReport(form){
 async function showCredits(token){
   main.innerHTML='<section class="narrow section-page"><a class="back" href="#/library">'+icon("back")+'All games</a><h1 class="panel-title">Credits</h1><p class="subcopy">Game art belongs to the artists and publishers listed below. Each game page links to its port.</p><div id="credits-list" class="pane">Loading credits…</div></section>';
   try {
-    const data=await readJson("./credits.json?v=3");if(token!==navigation)return;
+    const data=await readJson("./credits.json?v=4");if(token!==navigation)return;
     $("#credits-list").innerHTML='<ul class="credits-list">'+data.map(x=>'<li><a href="'+esc(x.source)+'" target="_blank" rel="noopener noreferrer">'+esc(x.title)+'</a> · '+esc(x.credit)+(x.posterSource?' · <a href="'+esc(x.posterSource)+'" target="_blank" rel="noopener noreferrer">Poster art</a>':'')+'</li>').join("")+'</ul><p class="hint">Interface typefaces include <a class="text-link" href="./assets/fonts/dm-sans-OFL.txt">DM Sans</a> and <a class="text-link" href="./assets/fonts/barlow-condensed-OFL.txt">Barlow Condensed</a>.</p>';
   }catch{if(token===navigation)feedback("#credits-list","Couldn’t load the credits. Refresh to try again.");}
 }
 function route({scroll=true}={}){
+  visibleCount=pageSize;
   endPlay();
   player?.dispose();player=null;
+  const previousPage=current.page;
   const token=++navigation;current=readRoute();currentLaunch=null;currentReport="";
   const isSearch=current.page==="search";
+  if(isSearch && previousPage!=="search")availability="all";
+  if(current.page==="library" && previousPage!=="library")availability="play";
   q=isSearch?(current.params.get("q") || "").slice(0,80):"";search.value=q;
   searchMessage="";
   setNav();$("#theme-panel").hidden=true;$("#theme-button").setAttribute("aria-expanded","false");
@@ -349,7 +382,7 @@ async function requestMissing(){
   const term=search.value.trim(),key=normalize(term);
   if(!term)return;
   if(current.page!=="search" || q!==term)searchView(term);
-  if(games.some(g=>matches(g,term))) {if(genre||level){genre="";level="";renderLibrary();}return;}
+  if(games.some(g=>matches(g,term))) {genre="";level="";availability="all";visibleCount=pageSize;renderLibrary();return;}
   if(!key){searchMessage="Enter a game title with at least two letters or numbers.";renderLibrary();return;}
   if(receivedQueries.has(key) || sendingSearch===key)return;
   lastSearchKey=key;sendingSearch=key;searchMessage="";renderLibrary();
@@ -386,7 +419,7 @@ function setup(){
   document.addEventListener("click",e=>{
     if(!e.target.closest(".preferences")){$("#theme-panel").hidden=true;$("#theme-button").setAttribute("aria-expanded","false");}
     const save=e.target.closest("[data-save]");if(save){rememberGame(save.dataset.save);return;}
-    const filter=e.target.closest("[data-genre]");if(filter){genre=filter.dataset.genre;renderLibrary();document.querySelector('[data-genre="'+genre+'"]')?.focus({preventScroll:true});return;}
+    const filter=e.target.closest("[data-genre]");if(filter){genre=filter.dataset.genre;visibleCount=pageSize;renderLibrary();document.querySelector('[data-genre="'+genre+'"]')?.focus({preventScroll:true});return;}
     const link=e.target.closest("a[data-page],a.brand");
     if(link && link.getAttribute("href")==="#/library"){genre="";level="";if(current.page==="library")renderLibrary();}
     const footerBug=e.target.closest('.footer a[href="#/report"]');if(footerBug && current.page!=="report"){e.preventDefault();location.hash=reportUrl();}
@@ -398,7 +431,8 @@ function setup(){
       case "close-guide":guide.close();break;
       case "see-top":guide.close();location.hash="#/top";break;
       case "specs":showSpecs();break;
-      case "reset-filters":genre="";level="";renderLibrary();break;
+      case "show-more":visibleCount+=pageSize;if(current.page==="top")drawTop();else if(current.page==="saved")renderSaved();else renderLibrary();break;
+      case "reset-filters":genre="";level="";availability="all";visibleCount=pageSize;renderLibrary();break;
       case "request":requestMissing();break;
       case "start-game":startGame(byId.get(current.id));break;
       case "retry-game":$("#startbox").innerHTML='<p role="status">Preparing the player…</p>';prepareGame(byId.get(current.id),navigation);break;
@@ -406,6 +440,8 @@ function setup(){
     }
   });
   document.addEventListener("change",e=>{
+    if(["availability","more-genres","demand"].includes(e.target.id))visibleCount=pageSize;
+    if(e.target.id==="availability"){availability=e.target.value;renderLibrary();$("#availability").focus({preventScroll:true});}
     if(e.target.id==="more-genres"){genre=e.target.value;renderLibrary();$("#more-genres").focus({preventScroll:true});}
     if(e.target.id==="demand"){level=e.target.value;renderLibrary();$("#demand").focus({preventScroll:true});}
   });
@@ -421,5 +457,5 @@ async function readJson(path){
   return res.json();
 }
 setup();
-try {games=(await readJson("./games.json?v=3")).sort(alphabetical);byId=new Map(games.map(g=>[g.id,g]));route({scroll:false});}
+try {games=(await readJson("./games.json?v=4")).sort(alphabetical);byId=new Map(games.map(g=>[g.id,g]));route({scroll:false});}
 catch {main.innerHTML='<div class="empty"><h1>Couldn’t open the vault</h1><p>Reload this page to fetch the game catalog.</p><a class="btn" href="./">Reload</a></div>';}

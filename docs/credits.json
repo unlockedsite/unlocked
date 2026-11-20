@@ -189,5 +189,20 @@
     "title": "Featured wordmark",
     "credit": "Telltale Games / Mojang",
     "source": "https://community.telltale.com/discussion/88513/telltale-and-mojang-developing-minecraft-story-mode-a-telltale-games-series-for-2015"
+  },
+  {
+    "title": "Ultimate Catalog of Web Game Ports",
+    "credit": "Carter54git and catalog contributors",
+    "source": "https://github.com/Carter54git/Ultimate-Catalog-Of-Web-Game-Ports"
+  },
+  {
+    "title": "2048",
+    "credit": "Gabriele Cirulli",
+    "source": "https://github.com/gabrielecirulli/2048"
+  },
+  {
+    "title": "Hextris",
+    "credit": "Hextris contributors",
+    "source": "https://github.com/Hextris/hextris"
   }
 ]

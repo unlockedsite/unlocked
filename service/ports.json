@@ -3,13 +3,7 @@
     "url": "https://wasm.rip/files/amongus/latest/"
   },
   "beatblock": {
-    "url": "https://somerandomfella.github.io/portsandrips/blockblast-port/game.html",
-    "alternates": [
-      {
-        "label": "Alternate port",
-        "url": "https://wasm.rip/files/beatblock/index.html"
-      }
-    ]
+    "url": "https://wasm.rip/files/beatblock/index.html"
   },
   "bendy": {
     "url": "https://gn-math.github.io/html/215-fix2.html"
@@ -106,5 +100,560 @@
   },
   "yandere-simulator": {
     "url": "https://gn-math.github.io/html/554-fix2.html"
+  },
+  "b": {
+    "url": "https://rawcdn.githack.com/web-ports/baldi-mods/debd42e16b6c6a59045e177c791c7ac779aa9c9f/-b/index.html"
+  },
+  "20-minutes-till-dawn": {
+    "url": "https://rawcdn.githack.com/web-ports/20-minutes/e82366ecffd3ed46f804da050d02a44422986204/index.html"
+  },
+  "amanda-the-adventurer": {
+    "url": "https://rawcdn.githack.com/genizy/web-port/a8bea5fd11f88e5a9192857f434e299c40efe7e6/amanda-the-adventurer/index.html"
+  },
+  "andy-s-apple-farm": {
+    "url": "https://rawcdn.githack.com/genizy/web-port/a8bea5fd11f88e5a9192857f434e299c40efe7e6/andys-apple-farm/index.html"
+  },
+  "animal-crossing": {
+    "url": "https://rawcdn.githack.com/web-ports/ac-gamecube/02e63512555558da9a4a1db5fc8c7ea7a0baffdc/index.html"
+  },
+  "antonblast": {
+    "url": "https://rawcdn.githack.com/web-ports/antonblast/1534cf1f683ccd14679813b3f7d2bb403875d8be/index.html"
+  },
+  "baldi-s-basics-classic-remastered": {
+    "url": "https://rawcdn.githack.com/genizy/web-port/a8bea5fd11f88e5a9192857f434e299c40efe7e6/baldi-remaster/index.html"
+  },
+  "baldi-s-basics-plus": {
+    "url": "https://rawcdn.githack.com/genizy/web-port/a8bea5fd11f88e5a9192857f434e299c40efe7e6/baldi-plus/index.html"
+  },
+  "a-bite-at-freddy-s": {
+    "url": "https://rawcdn.githack.com/freebuisness/assets/6bacc0f4e61e95e6a4e4309a63b189e179d91e34/258/index.html"
+  },
+  "block-blast": {
+    "url": "https://rawcdn.githack.com/SomeRandomFella/portsandrips/9546494b3052e8e078fb28df7430ac35f42a8787/blockblast-port/game.html"
+  },
+  "bloodmoney": {
+    "url": "https://rawcdn.githack.com/genizy/web-port/a8bea5fd11f88e5a9192857f434e299c40efe7e6/bloodmoney/index.html"
+  },
+  "bounce-tales": {
+    "url": "https://rawcdn.githack.com/PrasannaOne/BounceTales/eaa9955c8adf11d9e71ee06ed0b76b9d19804224/index.html"
+  },
+  "brotato": {
+    "url": "https://rawcdn.githack.com/BlueGameMC/BrotatoWeb/37d9eb47c2e3407076a77ba2da54cb3d42f033e9/index.html"
+  },
+  "celeste": {
+    "url": "https://rawcdn.githack.com/web-ports/celeste/02c0f473f85bab0fa4d826352464313de2d8e6c7/index.html"
+  },
+  "chasing-tails-a-promise-in-the-snow": {
+    "url": "https://rawcdn.githack.com/gays-studio/chasingtails/78414a1d22406c7415c322260982d7e3248b8bbe/index.html"
+  },
+  "christmas-massacre": {
+    "url": "https://rawcdn.githack.com/web-ports/christmas-massacre/156b0e5a5665eadc9258d2d3d9c93c21b4cfceb7/index.html"
+  },
+  "class-of-09": {
+    "url": "https://rawcdn.githack.com/genizy/web-port/a8bea5fd11f88e5a9192857f434e299c40efe7e6/class-of-09/index.html"
+  },
+  "class-of-09-the-flip-side": {
+    "url": "https://rawcdn.githack.com/AlexBoops/TFS/9b6be0e00f0c5a65228d8aed9fee4e0cb5a7ab88/index.html"
+  },
+  "class-of-09-the-re-up": {
+    "url": "https://rawcdn.githack.com/AlexBoops/tru/bba8426e8e3d02e6a85b5091f7fdbad3baf9490e/index.html"
+  },
+  "clover-pit": {
+    "url": "https://rawcdn.githack.com/web-ports/clover-pit/2ea4c7c5e25f56caacbec13c8540bc70cc81ff66/index.html"
+  },
+  "counter-strike-1-6": {
+    "url": "https://rawcdn.githack.com/woahhcrackers/Global-Strike/456b15f96e96e238b206262b96209aaf08568c93/index.html"
+  },
+  "cruelty-squad": {
+    "url": "https://rawcdn.githack.com/web-ports/cruelty-squad/19362b389fecb3c75593584d26f8d6c051430124/index.html"
+  },
+  "cuphead": {
+    "url": "https://rawcdn.githack.com/woahhcrackers/CupheadWeb/df67afd1412ca905ca43b8d44ab21ae81e84e58d/index.html"
+  },
+  "a-dance-of-fire-and-ice": {
+    "url": "https://rawcdn.githack.com/Nawsif/host/47a7d1dbcc152d9fb1f563774a7cebc22b0934f4/ADOFAI/index.html"
+  },
+  "dead-plate": {
+    "url": "https://rawcdn.githack.com/genizy/web-port/a8bea5fd11f88e5a9192857f434e299c40efe7e6/dead-plate/index.html"
+  },
+  "the-deadseat": {
+    "url": "https://rawcdn.githack.com/genizy/web-port/a8bea5fd11f88e5a9192857f434e299c40efe7e6/deadseat/index.html"
+  },
+  "descent": {
+    "url": "https://rawcdn.githack.com/arbruijn/d1wasm/3a26527a4ef108499b2daac43b8a6430539dd288/index.html"
+  },
+  "a-difficult-game-about-climbing": {
+    "url": "https://rawcdn.githack.com/web-ports/adgac/af2c9445175376a5f9b5d7446e59594571f17e54/index.html"
+  },
+  "do-not-take-this-cat-home": {
+    "url": "https://rawcdn.githack.com/genizy/web-port/a8bea5fd11f88e5a9192857f434e299c40efe7e6/donottakethiscathome/index.html"
+  },
+  "doom-3": {
+    "url": "https://rawcdn.githack.com/web-ports/doom-3/aaffbdd22620170ebfa86990a3cd76e501af4d46/index.html"
+  },
+  "duck-life-adventure": {
+    "url": "https://rawcdn.githack.com/web-ports/duck-8/e383317e834db183a3893b0303b4d7d9be2a473b/index.html"
+  },
+  "dumb-ways-to-die": {
+    "url": "https://rawcdn.githack.com/web-ports/dumb-ways-to-die/0a96f33195c8a19a023342162da8302ef9735b18/index.html"
+  },
+  "endacopia": {
+    "url": "https://rawcdn.githack.com/linkawaken1979-alt/endacopia-/ce8f6dea90b7e8efa925e9ecf2ae9073571e61f0/index.html"
+  },
+  "fear-hunger": {
+    "url": "https://rawcdn.githack.com/web-ports/fear-and-hunger/491156e1a00da0992cea9f9985a72f04874b8b79/index.html"
+  },
+  "fear-hunger-2-termina": {
+    "url": "https://rawcdn.githack.com/web-ports/fear-and-hunger-2/b52a0b60d2308a6d7addd16a4b4f2458c10ce9a3/index.html"
+  },
+  "fish": {
+    "url": "https://rawcdn.githack.com/web-ports/fish/e11b1e847859e1fbba6cb102b7d7ffac576327fc/index.html"
+  },
+  "five-nights-at-epstein-s": {
+    "url": "https://rawcdn.githack.com/web-ports/fnae/ce3e15db144629f468916e186bc11547098706a2/index.html"
+  },
+  "five-nights-at-candy-s": {
+    "url": "https://rawcdn.githack.com/web-ports/fnac/ba0ff4088706af7db1da0a60a77b5b8704863376/1/index.html"
+  },
+  "five-nights-at-candy-s-2": {
+    "url": "https://rawcdn.githack.com/web-ports/fnac/ba0ff4088706af7db1da0a60a77b5b8704863376/2/index.html"
+  },
+  "five-nights-at-freddy-s-4-halloween": {
+    "url": "https://rawcdn.githack.com/genizy/fnaf/7be68ae3d98c60a9a62b4164c2d61a416a0beb1a/4-halloween/index.html"
+  },
+  "five-nights-at-freddy-s-world-refreshed": {
+    "url": "https://rawcdn.githack.com/web-ports/fnaf-world-refreshed/5ad15720ba66d73ff80d7fa9d7a4cbf4a297e7ae/index.html"
+  },
+  "five-nights-at-freddy-s-sister-location": {
+    "url": "https://rawcdn.githack.com/irv77/hd_fnaf/8ddade73bcf0c30f4535d48af778d238f8ffd5a6/sl/index.html"
+  },
+  "five-nights-at-freddy-s-ultimate-custom-night": {
+    "url": "https://rawcdn.githack.com/irv77/hd_fnaf/8ddade73bcf0c30f4535d48af778d238f8ffd5a6/ucn/index.html"
+  },
+  "five-nights-at-freddy-s-world": {
+    "url": "https://rawcdn.githack.com/irv77/hd_fnaf/8ddade73bcf0c30f4535d48af778d238f8ffd5a6/w/index.html"
+  },
+  "flying-gorilla": {
+    "url": "https://rawcdn.githack.com/web-ports/flying-gorilla/b6873536e2b227d76800f08a42183949f9b1beb5/index.html"
+  },
+  "heroes-of-might-and-magic-ii": {
+    "url": "https://rawcdn.githack.com/Carter54git/fheroes-1.1.17-ported-to-web/fc9e1082960d7b3297e42e54df46eeaf19956069/index.html"
+  },
+  "fundamental-paper-novel": {
+    "url": "https://rawcdn.githack.com/bubbls/ports/6358736132208699cda37b554c75510a5fb77e41/fpn-FULLY_RECRAFTED-web/index.html"
+  },
+  "gabriel-s-awesome-schoolhouse": {
+    "url": "https://rawcdn.githack.com/web-ports/gash/2f811e80f6fe649d0dafac7df6599d64e4fee9a3/index.html"
+  },
+  "gta-3": {
+    "url": "https://rawcdn.githack.com/larpinguser/HelloWorldScriptBasicFunctionCSharpIsCool/6a6cf53d66fe8452ca6c1896ce0ce41f1ba12e0e/index.html"
+  },
+  "grand-theft-auto-vice-city": {
+    "url": "https://rawcdn.githack.com/joncodeofficial/gta-vice-city-wasm/5c6cccc56c1df5c3717c0b39953d5fe833f97b73/index.html"
+  },
+  "half-life-2": {
+    "url": "https://rawcdn.githack.com/AlexBoops/half-life-2-port/b86cc306c1d310ff7c4ce56524afa79d3ad2ef97/index.html"
+  },
+  "happy-sheepies": {
+    "url": "https://rawcdn.githack.com/genizy/web-port/a8bea5fd11f88e5a9192857f434e299c40efe7e6/happy-sheepies/index.html"
+  },
+  "helltaker": {
+    "url": "https://rawcdn.githack.com/larpinguser/Helltaker-Web/d3e64f765b7841390f502f33f0a3e20bfdf32999/helltakerweb/index.html"
+  },
+  "hollow-knight-silksong": {
+    "url": "https://rawcdn.githack.com/web-ports/hollow-knight-silksong/bcbe014765f2f6ca4b1d82ac25755a0299a600ab/index.html"
+  },
+  "hotline-miami": {
+    "url": "https://rawcdn.githack.com/genizy/web-port/a8bea5fd11f88e5a9192857f434e299c40efe7e6/hotline-miami/index.html"
+  },
+  "human-expenditure-program": {
+    "url": "https://rawcdn.githack.com/genizy/web-port/a8bea5fd11f88e5a9192857f434e299c40efe7e6/human-expenditure-program/index.html"
+  },
+  "in-stars-and-time": {
+    "url": "https://rawcdn.githack.com/Reeyuki/InStarsAndTime/d3e002beadc345642f5e29faf8d28e4242e573c9/index.html"
+  },
+  "inscryption": {
+    "url": "https://rawcdn.githack.com/Reeyuki/InscryptionWebport/a6069ee4139036ac01cca34a1a008ffc543469ac/index.html"
+  },
+  "iron-lung": {
+    "url": "https://rawcdn.githack.com/web-ports/iron-lung/609540cad01c7cad3de44271423305c9a57ac2bd/index.html"
+  },
+  "jeffrey-epstein-basics-in-education-and-kidnapping": {
+    "url": "https://rawcdn.githack.com/bubbls/ports/6358736132208699cda37b554c75510a5fb77e41/jeffrey-epsteins-basics-in-education-and-kidnapping/index.html"
+  },
+  "jelly-drift": {
+    "url": "https://rawcdn.githack.com/genizy/web-port/a8bea5fd11f88e5a9192857f434e299c40efe7e6/jelly-drift/index.html"
+  },
+  "just-shapes-beats": {
+    "url": "https://rawcdn.githack.com/web-ports/jsab/d641f8b750b201bdac7acb00482fbf77c5b7c175/index.html"
+  },
+  "karlson": {
+    "url": "https://rawcdn.githack.com/genizy/web-port/a8bea5fd11f88e5a9192857f434e299c40efe7e6/karlson/index.html"
+  },
+  "kindergarten-3": {
+    "url": "https://rawcdn.githack.com/slqntdevss/Kindergarten3Port/54992074c0e47888db4187134a8952ec92d3d30f/index.html"
+  },
+  "la-madriguera": {
+    "url": "https://rawcdn.githack.com/web-ports/la-madriguera/382bd4121bf0b484f8f8b4112cb9541d4774bf10/index.html"
+  },
+  "lacey-s-flash-games": {
+    "url": "https://rawcdn.githack.com/genizy/web-port/a8bea5fd11f88e5a9192857f434e299c40efe7e6/lacysflashgames/index.html"
+  },
+  "lego-star-wars-the-video-game": {
+    "url": "https://rawcdn.githack.com/Down1oads/LSWWEB/e67f1bdf1bddec873997f1c69658cd9e72d1f18e/index.html"
+  },
+  "lethal-ape": {
+    "url": "https://rawcdn.githack.com/web-ports/lethal-ape/9cc72f44a8bc4c42225b874523e92cc17de5f2d0/index.html"
+  },
+  "lobotomy-corporation": {
+    "url": "https://rawcdn.githack.com/Reeyuki/lobcorp/a8815a5edf746b24ebd8028273c4de80c8f67821/index.html"
+  },
+  "look-outside": {
+    "url": "https://rawcdn.githack.com/web-ports/look-outside/648f71f7680a78513695a579bbeab8e44066c501/index.html"
+  },
+  "lords-of-the-realm-ii": {
+    "url": "https://rawcdn.githack.com/1lk/Lords2web/77104c6f7ef960907baadf091849ec3837e2c038/index.html"
+  },
+  "the-man-from-the-window": {
+    "url": "https://rawcdn.githack.com/genizy/web-port/a8bea5fd11f88e5a9192857f434e299c40efe7e6/the-man-in-the-window/index.html"
+  },
+  "mario-party-4": {
+    "url": "https://rawcdn.githack.com/wigwoo1/Mario-Party-4-PC-Download-Play-Edition/64968f25481eda58a27987781452641611f961e1/web/index.html"
+  },
+  "micro-machines": {
+    "url": "https://rawcdn.githack.com/hivvu/scale-miniatures/28aa581b18af653145935f818a58fece1836f2fc/index.html"
+  },
+  "milk-inside-a-bag-of-milk-inside-a-bag-of-milk": {
+    "url": "https://rawcdn.githack.com/web-ports/milk-bag-games/b807a5dbb662c604418d9484820522f597c3d810/inside/index.html"
+  },
+  "milk-outside-a-bag-of-milk-outside-a-bag-of-milk": {
+    "url": "https://rawcdn.githack.com/web-ports/milk-bag-games/b807a5dbb662c604418d9484820522f597c3d810/outside/index.html"
+  },
+  "miside": {
+    "url": "https://rawcdn.githack.com/web-ports/miside/323f1ee5eb61b9ed3221656ce3790136f979557a/index.html"
+  },
+  "need-for-speed-most-wanted": {
+    "url": "https://rawcdn.githack.com/Iker3329/nfsmw-webport/b22b53bfb55687be19363f0bb90ef65b52eea678/index.html"
+  },
+  "needy-streamer-overload": {
+    "url": "https://rawcdn.githack.com/web-ports/needy-streamer-overload/59681566ec4e499caf20511e288aeb26c27daa08/index.html"
+  },
+  "omori": {
+    "url": "https://rawcdn.githack.com/genizy/web-port/a8bea5fd11f88e5a9192857f434e299c40efe7e6/omori-fixed/index.html"
+  },
+  "openttd": {
+    "url": "https://rawcdn.githack.com/swords02/openttd-online/8d2551d4e64ad4146b88db0665bca1b92836a839/index.html"
+  },
+  "peaks-of-yore": {
+    "url": "https://rawcdn.githack.com/web-ports/peaks-of-yore/2ea4ff35ac44352b72ca74cf7d8d824e756ff848/index.html"
+  },
+  "pizza-tower": {
+    "url": "https://rawcdn.githack.com/genizy/web-port/a8bea5fd11f88e5a9192857f434e299c40efe7e6/pizza-tower/index.html"
+  },
+  "scoutdingo": {
+    "url": "https://rawcdn.githack.com/web-ports/scoutdingo/4ca3ad113377a4131bba76bf41bea35834a7bfcb/index.html"
+  },
+  "plague-inc": {
+    "url": "https://rawcdn.githack.com/Reeyuki/PlagueIncEvolved/79306ef07b5456ebdc6d25dc023aa61184c1ae27/index.html"
+  },
+  "plants-vs-zombies": {
+    "url": "https://rawcdn.githack.com/web-ports/pvz/e3b5ddce5a318df69698d906a6d78313e327f965/index.html"
+  },
+  "portal": {
+    "url": "https://rawcdn.githack.com/AlexBoops/portal-1-port/7f4f6a3c652ce975db33c4750b2d1d6cd5b88bc1/index.html"
+  },
+  "power-hover": {
+    "url": "https://rawcdn.githack.com/web-ports/power-hover/c67e34e316cac468a24cfcdf543dc9878a9e23ff/index.html"
+  },
+  "prototype": {
+    "url": "https://rawcdn.githack.com/midzer/prototype/6312e8ff26423ad3660a02b863c660be30010ee5/docs/index.html"
+  },
+  "raldi-s-crackhouse": {
+    "url": "https://rawcdn.githack.com/woahhcrackers/RaldiWeb-LEGACY/68281aaf5f06982694d0a7a0079c2f6681f3090c/index.html"
+  },
+  "ravenfield": {
+    "url": "https://rawcdn.githack.com/degloved-net/Ravenfield/8c3bf5eac6b926128d798641350ba2824488bf08/index.html"
+  },
+  "reset-generation": {
+    "url": "https://rawcdn.githack.com/Hubert-Rybak/Reset-Generation-Wasm-Port/b80f517c88f07ce2d42a6adc20f972707fcb401a/web/index.html"
+  },
+  "rolling-sky": {
+    "url": "https://rawcdn.githack.com/3kh0/rolling-sky/bf1475e2b2c2678efa212c20070f4abf7c3badca/index.html"
+  },
+  "saihate-station": {
+    "url": "https://rawcdn.githack.com/web-ports/saihate-station/d9537964e10243e6a21ab60b93a0ec4705e15d16/index.html"
+  },
+  "schoolboy-runaway": {
+    "url": "https://rawcdn.githack.com/genizy/web-port/a8bea5fd11f88e5a9192857f434e299c40efe7e6/schoolboy-runaway/index.html"
+  },
+  "scp-containment-breach": {
+    "url": "https://rawcdn.githack.com/larpinguser/q8j/db4fc57d357e7112b1fec84f0c1428cd78214910/index.html"
+  },
+  "shift-at-midnight": {
+    "url": "https://rawcdn.githack.com/slqntdevss/ShiftAtMidnightPort/9d5cffa1e1b7ca2e35e1fb6154c77eb87c4f0a4a/index.html"
+  },
+  "side-effects": {
+    "url": "https://rawcdn.githack.com/gn-math/assets/6bacc0f4e61e95e6a4e4309a63b189e179d91e34/318/index.html"
+  },
+  "simcity": {
+    "url": "https://rawcdn.githack.com/graememcc/micropolisJS/f13a1624d111d235e804bd80f48ba7c9f66a8e0f/index.html"
+  },
+  "slender-the-eight-pages": {
+    "url": "https://rawcdn.githack.com/genizy/web-port/a8bea5fd11f88e5a9192857f434e299c40efe7e6/slender/index.html"
+  },
+  "slendytubbies-2": {
+    "url": "https://rawcdn.githack.com/web-ports/slendytubbies/efd9ef91acd1282a9ec4cae5bfd2fadc4f9f07ce/2/index.html"
+  },
+  "slendytubbies-2d": {
+    "url": "https://rawcdn.githack.com/web-ports/slendytubbies/efd9ef91acd1282a9ec4cae5bfd2fadc4f9f07ce/2d/index.html"
+  },
+  "slime-rancher": {
+    "url": "https://rawcdn.githack.com/web-ports/slime-ranchers/6523cde096deabd30216f7f8caa2a77d03ac52b2/index.html"
+  },
+  "super-mario-kart": {
+    "url": "https://rawcdn.githack.com/burnedpopcorn/SM-Kart-ZX-Web-Port/dd9bf843ad86e7254729ba575b99efc04aecf822/index.html"
+  },
+  "sonic-cd": {
+    "url": "https://rawcdn.githack.com/TWS2401/Sonic-CD-WASM/f23b349f4a8874236a0f884cb10bb248be1b6081/index.html"
+  },
+  "sonic-robo-blast-2": {
+    "url": "https://rawcdn.githack.com/web-ports/srb2/f6702b8f077bf7b23a8e40cbbb6c18d4fe061cf8/index.html"
+  },
+  "sonic-the-hedgehog": {
+    "url": "https://rawcdn.githack.com/VinMannie/Sonic-1-WASM/e997c2437788b03ef2713d1c20afa1f2aa974de3/index.html"
+  },
+  "sonic-the-hedgehog-2": {
+    "url": "https://rawcdn.githack.com/VinMannie/Sonic-2-WASM/0da4a4c3eebbbdcd8cb3f02daafa7c1195dcb9ad/index.html"
+  },
+  "sonic-exe": {
+    "url": "https://rawcdn.githack.com/genizy/web-port/a8bea5fd11f88e5a9192857f434e299c40efe7e6/sonic.exe/index.html"
+  },
+  "spaceflight-simulator": {
+    "url": "https://rawcdn.githack.com/web-ports/spaceflight-simulator/c10c91692e4e156f8450e4deee29c3a79489dcff/index.html"
+  },
+  "speed-stars": {
+    "url": "https://rawcdn.githack.com/genizy/web-port/a8bea5fd11f88e5a9192857f434e299c40efe7e6/speed-stars/index.html"
+  },
+  "stardew-valley": {
+    "url": "https://rawcdn.githack.com/degloved-net/stardew-wasm/a664842611f09771f9155b9718046649bcaded33/index.html"
+  },
+  "stick-with-it": {
+    "url": "https://rawcdn.githack.com/slqntdevss/StickWithItPort/e7a077bcf0a3bc9fd111e05878293a6d487b3b06/index.html"
+  },
+  "super-mario-64": {
+    "url": "https://rawcdn.githack.com/B1T64/m64-dl6t2g/96455eae321b97cc0ac9eaaccdbd98e353baa207/index.html"
+  },
+  "super-mario-galaxy": {
+    "url": "https://rawcdn.githack.com/T4ctica1YT/SMGwebport/40837804e15e2b3ee6ebc6c41f7afd0bcb158954/index.html"
+  },
+  "t-cubed": {
+    "url": "https://rawcdn.githack.com/web-ports/baldi-mods/debd42e16b6c6a59045e177c791c7ac779aa9c9f/t3/index.html"
+  },
+  "terraria": {
+    "url": "https://rawcdn.githack.com/web-ports/terraria/47731568354ea43e84e73a99a9e63328351d7194/index.html"
+  },
+  "tattletail": {
+    "url": "https://rawcdn.githack.com/genizy/web-port/a8bea5fd11f88e5a9192857f434e299c40efe7e6/tattletail/index.html"
+  },
+  "that-s-not-my-neighbor": {
+    "url": "https://rawcdn.githack.com/genizy/web-port/a8bea5fd11f88e5a9192857f434e299c40efe7e6/thats-not-my-neighbor/index.html"
+  },
+  "totally-accurate-battle-simulator": {
+    "url": "https://rawcdn.githack.com/web-ports/tabs/f03af105ef2a57a6a7c6ccf1831c95da3327c6f0/index.html"
+  },
+  "traffic-racer": {
+    "url": "https://rawcdn.githack.com/genizy/traffic-racer/9d32bf76916519d1d731558c228cb062d5afcf2d/index.html"
+  },
+  "trees-hate-you": {
+    "url": "https://rawcdn.githack.com/thirstygithub/fugglelatougin/64b65babdaa11d2084c5f8031fa8e4dc415217eb/index.html"
+  },
+  "ultrakill": {
+    "url": "https://rawcdn.githack.com/genizy/web-port/a8bea5fd11f88e5a9192857f434e299c40efe7e6/ultrakill/index.html"
+  },
+  "ultrapool": {
+    "url": "https://rawcdn.githack.com/ParrrotVR/ultrapoolwebport/193ddacb7e3594d2427d008c04d93d96c40dbafb/index.html"
+  },
+  "undertale-yellow": {
+    "url": "https://rawcdn.githack.com/genizy/web-port/a8bea5fd11f88e5a9192857f434e299c40efe7e6/undertale-yellow/index.html"
+  },
+  "untitled-goose-game": {
+    "url": "https://rawcdn.githack.com/web-ports/untitled-goose-game/fbdd0473a0f35fabaea9790e7d60330be1788e26/index.html"
+  },
+  "urban-chaos": {
+    "url": "https://rawcdn.githack.com/Carter54git/Urban-Chaos-OpenChaos-ported-to-web/127cc065fa88d52fba5fa62f0f4f633429c37363/docs/index.html"
+  },
+  "uvuvwevwevweonyetenvewveugwemubwemossas": {
+    "url": "https://rawcdn.githack.com/bubbls/ports/6358736132208699cda37b554c75510a5fb77e41/UvuvwevwevweOnyetenvewveUgwemubwemOssas/index.html"
+  },
+  "webfishing": {
+    "url": "https://rawcdn.githack.com/genizy/web-port/a8bea5fd11f88e5a9192857f434e299c40efe7e6/web-fishing/index.html"
+  },
+  "witch-s-heart": {
+    "url": "https://rawcdn.githack.com/genizy/web-port/a8bea5fd11f88e5a9192857f434e299c40efe7e6/witch-heart/index.html"
+  },
+  "wolfenstein-3d": {
+    "url": "https://rawcdn.githack.com/lazarv/wolf3d/1f6bad2d72981b6a363b0f42f7a67b13021f7f60/index.html"
+  },
+  "your-only-move-is-hustle": {
+    "url": "https://rawcdn.githack.com/web-ports/yomi-hustle/dab11bc3c2f53ab921c773f24939d7da7b293577/index.html"
+  },
+  "yume-nikki": {
+    "url": "https://rawcdn.githack.com/genizy/web-port/a8bea5fd11f88e5a9192857f434e299c40efe7e6/yume-nikki/index.html"
+  },
+  "zanac-ex": {
+    "url": "https://rawcdn.githack.com/ultimzeus/zanac-ex-webport/f393cd5be99a7203e3bf1864b9bb478a3caf0340/index.html"
+  },
+  "2048": {
+    "url": "https://unlockedsite.github.io/unlocked/imports/2048/"
+  },
+  "hextris": {
+    "url": "https://rawcdn.githack.com/Hextris/hextris/3f4847dc8fd7dab3d1c87e6324b9159d92fbd396/index.html"
+  },
+  "60-seconds": {
+    "url": "https://rawcdn.githack.com/usheje883-maker/60-Seconds-Webport/4a1ebbeb5d93e269e12530cd6f56fae314cea8f0/index.html"
+  },
+  "arco": {
+    "url": "https://rawcdn.githack.com/degloved-net/arco/c6a78c0ecf7fbecdd20040bd56c92df766ce4633/index.html"
+  },
+  "backyard-baseball-97": {
+    "url": "https://rawcdn.githack.com/degloved-net/backyard-baseball-97/4dfa46b8023e1f571d7f695e132fe3639778399f/index.html"
+  },
+  "balatro": {
+    "url": "https://rawcdn.githack.com/W0W53R/web-balatro/53ddedfdd2e44d29b922210a92b85b2bfd57d9c2/index.html"
+  },
+  "bat-to-bed-demo": {
+    "url": "https://rawcdn.githack.com/gays-studio/BatToBed-DEMO-webport/d1704994091bb270a263fb4f2b4bf0b351bd80f8/index.html"
+  },
+  "bat-to-the-heavens": {
+    "url": "https://rawcdn.githack.com/gays-studio/bat-to-the-heavens/e12db8d57d16ab7e7a6e14b225cba91e3d1a6c49/index.html"
+  },
+  "the-binding-of-isaac-repentance": {
+    "url": "https://rawcdn.githack.com/chiikabu/the-browsing-of-isaac/f4d8f147fe560dcc3bd4a8d3d60c593d2988522d/index.html"
+  },
+  "black-hole-fishing": {
+    "url": "https://rawcdn.githack.com/mynamescrax/gamesforaetheris/49d00bc76b26b937245fa30de4fabc25b5d5d7d3/blackholefishing/index.html"
+  },
+  "cat-goes-fishing": {
+    "url": "https://rawcdn.githack.com/Reeyuki/CatFish/6f8d9f78a4a98387d29ec6386afe7a3ade9e8e09/index.html"
+  },
+  "click-to-ten": {
+    "url": "https://rawcdn.githack.com/BestSpark687090/bestspark-web-ports/59b23ccf86cb632b9fd8fc54ce7ddddeb99b65be/click-to-ten/index.html"
+  },
+  "dawnfolk": {
+    "url": "https://rawcdn.githack.com/degloved-net/dawnfolk/dda2a81a1252cfec3891f905c3e01675c51a53ce/index.html"
+  },
+  "deltarune": {
+    "url": "https://rawcdn.githack.com/genizy/web-port/a8bea5fd11f88e5a9192857f434e299c40efe7e6/deltatraveler/index.html"
+  },
+  "dewdrop-dynasty": {
+    "url": "https://rawcdn.githack.com/obsidian-ports/Dewdrop-Dynasty/b0d0d75fe0368f5f4668c923e1bd69220ac9c4db/index.html"
+  },
+  "dictators-no-peace-countryballs": {
+    "url": "https://rawcdn.githack.com/web-ports/countryballsdictator/af98c76406defa3e707f0c1f65baba3716b8847b/index.html"
+  },
+  "don-t-bite-me-bro": {
+    "url": "https://rawcdn.githack.com/usheje883-maker/Dont-Bite-Me-Bro-Web/f8f4419ffd7ebe03b1274ab92b947b7f12e1e88a/index.html"
+  },
+  "don-t-sleep-with-the-fishes": {
+    "url": "https://rawcdn.githack.com/AlexBoops/DSWTF-Port/89da47f819334a22cd49af0c73640fcc758c1719/index.html"
+  },
+  "duck-game": {
+    "url": "https://rawcdn.githack.com/im-nassinger/duck-game/d15b1198318bd7fa2cede05eb152b19d0a43770b/index.html"
+  },
+  "gamble-with-your-friends": {
+    "url": "https://rawcdn.githack.com/Camzzz-vrgt/gamble-with-your-friends-web/d7b3ac61ce6d2cb98e212dfa01ba0df413539a53/game/index.html"
+  },
+  "gambonanza": {
+    "url": "https://rawcdn.githack.com/AlexBoops/Gambonanza-Port/b99dbb5bde17f727094b2caefcfd1e2498823823/index.html"
+  },
+  "happy-room": {
+    "url": "https://rawcdn.githack.com/degloved-net/happy-room/adeec544ade64227c7dcec835b9a2c10b4606fa1/index.html"
+  },
+  "hayai": {
+    "url": "https://rawcdn.githack.com/degloved-net/HAYAI/c15a6c1f89a3c99c3daf6100f00295c012338b4d/index.html"
+  },
+  "horsey-game": {
+    "url": "https://rawcdn.githack.com/woahhcrackers/HorseyGameWeb/90db495570cf97ec265f2adae069465219c4613f/index.html"
+  },
+  "hydrogen": {
+    "url": "https://rawcdn.githack.com/BestSpark687090/bestspark-web-ports/59b23ccf86cb632b9fd8fc54ce7ddddeb99b65be/hydrogen/index.html"
+  },
+  "the-message-from-deep-space": {
+    "url": "https://rawcdn.githack.com/dashiellbenton/ports/6803b161f4367af93b7cdd0bb82e9663eed1c0cb/tmfds/index.html"
+  },
+  "meteor-60-seconds": {
+    "url": "https://rawcdn.githack.com/ThatWirdGuy/Meteor-60-Seconds-Web/48d4007cb417492f5d728a5aeaa1907616858e04/index.html"
+  },
+  "muck": {
+    "url": "https://rawcdn.githack.com/gays-studio/muck-webport/148e5bfcacf485774fa774413df8412a4a22000e/index.html"
+  },
+  "night-in-the-woods": {
+    "url": "https://rawcdn.githack.com/reeyuki/NightInTheWoods/0a31ed6d0a54eaf93d1cec111dc743cabfed4d0b/index.html"
+  },
+  "night-of-the-consumers": {
+    "url": "https://rawcdn.githack.com/linkawaken1979-alt/night-of-the-consumers-web-port/bbd9490aaac9e4abb3575579e2caa14d95aa4fbb/index.html"
+  },
+  "nodebuster": {
+    "url": "https://rawcdn.githack.com/degloved-net/nodebuster/3ce74e2c31e7f6055bed0c248288ab0d1d78788c/index.html"
+  },
+  "one-potion-please": {
+    "url": "https://rawcdn.githack.com/ajtabjs/onepotionplease/5f7e6baa3683cec87abf917d9e6df8c5afc897f5/index.html"
+  },
+  "paint-the-town-red": {
+    "url": "https://rawcdn.githack.com/Reeyuki/PttrWebport/dab47af55b69c7c3536f6c22ed3ab8dbfcea0394/index.html"
+  },
+  "project-zomboid": {
+    "url": "https://rawcdn.githack.com/mtnskye/ProjectZomboidTechDemoPort/550054fde222989e46b862760522e6facc6cab22/index.html"
+  },
+  "rimworld": {
+    "url": "https://rawcdn.githack.com/SomeRandomFella/portsandrips/9546494b3052e8e078fb28df7430ac35f42a8787/rimworld/index.html"
+  },
+  "rounds": {
+    "url": "https://rawcdn.githack.com/Nawsif/host/47a7d1dbcc152d9fb1f563774a7cebc22b0934f4/ROUNDS/index.html"
+  },
+  "shrimpio": {
+    "url": "https://rawcdn.githack.com/goodmeals/shrimpio/26877b04c7720e7d938d3e74773491936f426918/index.html"
+  },
+  "super-choppy-orc": {
+    "url": "https://rawcdn.githack.com/gays-studio/super-choppy-orc/045f6fb62c7f06e6c1fa1f668afb26fc9029a8e5/index.html"
+  },
+  "superflight": {
+    "url": "https://rawcdn.githack.com/squidward5/superflight-webport/fba1725080f85c920235fce6452f422ddacd8d2b/index.html"
+  },
+  "there-s-a-butcher-around": {
+    "url": "https://rawcdn.githack.com/usheje883-maker/There-s-A-Butcher-Around-Webport/badfae35a58dc36400d9df0fa4147f5b09b04e0c/index.html"
+  },
+  "trizon": {
+    "url": "https://rawcdn.githack.com/degloved-net/trizon/b6424125e3abb570cf420f11f8438fd22a04eb4c/index.html"
+  },
+  "trombone-champ": {
+    "url": "https://rawcdn.githack.com/degloved-net/trombone-champ/87dbbc3e01c1128e31bda871d7250eb9aa2e7692/index.html"
+  },
+  "upload-labs": {
+    "url": "https://rawcdn.githack.com/googoogoob/UploadLabsWebPort/007a95f3b369e63bcaca7ea3355d2569c922ba13/index.html"
+  },
+  "void-whispers": {
+    "url": "https://rawcdn.githack.com/degloved-net/void-whispers/52797d045d07675c333f8d00f872d56e9fe6277e/index.html"
+  },
+  "while-true-learn": {
+    "url": "https://rawcdn.githack.com/dashiellbenton/ports/6803b161f4367af93b7cdd0bb82e9663eed1c0cb/while-true-learn/index.html"
+  },
+  "chip-s-challenge": {
+    "url": "https://rawcdn.githack.com/CasualX/chipdx/d780b174762ab8a97686f469f85250a8c72f657f/index.html"
+  },
+  "hugo": {
+    "url": "https://rawcdn.githack.com/cyxx/hugo_js/5fa7c8f52dfb7e69ba1e1a3da628fb766505ca31/index.html"
+  },
+  "kingdom-hearts-chain-of-memories": {
+    "url": "https://rawcdn.githack.com/MatyMeatBoy/ReKHCom/3882dc7159f4196599ff9a8e3ccabbf0d937fb8e/index.html"
+  },
+  "the-legend-of-zelda-ocarina-of-time": {
+    "url": "https://rawcdn.githack.com/andrewnakas/oot-cleanroom/4c2bf5c2ce7d7f95a2a41b17da96c51dc5e09cf5/index.html"
+  },
+  "prehistorik": {
+    "url": "https://rawcdn.githack.com/cyxx/prehistorik_js/e2fc4dcc390c46f6bbf4750a1387b1a1512a9f96/index.html"
+  },
+  "quake-2": {
+    "url": "https://rawcdn.githack.com/athola/qwasm2-rs/3cf45b7ca68881421ff8984615774b34ee7061dd/index.html"
   }
 }
