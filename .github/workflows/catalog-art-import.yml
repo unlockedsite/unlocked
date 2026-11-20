@@ -1,0 +1,24 @@
+name: Prepare catalog artwork
+on:
+  push:
+    branches: [catalog-preview-import]
+    paths: [catalog-review/input.json]
+permissions:
+  contents: write
+jobs:
+  artwork:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare game previews
+        run: |
+          python -m pip install Pillow --quiet
+          python catalog-review/prepare.py
+      - name: Save verified previews on the preparation branch
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@users.noreply.github.com
+          git add catalog-review/posters catalog-review/result.json
+          git commit -m "Save decoded catalog posters and launch checks"
+          git push origin HEAD:catalog-preview-import
