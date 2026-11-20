@@ -26,8 +26,10 @@ with sync_playwright() as p:
    url=route.request.url
    response={'plays':{},'active':{}} if '/top' in url else {'url':base+'/imports/2048/'} if '/launch/' in url else {'recorded':True}
    route.fulfill(json=response,headers={'Access-Control-Allow-Origin':'*'})
-  page.route('https://unlocked-arcade-service.**',mock)
-  page.goto(base+'/#/game/2048');page.get_by_role('button',name='Play game').click(timeout=6000)
+  page.route('https://unlocked-arcade-service.persistingthoughts0.chatgpt.site/**',mock)
+  page.on('console',lambda msg:print("browser",msg.type,msg.text[:300]) if msg.type=="error" else None)
+  page.goto(base+'/#/game/2048');page.wait_for_selector('#stage');page.wait_for_timeout(350);print("startbox",page.locator('#startbox').inner_text(),errs)
+  page.get_by_role('button',name='Play game').click(timeout=6000)
   frame=page.frame_locator('iframe');frame.locator('.tile').first.wait_for()
   page.evaluate('window.originalFrame=document.querySelector("iframe")')
   old=frame.locator('.tile-container').inner_html()
