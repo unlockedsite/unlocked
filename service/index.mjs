@@ -10,7 +10,7 @@ const hints = {
   loading: "Check the port URL and the first missing network request. For a threaded build, compare the standalone launch and verify its isolation headers.",
   performance: "Compare the game's spec estimate with the device. Try the lowest graphics preset, close spare tabs, and test the same scene again.",
   controls: "Check keyboard focus and the port's documented input method. Compare the embedded and standalone player.",
-  fullscreen: "On a Chromebook use the arcade’s Full tab button. On other devices, start fullscreen from a button press and check iframe fullscreen delegation.",
+  fullscreen: "Start fullscreen with the player button. If the browser blocks it, open the arcade directly and check iframe fullscreen delegation.",
   sound: "Test sound after a direct click inside the game. Check per-tab mute and the game's audio settings.",
   other: "Reproduce with the supplied steps on the same page, then compare a second browser to narrow down the cause."
 };
