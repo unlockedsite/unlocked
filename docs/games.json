@@ -1099,20 +1099,6 @@
     "posterSource": "https://github.com/gn-math/covers/blob/67baf382659b6b386371fdb2f5c56bcc9b5174eb/825.png"
   },
   {
-    "id": "cuphead",
-    "title": "Cuphead",
-    "genre": "Arcade",
-    "mode": "embed",
-    "load": "high",
-    "sources": [
-      "https://github.com/genizy/web-port/tree/main/cuphead",
-      "https://github.com/woahhcrackers/CupheadWeb",
-      "https://github.com/web-ports/cuphead"
-    ],
-    "imported": true,
-    "posterSource": "https://github.com/gn-math/covers/blob/67baf382659b6b386371fdb2f5c56bcc9b5174eb/465.png"
-  },
-  {
     "id": "a-dance-of-fire-and-ice",
     "title": "A Dance of Fire and Ice",
     "genre": "Arcade",
