@@ -1,0 +1,953 @@
+{
+  "baldi-s-basics-minus-3": {
+    "art": true
+  },
+  "b": {
+    "art": true,
+    "launch": true
+  },
+  "20-minutes-till-dawn": {
+    "art": true,
+    "launch": true
+  },
+  "abuse": {
+    "art": true
+  },
+  "albion": {
+    "art": true
+  },
+  "alley-cat": {
+    "art": true
+  },
+  "alone-in-the-dark": {
+    "art": true
+  },
+  "amanda-the-adventurer": {
+    "art": true,
+    "launch": true
+  },
+  "andy-s-apple-farm": {
+    "art": true,
+    "launch": true
+  },
+  "angband": {
+    "art": true
+  },
+  "animal-crossing": {
+    "art": true,
+    "launch": true
+  },
+  "another-world": {
+    "art": true
+  },
+  "antonblast": {
+    "art": true,
+    "launch": true
+  },
+  "apes-vs-helium": {
+    "art": true
+  },
+  "asylum": {
+    "art": true
+  },
+  "atlantis-the-lost-tales": {
+    "art": true
+  },
+  "baldi-s-basics-classic-remastered": {
+    "art": true,
+    "launch": true
+  },
+  "baldi-s-basics-plus": {
+    "art": true,
+    "launch": true
+  },
+  "bergentruck-201x": {
+    "art": true
+  },
+  "a-bite-at-freddy-s": {
+    "art": true,
+    "launch": true
+  },
+  "blast-corps": {
+    "art": true
+  },
+  "block-blast": {
+    "art": true,
+    "launch": true
+  },
+  "bloodmoney": {
+    "art": true,
+    "launch": true
+  },
+  "bounce-tales": {
+    "art": true,
+    "launch": true
+  },
+  "brotato": {
+    "art": true,
+    "launch": true
+  },
+  "bubble-bobble": {
+    "art": true
+  },
+  "carmageddon": {
+    "art": true
+  },
+  "cave-story": {
+    "art": true
+  },
+  "celeste": {
+    "art": true,
+    "launch": true
+  },
+  "chain-chillas": {
+    "art": true
+  },
+  "chasing-tails-a-promise-in-the-snow": {
+    "art": true,
+    "launch": true
+  },
+  "chip-s-challenge": {
+    "art": true
+  },
+  "christmas-massacre": {
+    "art": true,
+    "launch": true
+  },
+  "class-of-09": {
+    "art": true,
+    "launch": true
+  },
+  "class-of-09-the-flip-side": {
+    "art": true,
+    "launch": true
+  },
+  "class-of-09-the-re-up": {
+    "art": true,
+    "launch": true
+  },
+  "clover-pit": {
+    "art": true,
+    "launch": true
+  },
+  "clustertruck": {
+    "art": true
+  },
+  "command-conquer": {
+    "art": true
+  },
+  "counter-strike-1-6": {
+    "art": true,
+    "launch": true
+  },
+  "half-life": {
+    "art": true
+  },
+  "crash-of-the-titans": {
+    "art": true
+  },
+  "cruelty-squad": {
+    "art": true,
+    "launch": true
+  },
+  "cuphead": {
+    "art": true,
+    "launch": true
+  },
+  "a-dance-of-fire-and-ice": {
+    "art": true,
+    "launch": true
+  },
+  "dead-plate": {
+    "art": true,
+    "launch": true
+  },
+  "the-deadseat": {
+    "art": true,
+    "launch": true
+  },
+  "descent": {
+    "art": true,
+    "launch": true
+  },
+  "devil-may-cry": {
+    "art": true
+  },
+  "diablo": {
+    "art": true
+  },
+  "dice-a-million": {
+    "art": true
+  },
+  "diddy-kong-racing": {
+    "art": true
+  },
+  "a-difficult-game-about-climbing": {
+    "art": true,
+    "launch": true
+  },
+  "do-not-take-this-cat-home": {
+    "art": true,
+    "launch": true
+  },
+  "donald-duck-goin-quackers": {
+    "art": true
+  },
+  "doom-ii": {
+    "art": true
+  },
+  "heretic": {
+    "art": true
+  },
+  "doom-3": {
+    "art": true,
+    "launch": true
+  },
+  "downhill-domination": {
+    "art": true
+  },
+  "dragon-ball-z-budokai-tenkaichi-3": {
+    "art": true
+  },
+  "drakan-the-ancients-gates": {
+    "art": true
+  },
+  "duck-life-adventure": {
+    "art": true,
+    "launch": true
+  },
+  "duke-nukem-ii": {
+    "art": true
+  },
+  "dumb-ways-to-die": {
+    "art": true,
+    "launch": true
+  },
+  "endacopia": {
+    "art": true,
+    "launch": true
+  },
+  "f-zero-x": {
+    "art": true
+  },
+  "fade-to-black": {
+    "art": true
+  },
+  "fear-hunger": {
+    "art": true,
+    "launch": true
+  },
+  "fear-hunger-2-termina": {
+    "art": true,
+    "launch": true
+  },
+  "fih": {
+    "art": true
+  },
+  "fish": {
+    "art": true,
+    "launch": true
+  },
+  "five-nights-at-epstein-s": {
+    "art": true,
+    "launch": true
+  },
+  "five-nights-at-candy-s": {
+    "art": true,
+    "launch": true
+  },
+  "five-nights-at-candy-s-2": {
+    "art": true,
+    "launch": true
+  },
+  "five-nights-at-freddy-s-4-halloween": {
+    "art": true,
+    "launch": true
+  },
+  "five-nights-at-freddy-s-world-refreshed": {
+    "art": true,
+    "launch": true
+  },
+  "five-nights-at-freddy-s-sister-location": {
+    "art": true,
+    "launch": true
+  },
+  "five-nights-at-freddy-s-ultimate-custom-night": {
+    "art": true,
+    "launch": true
+  },
+  "five-nights-at-freddy-s-world": {
+    "art": true,
+    "launch": true
+  },
+  "five-nights-at-frickbear-s-3": {
+    "art": true
+  },
+  "flashback": {
+    "art": true
+  },
+  "flying-gorilla": {
+    "art": true,
+    "launch": true
+  },
+  "heroes-of-might-and-magic-ii": {
+    "art": true,
+    "launch": true
+  },
+  "fundamental-paper-novel": {
+    "art": true,
+    "launch": true
+  },
+  "gabriel-s-awesome-schoolhouse": {
+    "art": true,
+    "launch": true
+  },
+  "a-game-about-feeding-a-black-hole": {
+    "art": true
+  },
+  "god-of-war-ii": {
+    "art": true
+  },
+  "gran-turismo-4": {
+    "art": true
+  },
+  "god-of-war-chains-of-olympus": {
+    "art": true
+  },
+  "god-of-war-ghost-of-sparta": {
+    "art": true
+  },
+  "golden-sun": {
+    "art": true
+  },
+  "gran-turismo-2": {
+    "art": true
+  },
+  "grand-theft-auto-2": {
+    "art": true
+  },
+  "gta-3": {
+    "art": true,
+    "launch": true
+  },
+  "grand-theft-auto-chinatown-wars": {
+    "art": true
+  },
+  "grand-theft-auto-vice-city": {
+    "art": true,
+    "launch": true
+  },
+  "half-life-2": {
+    "art": true,
+    "launch": true
+  },
+  "halo-combat-evolved": {
+    "art": true
+  },
+  "happy-sheepies": {
+    "art": true,
+    "launch": true
+  },
+  "harry-potter-and-the-chamber-of-secrets": {
+    "art": true
+  },
+  "heart-of-darkness": {
+    "art": true
+  },
+  "helltaker": {
+    "art": true,
+    "launch": true
+  },
+  "hollow-knight": {
+    "art": true
+  },
+  "hollow-knight-silksong": {
+    "art": true,
+    "launch": true
+  },
+  "hot-shots-tennis": {
+    "art": true
+  },
+  "hotline-miami": {
+    "art": true,
+    "launch": true
+  },
+  "hugo": {
+    "art": true
+  },
+  "human-expenditure-program": {
+    "art": true,
+    "launch": true
+  },
+  "ignition": {
+    "art": true
+  },
+  "in-stars-and-time": {
+    "art": true,
+    "launch": true
+  },
+  "inscryption": {
+    "art": true,
+    "launch": true
+  },
+  "iron-lung": {
+    "art": true,
+    "launch": true
+  },
+  "jazz-jackrabbit": {
+    "art": true
+  },
+  "jeffrey-epstein-basics-in-education-and-kidnapping": {
+    "art": true,
+    "launch": true
+  },
+  "jelly-drift": {
+    "art": true,
+    "launch": true
+  },
+  "just-shapes-beats": {
+    "art": true,
+    "launch": true
+  },
+  "karlson": {
+    "art": true,
+    "launch": true
+  },
+  "kindergarten": {
+    "art": true
+  },
+  "kindergarten-2": {
+    "art": true
+  },
+  "kindergarten-3": {
+    "art": true,
+    "launch": true
+  },
+  "kingdom-hearts-chain-of-memories": {
+    "art": true
+  },
+  "kirby-soft-wet": {
+    "art": true
+  },
+  "la-madriguera": {
+    "art": true,
+    "launch": true
+  },
+  "lacey-s-flash-games": {
+    "art": true,
+    "launch": true
+  },
+  "legend-of-legaia": {
+    "art": true
+  },
+  "the-legend-of-zelda": {
+    "art": true
+  },
+  "the-legend-of-zelda-ocarina-of-time": {
+    "art": true
+  },
+  "the-legend-of-zelda-twilight-princess": {
+    "art": true
+  },
+  "lego-star-wars-the-video-game": {
+    "art": true,
+    "launch": true
+  },
+  "lemmings": {
+    "art": true
+  },
+  "lethal-ape": {
+    "art": true,
+    "launch": true
+  },
+  "lobotomy-corporation": {
+    "art": true,
+    "launch": true
+  },
+  "look-outside": {
+    "art": true,
+    "launch": true
+  },
+  "lords-of-the-realm-ii": {
+    "art": true,
+    "launch": true
+  },
+  "the-man-from-the-window": {
+    "art": true,
+    "launch": true
+  },
+  "mario-kart-wii": {
+    "art": true
+  },
+  "mario-party": {
+    "art": true
+  },
+  "mario-party-2": {
+    "art": true
+  },
+  "mario-party-3": {
+    "art": true
+  },
+  "mario-party-4": {
+    "art": true,
+    "launch": true
+  },
+  "master-of-orion": {
+    "art": true
+  },
+  "metal-gear-solid": {
+    "art": true
+  },
+  "micro-machines": {
+    "art": true,
+    "launch": true
+  },
+  "midnight-club-3-dub-edition": {
+    "art": true
+  },
+  "milk-inside-a-bag-of-milk-inside-a-bag-of-milk": {
+    "art": true,
+    "launch": true
+  },
+  "milk-outside-a-bag-of-milk-outside-a-bag-of-milk": {
+    "art": true,
+    "launch": true
+  },
+  "minesweeper-plus": {
+    "art": true
+  },
+  "miside": {
+    "art": true,
+    "launch": true
+  },
+  "mobile-suit-gundam-gundam-vs-zeta-gundam": {
+    "art": true
+  },
+  "mvp-baseball-2005": {
+    "art": true
+  },
+  "nba-street-v3": {
+    "art": true
+  },
+  "ncaa-football-10": {
+    "art": true
+  },
+  "need-for-speed-iii-hot-pursuit": {
+    "art": true
+  },
+  "need-for-speed-most-wanted": {
+    "art": true,
+    "launch": true
+  },
+  "need-for-speed-prostreet": {
+    "art": true
+  },
+  "need-for-speed-underground": {
+    "art": true
+  },
+  "needy-streamer-overload": {
+    "art": true,
+    "launch": true
+  },
+  "new-super-mario-bros-wii": {
+    "art": true
+  },
+  "nubby-s-number-factory": {
+    "art": true
+  },
+  "ogre-battle-64-person-of-lordly-caliber": {
+    "art": true
+  },
+  "omori": {
+    "art": true,
+    "launch": true
+  },
+  "oneshot": {
+    "art": true
+  },
+  "oneshot-world-machine-edition": {
+    "art": true
+  },
+  "openttd": {
+    "art": true,
+    "launch": true
+  },
+  "opentyrian": {
+    "art": true
+  },
+  "pacman": {
+    "art": true
+  },
+  "paper-mario": {
+    "art": true
+  },
+  "peak": {
+    "art": true
+  },
+  "peaks-of-yore": {
+    "art": true,
+    "launch": true
+  },
+  "perfect-dark": {
+    "art": true
+  },
+  "pizza-tower": {
+    "art": true,
+    "launch": true
+  },
+  "scoutdingo": {
+    "art": true,
+    "launch": true
+  },
+  "plague-inc": {
+    "art": true,
+    "launch": true
+  },
+  "plants-vs-zombies": {
+    "art": true,
+    "launch": true
+  },
+  "pokemon-emerald": {
+    "art": true
+  },
+  "pokemon-snap": {
+    "art": true
+  },
+  "portal": {
+    "art": true,
+    "launch": true
+  },
+  "postal": {
+    "art": true
+  },
+  "power-hover": {
+    "art": true,
+    "launch": true
+  },
+  "prehistorik": {
+    "art": true
+  },
+  "prince-of-persia": {
+    "art": true
+  },
+  "prototype": {
+    "art": true,
+    "launch": true
+  },
+  "quake": {
+    "art": true
+  },
+  "quake-2": {
+    "art": true
+  },
+  "quake-iii-arena": {
+    "art": true
+  },
+  "rabbids-go-home": {
+    "art": true
+  },
+  "raldi-s-crackhouse": {
+    "art": true,
+    "launch": true
+  },
+  "raptor-call-of-the-shadows": {
+    "art": true
+  },
+  "ravenfield": {
+    "art": true,
+    "launch": true
+  },
+  "rayman-2-the-great-escape": {
+    "art": true
+  },
+  "re-run": {
+    "art": true
+  },
+  "reset-generation": {
+    "art": true,
+    "launch": true
+  },
+  "rolling-sky": {
+    "art": true,
+    "launch": true
+  },
+  "rugby-08": {
+    "art": true
+  },
+  "s-p-l-i-t": {
+    "art": true
+  },
+  "saihate-station": {
+    "art": true,
+    "launch": true
+  },
+  "san-francisco-rush-2049": {
+    "art": true
+  },
+  "saturday-night-slam-masters": {
+    "art": true
+  },
+  "schoolboy-runaway": {
+    "art": true,
+    "launch": true
+  },
+  "scp-containment-breach": {
+    "art": true,
+    "launch": true
+  },
+  "serial-experiments-lain": {
+    "art": true
+  },
+  "shadow-warrior": {
+    "art": true
+  },
+  "shift-at-midnight": {
+    "art": true,
+    "launch": true
+  },
+  "side-effects": {
+    "art": true,
+    "launch": true
+  },
+  "silent-hill": {
+    "art": true
+  },
+  "simcity": {
+    "art": true,
+    "launch": true
+  },
+  "slender-the-eight-pages": {
+    "art": true,
+    "launch": true
+  },
+  "slendytubbies": {
+    "art": true
+  },
+  "slendytubbies-2": {
+    "art": true,
+    "launch": true
+  },
+  "slendytubbies-2d": {
+    "art": true,
+    "launch": true
+  },
+  "slime-rancher": {
+    "art": true,
+    "launch": true
+  },
+  "super-mario-kart": {
+    "art": true,
+    "launch": true
+  },
+  "socom-ii-u-s-navy-seals": {
+    "art": true
+  },
+  "sokoban": {
+    "art": true
+  },
+  "sonic-cd": {
+    "art": true,
+    "launch": true
+  },
+  "sonic-mania": {
+    "art": true
+  },
+  "sonic-robo-blast-2": {
+    "art": true,
+    "launch": true
+  },
+  "sonic-the-hedgehog": {
+    "art": true,
+    "launch": true
+  },
+  "sonic-the-hedgehog-2": {
+    "art": true,
+    "launch": true
+  },
+  "sonic-exe": {
+    "art": true,
+    "launch": true
+  },
+  "spaceflight-simulator": {
+    "art": true,
+    "launch": true
+  },
+  "speed-stars": {
+    "art": true,
+    "launch": true
+  },
+  "ssx-3": {
+    "art": true
+  },
+  "star-command": {
+    "art": true
+  },
+  "stardew-valley": {
+    "art": true,
+    "launch": true
+  },
+  "starfighter": {
+    "art": true
+  },
+  "stick-with-it": {
+    "art": true,
+    "launch": true
+  },
+  "stunts": {
+    "art": true
+  },
+  "supaplex": {
+    "art": true
+  },
+  "super-mario-64": {
+    "art": true,
+    "launch": true
+  },
+  "super-mario-64-ds": {
+    "art": true
+  },
+  "super-mario-bros-remastered": {
+    "art": true
+  },
+  "super-mario-galaxy": {
+    "art": true,
+    "launch": true
+  },
+  "super-smash-bros": {
+    "art": true
+  },
+  "super-smash-bros-melee": {
+    "art": true
+  },
+  "syndicate": {
+    "art": true
+  },
+  "t-cubed": {
+    "art": true,
+    "launch": true
+  },
+  "tekken-3": {
+    "art": true
+  },
+  "tekken-dark-resurrection": {
+    "art": true
+  },
+  "terraria": {
+    "art": true,
+    "launch": true
+  },
+  "tony-hawk-s-pro-skater": {
+    "art": true
+  },
+  "tony-hawk-s-underground-2": {
+    "art": true
+  },
+  "turok-2-seeds-of-evil": {
+    "art": true
+  },
+  "turok-3-shadow-of-oblivion": {
+    "art": true
+  },
+  "turok-dinosaur-hunter": {
+    "art": true
+  },
+  "tattletail": {
+    "art": true,
+    "launch": true
+  },
+  "that-s-not-my-neighbor": {
+    "art": true,
+    "launch": true
+  },
+  "tomb-raider": {
+    "art": true
+  },
+  "totally-accurate-battle-simulator": {
+    "art": true,
+    "launch": true
+  },
+  "touhou-mother": {
+    "art": true
+  },
+  "traffic-racer": {
+    "art": true,
+    "launch": true
+  },
+  "trees-hate-you": {
+    "art": true,
+    "launch": true
+  },
+  "ultima-v-warriors-of-destiny": {
+    "art": true
+  },
+  "ultrakill": {
+    "art": true,
+    "launch": true
+  },
+  "ultrapool": {
+    "art": true,
+    "launch": true
+  },
+  "uncharted-waters-new-horizons": {
+    "art": true
+  },
+  "undertale-yellow": {
+    "art": true,
+    "launch": true
+  },
+  "untitled-goose-game": {
+    "art": true,
+    "launch": true
+  },
+  "urban-chaos": {
+    "art": true,
+    "launch": true
+  },
+  "urban-reign": {
+    "art": true
+  },
+  "uvuvwevwevweonyetenvewveugwemubwemossas": {
+    "art": true,
+    "launch": true
+  },
+  "webfishing": {
+    "art": true,
+    "launch": true
+  },
+  "wipeout": {
+    "art": true
+  },
+  "witch-s-heart": {
+    "art": true,
+    "launch": true
+  },
+  "wolfenstein-3d": {
+    "art": true,
+    "launch": true
+  },
+  "worldbox": {
+    "art": true
+  },
+  "your-only-move-is-hustle": {
+    "art": true,
+    "launch": true
+  },
+  "yume-nikki": {
+    "art": true,
+    "launch": true
+  },
+  "zanac-ex": {
+    "art": true,
+    "launch": true
+  },
+  "zelda-ii-the-adventure-of-link": {
+    "art": true
+  },
+  "zeliard": {
+    "art": true
+  },
+  "hextris": {
+    "art": true,
+    "launch": true
+  }
+}
