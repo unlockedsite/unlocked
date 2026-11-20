@@ -11,8 +11,8 @@ const posterAsset = id => "./assets/posters/" + encodeURIComponent(id) + ".webp"
 const featureId = "minecraft-story-mode";
 const podium = ["geometry-dash", "among-us", "bendy"];
 const highlighted = new Set([featureId, ...podium]);
-const levels = { low: "Low", medium: "Medium", high: "High", unknown: "Unrated" };
-const levelTips = { unknown: "Hardware demand has not been measured.", low: "Lightweight, targets around 60 FPS.", medium: "Moderate load, targets around 30 FPS.", high: "Demanding. May struggle or fail on an entry-level Chromebook." };
+const levels = { low: "Low", medium: "Medium", high: "High" };
+const levelTips = { low: "Lightweight, targets around 60 FPS.", medium: "Moderate load, targets around 30 FPS.", high: "Demanding. May struggle or fail on an entry-level Chromebook." };
 const categories = { loading:"Game won’t load", performance:"Slow or choppy", controls:"Controls", fullscreen:"Fullscreen", sound:"Audio", other:"Something else" };
 const collate = new Intl.Collator("en", {numeric:true, sensitivity:"base", ignorePunctuation:true});
 const dl = (key, fallback, session = false) => {
@@ -242,7 +242,7 @@ async function getLaunch(id) {
   // Free releases ship their launch map alongside the catalog on Pages.
   // Gated releases omit the map and authorize each launch with the Worker.
   if (!launchCatalog) {
-    launchCatalog = fetch("./free-launches.json?v=4", {credentials:"omit",cache:"no-store"}).then(async response => {
+    launchCatalog = fetch("./free-launches.json?v=5", {credentials:"omit",cache:"no-store"}).then(async response => {
       if (response.status===404) return null;
       if (!response.ok) throw Error("Couldn’t load the launch catalog. Try again.");
       return response.json();
@@ -265,7 +265,8 @@ async function prepareGame(g, token, autoStart=false){
     currentLaunch={id:g.id,url:playerUrl};
     $(".play-tools [data-action=fullscreen]").disabled=false;
     $("#key-area").replaceChildren();
-    const resolutionOption=chromeOS && (g.load==="high" || g.load==="unknown")
+    const externalImport = g.imported && new URL(playerUrl).origin !== location.origin;
+    const resolutionOption=chromeOS && (g.load==="high" || externalImport)
       ? '<label class="resolution-option"><input id="limit-resolution" type="checkbox" '+(g.load==="high"?"checked":"")+'> Limit player size to 1280 × 720</label>' : "";
     $("#startbox").innerHTML=btn("start-game",g.edition==="Classic demo"?"Play demo":"Play game","play","btn")+resolutionOption;
     if(autoStart) startGame(g);
@@ -339,7 +340,7 @@ async function submitReport(form){
 async function showCredits(token){
   main.innerHTML='<section class="narrow section-page"><a class="back" href="#/library">'+icon("back")+'All games</a><h1 class="panel-title">Credits</h1><p class="subcopy">Game art belongs to the artists and publishers listed below. Each game page links to its port.</p><div id="credits-list" class="pane">Loading credits…</div></section>';
   try {
-    const data=await readJson("./credits.json?v=4");if(token!==navigation)return;
+    const data=await readJson("./credits.json?v=5");if(token!==navigation)return;
     $("#credits-list").innerHTML='<ul class="credits-list">'+data.map(x=>'<li><a href="'+esc(x.source)+'" target="_blank" rel="noopener noreferrer">'+esc(x.title)+'</a> · '+esc(x.credit)+(x.posterSource?' · <a href="'+esc(x.posterSource)+'" target="_blank" rel="noopener noreferrer">Poster art</a>':'')+'</li>').join("")+'</ul><p class="hint">Interface typefaces include <a class="text-link" href="./assets/fonts/dm-sans-OFL.txt">DM Sans</a> and <a class="text-link" href="./assets/fonts/barlow-condensed-OFL.txt">Barlow Condensed</a>.</p>';
   }catch{if(token===navigation)feedback("#credits-list","Couldn’t load the credits. Refresh to try again.");}
 }
@@ -457,5 +458,5 @@ async function readJson(path){
   return res.json();
 }
 setup();
-try {games=(await readJson("./games.json?v=4")).sort(alphabetical);byId=new Map(games.map(g=>[g.id,g]));route({scroll:false});}
+try {games=(await readJson("./games.json?v=5")).sort(alphabetical);byId=new Map(games.map(g=>[g.id,g]));route({scroll:false});}
 catch {main.innerHTML='<div class="empty"><h1>Couldn’t open the vault</h1><p>Reload this page to fetch the game catalog.</p><a class="btn" href="./">Reload</a></div>';}

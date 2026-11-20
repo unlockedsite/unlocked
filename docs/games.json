@@ -163,28 +163,6 @@
     "notes": "WebPrBoom includes the original shareware episode and both Freedoom campaigns. Use a keyboard and mouse or a gamepad."
   },
   {
-    "id": "duke-nukem-3d",
-    "title": "Duke Nukem 3D",
-    "genre": "Shooter",
-    "load": "low",
-    "mode": "embed",
-    "sources": [
-      "https://midzer.de/wasm/duke3d/",
-      "https://archive.org/details/3dduke13SW",
-      "https://github.com/midzer/BelgianChocolateDuke3D",
-      "https://github.com/digitalcybersoft/eduke32-wasm"
-    ],
-    "aliases": [
-      "Duke 3D",
-      "Duke3D",
-      "Duke Nukem",
-      "Duke Nukem 3D TG"
-    ],
-    "description": "Fight through alien-occupied Los Angeles in a classic first-person shooter.",
-    "notes": "Launch the original shareware episode in DOSBox. Click the player to capture the keyboard and mouse.",
-    "edition": "Shareware episode"
-  },
-  {
     "id": "fallout",
     "title": "Fallout",
     "genre": "RPG",
@@ -634,39 +612,11 @@
     "notes": "A stealth simulation with a large WebGL build. Desktop controls are recommended."
   },
   {
-    "id": "baldi-s-basics-minus-3",
-    "title": "Baldi's Basics: Minus 3",
-    "genre": "Arcade",
-    "mode": "unavailable",
-    "load": "unknown",
-    "sources": [
-      "https://github.com/aukak/-3"
-    ],
-    "imported": true,
-    "unavailable": "The linked project needs a compatible browser build.",
-    "posterSource": "https://github.com/gn-math/covers/blob/67baf382659b6b386371fdb2f5c56bcc9b5174eb/816.png",
-    "aliases": [
-      "-3"
-    ]
-  },
-  {
-    "id": "b",
-    "title": "-b",
-    "genre": "Arcade",
-    "mode": "embed",
-    "load": "unknown",
-    "sources": [
-      "https://github.com/web-ports/baldi-mods/tree/main/-b"
-    ],
-    "imported": true,
-    "posterSource": "https://github.com/gn-math/covers/blob/67baf382659b6b386371fdb2f5c56bcc9b5174eb/817.png"
-  },
-  {
     "id": "20-minutes-till-dawn",
     "title": "20 Minutes Till Dawn",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/web-ports/20-minutes"
     ],
@@ -678,7 +628,7 @@
     "title": "Abuse",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/midzer/abuse"
     ],
@@ -691,7 +641,7 @@
     "title": "Albion",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/IS4Code/Albion"
     ],
@@ -704,7 +654,7 @@
     "title": "Alley Cat",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/petarov/alleycat.exe"
     ],
@@ -717,7 +667,7 @@
     "title": "Alone in the Dark",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/xesf/aitd"
     ],
@@ -730,7 +680,7 @@
     "title": "Amanda The Adventurer",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/genizy/web-port/tree/main/amanda-the-adventurer"
     ],
@@ -742,7 +692,7 @@
     "title": "Andy's Apple Farm",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/genizy/web-port/tree/main/andys-apple-farm"
     ],
@@ -754,7 +704,7 @@
     "title": "Angband",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/angband/angband"
     ],
@@ -767,7 +717,7 @@
     "title": "Animal Crossing",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/web-ports/ac-gamecube"
     ],
@@ -779,7 +729,7 @@
     "title": "Another World",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/malandrin/another-world-suite"
     ],
@@ -792,7 +742,7 @@
     "title": "Antonblast",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/burnedpopcorn/Anton-Blast-Demo-Web-Port",
       "https://github.com/web-ports/antonblast"
@@ -808,7 +758,7 @@
     "title": "Apes vs Helium",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/bubbls/UGS-Assets/tree/main/apesvshelium"
     ],
@@ -821,7 +771,7 @@
     "title": "Asylum",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/GMH-Code/Asylum"
     ],
@@ -834,7 +784,7 @@
     "title": "Atlantis: The Lost Tales",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/ripleyXLR8/atlantis-native"
     ],
@@ -847,44 +797,22 @@
     "title": "Baldi's Basics Classic Remastered",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/genizy/web-port/tree/main/baldi-remaster"
     ],
     "imported": true,
-    "posterSource": "https://github.com/gn-math/covers/blob/67baf382659b6b386371fdb2f5c56bcc9b5174eb/466.png"
-  },
-  {
-    "id": "baldi-s-basics-plus",
-    "title": "Baldi's Basics Plus",
-    "genre": "Arcade",
-    "mode": "embed",
-    "load": "unknown",
-    "sources": [
-      "https://github.com/genizy/web-port/tree/main/baldi-plus"
-    ],
-    "imported": true,
-    "posterSource": "https://github.com/gn-math/covers/blob/67baf382659b6b386371fdb2f5c56bcc9b5174eb/467.png"
-  },
-  {
-    "id": "bergentruck-201x",
-    "title": "BERGENTRUCK 201x",
-    "genre": "Arcade",
-    "mode": "unavailable",
-    "load": "unknown",
-    "sources": [
-      "https://github.com/genizy/web-port/tree/main/bergentruck"
-    ],
-    "imported": true,
-    "unavailable": "The linked project needs a compatible browser build.",
-    "posterSource": "https://github.com/gn-math/covers/blob/67baf382659b6b386371fdb2f5c56bcc9b5174eb/455.png"
+    "posterSource": "https://github.com/gn-math/covers/blob/67baf382659b6b386371fdb2f5c56bcc9b5174eb/466.png",
+    "aliases": [
+      "Baldi's Basics"
+    ]
   },
   {
     "id": "a-bite-at-freddy-s",
     "title": "A Bite at Freddy's",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/freebuisness/assets/tree/main/258"
     ],
@@ -896,7 +824,7 @@
     "title": "Blast Corps",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/Doridian/DozerEncore"
     ],
@@ -909,7 +837,7 @@
     "title": "Block Blast",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/SomeRandomFella/portsandrips/tree/master/blockblast-port"
     ],
@@ -921,7 +849,7 @@
     "title": "BLOODMONEY!",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/genizy/web-port/tree/main/bloodmoney"
     ],
@@ -933,7 +861,7 @@
     "title": "Bounce Tales",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/PrasannaOne/BounceTales"
     ],
@@ -945,7 +873,7 @@
     "title": "Brotato",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/BlueGameMC/BrotatoWeb",
       "https://github.com/gays-studio/brotato-webport/",
@@ -960,7 +888,7 @@
     "title": "Bubble Bobble",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/cookertron/BubbleBobble"
     ],
@@ -973,7 +901,7 @@
     "title": "Carmageddon",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/Carter54git/dethrace-ported-to-web"
     ],
@@ -986,7 +914,7 @@
     "title": "Cave Story",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/midzer/nxengine-evo"
     ],
@@ -999,7 +927,7 @@
     "title": "Celeste",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/MercuryWorkshop/celeste-wasm",
       "https://github.com/web-ports/celeste"
@@ -1012,7 +940,7 @@
     "title": "Chain-Chillas",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/Camzzz-vrgt/chain-chillas-web"
     ],
@@ -1025,7 +953,7 @@
     "title": "Chasing Tails ~A Promise in the Snow~",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/gays-studio/chasingtails"
     ],
@@ -1037,7 +965,7 @@
     "title": "Chip's Challenge",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/CasualX/chipdx"
     ],
@@ -1049,7 +977,7 @@
     "title": "Christmas Massacre",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/web-ports/christmas-massacre"
     ],
@@ -1061,7 +989,7 @@
     "title": "Class of '09",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/genizy/web-port/tree/main/class-of-09"
     ],
@@ -1073,7 +1001,7 @@
     "title": "Class of '09: The Flip Side",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/AlexBoops/TFS"
     ],
@@ -1085,7 +1013,7 @@
     "title": "Class of '09: The Re-Up",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/AlexBoops/tru"
     ],
@@ -1097,7 +1025,7 @@
     "title": "Clover Pit",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/web-ports/clover-pit"
     ],
@@ -1109,7 +1037,7 @@
     "title": "Clustertruck",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/wasmdotrip/Clustertruck-Port"
     ],
@@ -1122,7 +1050,7 @@
     "title": "Command & Conquer",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/midzer/Vanilla-Conquer"
     ],
@@ -1135,7 +1063,7 @@
     "title": "Counter Strike 1.6",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/yohimik/webxash3d-fwgs",
       "https://github.com/Pixelsuft/hl",
@@ -1153,7 +1081,7 @@
     "title": "Half Life",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/yohimik/webxash3d-fwgs",
       "https://github.com/Pixelsuft/hl",
@@ -1168,7 +1096,7 @@
     "title": "Crash of the Titans",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/costa961/Crash-OTT-web"
     ],
@@ -1181,7 +1109,7 @@
     "title": "Cruelty Squad",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/imt00dizzy/cruelty-squad",
       "https://github.com/web-ports/cruelty-squad"
@@ -1194,7 +1122,7 @@
     "title": "Cuphead",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/genizy/web-port/tree/main/cuphead",
       "https://github.com/woahhcrackers/CupheadWeb",
@@ -1208,7 +1136,7 @@
     "title": "A Dance of Fire and Ice",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/Nawsif/host/tree/main/ADOFAI"
     ],
@@ -1220,7 +1148,7 @@
     "title": "Dead Plate",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/genizy/web-port/tree/main/dead-plate"
     ],
@@ -1232,7 +1160,7 @@
     "title": "The Deadseat",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/genizy/web-port/tree/main/deadseat",
       "https://github.com/TheBlehLollipop/The-Deadseat-Webport"
@@ -1248,7 +1176,7 @@
     "title": "Descent",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/arbruijn/d1wasm",
       "https://github.com/midzer/dxx-rebirth"
@@ -1264,7 +1192,7 @@
     "title": "Devil May Cry",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/Brando-karim/ps2-web-dmc"
     ],
@@ -1277,7 +1205,7 @@
     "title": "Diablo",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/d07RiV/diabloweb",
       "https://github.com/johnimril/diablo_web"
@@ -1291,7 +1219,7 @@
     "title": "Dice a Million",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/NotRexed/Unblocked-Games/tree/main/diceamillion"
     ],
@@ -1304,7 +1232,7 @@
     "title": "Diddy Kong Racing",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/akratch/goldenballoon"
     ],
@@ -1317,7 +1245,7 @@
     "title": "A Difficult Game About Climbing",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/web-ports/adgac"
     ],
@@ -1329,7 +1257,7 @@
     "title": "Do NOT Take This Cat Home",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/genizy/web-port/tree/main/donottakethiscathome"
     ],
@@ -1341,7 +1269,7 @@
     "title": "Donald Duck: Goin' Quackers",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/n64hub/donald-duck-goin-quackers-recomp"
     ],
@@ -1354,7 +1282,7 @@
     "title": "Doom II",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/edge-classic/EDGE-classic"
     ],
@@ -1367,7 +1295,7 @@
     "title": "Heretic",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/edge-classic/EDGE-classic"
     ],
@@ -1380,7 +1308,7 @@
     "title": "Doom 3",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/web-ports/doom-3",
       "https://github.com/Hiten-dev-ai/D3BFG.js"
@@ -1397,7 +1325,7 @@
     "title": "Downhill Domination",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/skuza-oss/downhill-revived",
       "https://github.com/ekansh28/downhill-web"
@@ -1411,7 +1339,7 @@
     "title": "Dragon Ball Z: Budokai Tenkaichi 3",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/BeeLTL/Tenkaichi3Decomp"
     ],
@@ -1424,7 +1352,7 @@
     "title": "Drakan: The Ancients' Gates",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/ChristopherVR/Drakan2PC"
     ],
@@ -1437,7 +1365,7 @@
     "title": "Duck Life Adventure",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/aukak/duck-life-adventure",
       "https://github.com/web-ports/duck-8"
@@ -1449,24 +1377,11 @@
     ]
   },
   {
-    "id": "duke-nukem-ii",
-    "title": "Duke Nukem II",
-    "genre": "Arcade",
-    "mode": "unavailable",
-    "load": "unknown",
-    "sources": [
-      "https://github.com/lethal-guitar/RigelEngine"
-    ],
-    "imported": true,
-    "unavailable": "The linked project needs a compatible browser build.",
-    "posterSource": "https://github.com/libretro-thumbnails/DOS/blob/2f6336592694d29272b0c0c343abbd6418827f8f/Named_Boxarts/Duke%20Nukem%20II.png"
-  },
-  {
     "id": "dumb-ways-to-die",
     "title": "Dumb Ways to Die",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/web-ports/dumb-ways-to-die"
     ],
@@ -1478,7 +1393,7 @@
     "title": "Endacopia",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/linkawaken1979-alt/endacopia-"
     ],
@@ -1490,7 +1405,7 @@
     "title": "F-Zero X",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/n64hub/f-zero-x-recomp"
     ],
@@ -1503,7 +1418,7 @@
     "title": "Fade To Black",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/midzer/f2bgl"
     ],
@@ -1516,7 +1431,7 @@
     "title": "Fear & Hunger",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/web-ports/fear-and-hunger"
     ],
@@ -1531,7 +1446,7 @@
     "title": "Fear & Hunger 2: Termina",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/web-ports/fear-and-hunger-2"
     ],
@@ -1546,7 +1461,7 @@
     "title": "Fih",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/InsayneBoko/fih-port/tree/main/port"
     ],
@@ -1559,7 +1474,7 @@
     "title": "FISH",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/web-ports/fish"
     ],
@@ -1567,26 +1482,11 @@
     "posterSource": "https://github.com/gn-math/covers/blob/67baf382659b6b386371fdb2f5c56bcc9b5174eb/761.png"
   },
   {
-    "id": "five-nights-at-epstein-s",
-    "title": "Five Nights at Epstein's",
-    "genre": "Arcade",
-    "mode": "embed",
-    "load": "unknown",
-    "sources": [
-      "https://github.com/web-ports/fnae"
-    ],
-    "imported": true,
-    "posterSource": "https://github.com/gn-math/covers/blob/67baf382659b6b386371fdb2f5c56bcc9b5174eb/710.png",
-    "aliases": [
-      "Five Nighs at Epstein's"
-    ]
-  },
-  {
     "id": "five-nights-at-candy-s",
     "title": "Five Nights at Candy's",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/web-ports/fnac/tree/main/1"
     ],
@@ -1601,7 +1501,7 @@
     "title": "Five Nights at Candy's 2",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/web-ports/fnac/tree/main/2"
     ],
@@ -1609,38 +1509,11 @@
     "posterSource": "https://github.com/gn-math/covers/blob/67baf382659b6b386371fdb2f5c56bcc9b5174eb/504.png"
   },
   {
-    "id": "five-nights-at-freddy-s-4-halloween",
-    "title": "Five Nights at Freddy's 4: Halloween",
-    "genre": "Arcade",
-    "mode": "embed",
-    "load": "unknown",
-    "sources": [
-      "https://github.com/genizy/fnaf/tree/main/4-halloween"
-    ],
-    "imported": true,
-    "aliases": [
-      "Five Nights at Freddy's 4: Halloween Edition"
-    ],
-    "posterSource": "https://github.com/gn-math/covers/blob/67baf382659b6b386371fdb2f5c56bcc9b5174eb/428.png"
-  },
-  {
-    "id": "five-nights-at-freddy-s-world-refreshed",
-    "title": "Five Nights at Freddy's World: Refreshed",
-    "genre": "Arcade",
-    "mode": "embed",
-    "load": "unknown",
-    "sources": [
-      "https://github.com/web-ports/fnaf-world-refreshed"
-    ],
-    "imported": true,
-    "posterSource": "https://github.com/gn-math/covers/blob/67baf382659b6b386371fdb2f5c56bcc9b5174eb/704.png"
-  },
-  {
     "id": "five-nights-at-freddy-s-sister-location",
     "title": "Five Nights at Freddy's: Sister Location",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/irv77/hd_fnaf/tree/main/sl"
     ],
@@ -1652,7 +1525,7 @@
     "title": "Five Nights at Freddy's: Ultimate Custom Night",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/irv77/hd_fnaf/tree/main/ucn"
     ],
@@ -1664,7 +1537,7 @@
     "title": "Five Nights at Freddy's: World",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/irv77/hd_fnaf/tree/main/w"
     ],
@@ -1672,24 +1545,11 @@
     "posterSource": "https://github.com/gn-math/covers/blob/67baf382659b6b386371fdb2f5c56bcc9b5174eb/190.png"
   },
   {
-    "id": "five-nights-at-frickbear-s-3",
-    "title": "Five Nights at Frickbear's 3",
-    "genre": "Arcade",
-    "mode": "unavailable",
-    "load": "unknown",
-    "sources": [
-      "https://github.com/Reeyuki/frickbears3port/"
-    ],
-    "imported": true,
-    "unavailable": "The linked project needs a compatible browser build.",
-    "posterSource": "https://github.com/gn-math/covers/blob/67baf382659b6b386371fdb2f5c56bcc9b5174eb/813.png"
-  },
-  {
     "id": "flashback",
     "title": "Flashback",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/midzer/reminiscence"
     ],
@@ -1705,7 +1565,7 @@
     "title": "Flying Gorilla",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/web-ports/flying-gorilla"
     ],
@@ -1720,7 +1580,7 @@
     "title": "Heroes of Might and Magic II",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/Carter54git/fheroes-1.1.17-ported-to-web",
       "https://github.com/midzer/fheroes2"
@@ -1736,7 +1596,7 @@
     "title": "Fundamental Paper Novel",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/bubbls/ports/tree/main/fpn-FULLY_RECRAFTED-web"
     ],
@@ -1744,23 +1604,11 @@
     "posterSource": "https://github.com/gn-math/covers/blob/67baf382659b6b386371fdb2f5c56bcc9b5174eb/746.png"
   },
   {
-    "id": "gabriel-s-awesome-schoolhouse",
-    "title": "Gabriel's Awesome Schoolhouse",
-    "genre": "Arcade",
-    "mode": "embed",
-    "load": "unknown",
-    "sources": [
-      "https://github.com/web-ports/gash"
-    ],
-    "imported": true,
-    "posterSource": "https://github.com/gn-math/covers/blob/67baf382659b6b386371fdb2f5c56bcc9b5174eb/784.png"
-  },
-  {
     "id": "a-game-about-feeding-a-black-hole",
     "title": "A Game about Feeding a Black Hole",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/GrassPorts/A-Game-About-Feeding-A-Black-Hole",
       "https://git.gay/portmirrors/agafabh"
@@ -1774,7 +1622,7 @@
     "title": "God of War II",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/snuri00/ps2-web-recomp"
     ],
@@ -1787,7 +1635,7 @@
     "title": "Gran Turismo 4",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/snuri00/ps2-web-recomp"
     ],
@@ -1800,7 +1648,7 @@
     "title": "God of War: Chains of Olympus",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/snuri00/psp-web-recomp"
     ],
@@ -1813,7 +1661,7 @@
     "title": "God of War: Ghost of Sparta",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/snuri00/psp-web-recomp"
     ],
@@ -1826,7 +1674,7 @@
     "title": "Golden Sun",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/shmargus/GSRecomp"
     ],
@@ -1839,7 +1687,7 @@
     "title": "Gran Turismo 2",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/dubrovskiy-yevhen-stakelogic/gt-2-pc"
     ],
@@ -1852,7 +1700,7 @@
     "title": "Grand Theft Auto 2",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/M1sterMo/gta2-browser"
     ],
@@ -1865,7 +1713,7 @@
     "title": "GTA 3",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/larpinguser/HelloWorldScriptBasicFunctionCSharpIsCool/",
       "https://github.com/woahhcrackers/GTA3Web"
@@ -1881,7 +1729,7 @@
     "title": "Grand Theft Auto: Chinatown Wars",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/root-hunter/ppsspp-web"
     ],
@@ -1894,7 +1742,7 @@
     "title": "Grand Theft Auto: Vice City",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/origami-ltd/wasm-revc",
       "https://github.com/Lolendor/reVCDOS",
@@ -1912,7 +1760,7 @@
     "title": "Half Life 2",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/AlexBoops/half-life-2-port"
     ],
@@ -1924,7 +1772,7 @@
     "title": "Halo: Combat Evolved",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/ecumene/web-halo",
       "https://github.com/GACWR/halo-ce-web-multiplayer",
@@ -1939,7 +1787,7 @@
     "title": "Happy Sheepies",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/genizy/web-port/tree/main/happy-sheepies"
     ],
@@ -1951,7 +1799,7 @@
     "title": "Harry Potter and the Chamber of Secrets",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/cefege/harry-potter-2-chamber-of-secrets-pc"
     ],
@@ -1964,7 +1812,7 @@
     "title": "Heart of Darkness",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/midzer/hode"
     ],
@@ -1977,7 +1825,7 @@
     "title": "Helltaker",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/larpinguser/Helltaker-Web/tree/main/helltakerweb",
       "https://github.com/reeyuki/Helltaker-Webport"
@@ -1990,7 +1838,7 @@
     "title": "Hollow Knight",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/aukak/hollow-knight",
       "https://github.com/NOTAHACKER9999/Hollow-Knight-Port"
@@ -2004,7 +1852,7 @@
     "title": "Hollow Knight: Silksong",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/web-ports/hollow-knight-silksong",
       "https://github.com/webporting/Hollow-Knight-Silksong"
@@ -2017,7 +1865,7 @@
     "title": "Hot Shots Tennis",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/FIZL0/opentennis"
     ],
@@ -2030,7 +1878,7 @@
     "title": "Hotline Miami",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/genizy/web-port/tree/main/hotline-miami"
     ],
@@ -2042,7 +1890,7 @@
     "title": "Hugo",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/cyxx/hugo_js"
     ],
@@ -2056,7 +1904,7 @@
     "title": "Human Expenditure Program",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/genizy/web-port/tree/main/human-expenditure-program"
     ],
@@ -2068,7 +1916,7 @@
     "title": "Ignition",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/xesf/ignition"
     ],
@@ -2081,7 +1929,7 @@
     "title": "In Stars and Time",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/Reeyuki/InStarsAndTime",
       "https://github.com/web-ports/in-stars-and-time"
@@ -2094,7 +1942,7 @@
     "title": "Inscryption",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/Reeyuki/InscryptionWebport"
     ],
@@ -2106,7 +1954,7 @@
     "title": "Iron Lung",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/web-ports/iron-lung"
     ],
@@ -2118,7 +1966,7 @@
     "title": "Jazz Jackrabbit",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/midzer/openjazz"
     ],
@@ -2127,23 +1975,11 @@
     "posterSource": "https://github.com/libretro-thumbnails/DOS/blob/2f6336592694d29272b0c0c343abbd6418827f8f/Named_Boxarts/Jazz%20Jackrabbit.png"
   },
   {
-    "id": "jeffrey-epstein-basics-in-education-and-kidnapping",
-    "title": "Jeffrey Epstein Basics In Education And Kidnapping",
-    "genre": "Arcade",
-    "mode": "embed",
-    "load": "unknown",
-    "sources": [
-      "https://github.com/bubbls/ports/tree/main/jeffrey-epsteins-basics-in-education-and-kidnapping"
-    ],
-    "imported": true,
-    "posterSource": "https://github.com/gn-math/covers/blob/67baf382659b6b386371fdb2f5c56bcc9b5174eb/751.png"
-  },
-  {
     "id": "jelly-drift",
     "title": "Jelly Drift",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/genizy/web-port/tree/main/jelly-drift"
     ],
@@ -2155,7 +1991,7 @@
     "title": "Just Shapes & Beats",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/web-ports/jsab",
       "https://github.com/PaxyHilly/justshapesandbeatswebport"
@@ -2168,7 +2004,7 @@
     "title": "Karlson",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/genizy/web-port/tree/main/karlson",
       "https://github.com/thecheetoman/KarlsonWebPort"
@@ -2181,7 +2017,7 @@
     "title": "Kindergarten",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/genizy/web-port/tree/main/kindergarten"
     ],
@@ -2194,7 +2030,7 @@
     "title": "Kindergarten 2",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/genizy/web-port/tree/main/kindergarten"
     ],
@@ -2207,7 +2043,7 @@
     "title": "Kindergarten 3",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/slqntdevss/Kindergarten3Port"
     ],
@@ -2219,7 +2055,7 @@
     "title": "Kingdom Hearts: Chain of Memories",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/MatyMeatBoy/ReKHCom"
     ],
@@ -2233,7 +2069,7 @@
     "title": "Kirby ~ Soft & Wet",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/web-ports/soft-and-wet"
     ],
@@ -2249,7 +2085,7 @@
     "title": "La Madriguera",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/web-ports/la-madriguera"
     ],
@@ -2261,7 +2097,7 @@
     "title": "Lacey's Flash Games",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/genizy/web-port/tree/main/lacysflashgames"
     ],
@@ -2273,7 +2109,7 @@
     "title": "Legend of Legaia",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/AndrewAltimit/legend-of-legaia-re"
     ],
@@ -2286,7 +2122,7 @@
     "title": "The Legend of Zelda",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/ZQuestClassic/ZQuestClassic"
     ],
@@ -2299,7 +2135,7 @@
     "title": "The Legend of Zelda: Ocarina of Time",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/andrewnakas/oot-cleanroom"
     ],
@@ -2313,7 +2149,7 @@
     "title": "The Legend of Zelda: Twilight Princess",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/caribbeansc/dusklight"
     ],
@@ -2326,7 +2162,7 @@
     "title": "LEGO Star Wars: The Video Game",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/Down1oads/LSWWEB"
     ],
@@ -2338,7 +2174,7 @@
     "title": "Lemmings",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/edwardkim/ohmylemmings"
     ],
@@ -2351,7 +2187,7 @@
     "title": "Lethal Ape",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/web-ports/lethal-ape"
     ],
@@ -2363,7 +2199,7 @@
     "title": "Lobotomy Corporation",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/Reeyuki/lobcorp"
     ],
@@ -2375,7 +2211,7 @@
     "title": "Look Outside",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/web-ports/look-outside"
     ],
@@ -2387,7 +2223,7 @@
     "title": "Lords of the Realm II",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/1lk/Lords2web"
     ],
@@ -2399,7 +2235,7 @@
     "title": "The Man From the Window",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/genizy/web-port/tree/main/the-man-in-the-window"
     ],
@@ -2414,7 +2250,7 @@
     "title": "Mario Kart Wii",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/dynamiteswag81/webcompiled"
     ],
@@ -2427,7 +2263,7 @@
     "title": "Mario Party",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/n64hub/mario-party-recomp"
     ],
@@ -2440,7 +2276,7 @@
     "title": "Mario Party 2",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/n64hub/mario-party-2-recomp"
     ],
@@ -2453,7 +2289,7 @@
     "title": "Mario Party 3",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/n64hub/mario-party-3-recomp"
     ],
@@ -2466,7 +2302,7 @@
     "title": "Mario Party 4",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/wigwoo1/Mario-Party-4-PC-Download-Play-Edition"
     ],
@@ -2478,7 +2314,7 @@
     "title": "Master of Orion",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/midzer/1oom"
     ],
@@ -2491,7 +2327,7 @@
     "title": "Metal Gear Solid",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/vjravenlight/shadow-moses-web"
     ],
@@ -2504,7 +2340,7 @@
     "title": "Micro Machines",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/hivvu/scale-miniatures"
     ],
@@ -2516,7 +2352,7 @@
     "title": "Midnight Club 3: DUB Edition",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/LeandroDettmer/mc3-web",
       "https://github.com/clydejuniorscripts/mc3-web-study"
@@ -2530,7 +2366,7 @@
     "title": "Milk inside a bag of milk inside a bag of milk",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/web-ports/milk-bag-games/tree/main/inside"
     ],
@@ -2542,7 +2378,7 @@
     "title": "Milk outside a bag of milk outside a bag of milk",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/web-ports/milk-bag-games/tree/main/outside"
     ],
@@ -2554,7 +2390,7 @@
     "title": "Minesweeper Plus",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/genizy/web-port/tree/main/minesweeperplus"
     ],
@@ -2567,7 +2403,7 @@
     "title": "MiSide",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/web-ports/miside/",
       "https://github.com/woahhcrackers/MiSideWeb"
@@ -2580,7 +2416,7 @@
     "title": "Mobile Suit Gundam: Gundam vs. Zeta Gundam",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/sennett-lau/re-gvs-gvzg"
     ],
@@ -2593,7 +2429,7 @@
     "title": "MVP Baseball 2005",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/ptitty12/mvp2005-decomp"
     ],
@@ -2606,7 +2442,7 @@
     "title": "NBA Street V3",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/recomp-code/street-recomp-v3"
     ],
@@ -2619,7 +2455,7 @@
     "title": "NCAA Football 10",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/awest813/NCAA-10-PSP-Recomp"
     ],
@@ -2632,7 +2468,7 @@
     "title": "Need for Speed III: Hot Pursuit",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/mrz944/nfs3-web"
     ],
@@ -2645,7 +2481,7 @@
     "title": "Need for Speed: Most Wanted",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/Iker3329/nfsmw-webport"
     ],
@@ -2657,7 +2493,7 @@
     "title": "Need for Speed: ProStreet",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/uvindusl/NFSProStreet_online"
     ],
@@ -2670,7 +2506,7 @@
     "title": "Need for Speed: Underground",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/yurasmetanka/nfsu1web"
     ],
@@ -2683,7 +2519,7 @@
     "title": "Needy Streamer Overload",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/web-ports/needy-streamer-overload"
     ],
@@ -2695,7 +2531,7 @@
     "title": "New Super Mario Bros. Wii",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/teaserlua/nsmbw-web-port"
     ],
@@ -2708,7 +2544,7 @@
     "title": "Nubby's Number Factory",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/genizy/biologyexams/tree/main/nubbys-number-factory"
     ],
@@ -2721,7 +2557,7 @@
     "title": "Ogre Battle 64: Person of Lordly Caliber",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/lfarroco/ogre-battle-64-recomp"
     ],
@@ -2734,7 +2570,7 @@
     "title": "OMORI",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/genizy/web-port/tree/main/omori-fixed",
       "https://github.com/dazacode/openomori"
@@ -2747,7 +2583,7 @@
     "title": "Oneshot",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/67-Factory/oneshotthing"
     ],
@@ -2756,24 +2592,11 @@
     "posterSource": "https://github.com/gn-math/covers/blob/67baf382659b6b386371fdb2f5c56bcc9b5174eb/622.png"
   },
   {
-    "id": "oneshot-world-machine-edition",
-    "title": "Oneshot: World Machine Edition",
-    "genre": "Arcade",
-    "mode": "unavailable",
-    "load": "unknown",
-    "sources": [
-      "https://github.com/MercuryWorkshop/webshot"
-    ],
-    "imported": true,
-    "unavailable": "The linked project needs a compatible browser build.",
-    "posterSource": "https://github.com/gn-math/covers/blob/67baf382659b6b386371fdb2f5c56bcc9b5174eb/846.png"
-  },
-  {
     "id": "openttd",
     "title": "OpenTTD",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/OpenTTD/OpenTTD",
       "https://github.com/swords02/openttd-online"
@@ -2786,7 +2609,7 @@
     "title": "OpenTyrian",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/midzer/opentyrian"
     ],
@@ -2802,7 +2625,7 @@
     "title": "Pacman",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/midzer/pacman"
     ],
@@ -2815,7 +2638,7 @@
     "title": "Paper Mario",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/n64hub/paper-mario-recomp"
     ],
@@ -2828,7 +2651,7 @@
     "title": "PEAK",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/wasmdotrip/Peak-Port"
     ],
@@ -2841,7 +2664,7 @@
     "title": "Peaks of Yore",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/web-ports/peaks-of-yore"
     ],
@@ -2853,7 +2676,7 @@
     "title": "Perfect Dark",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/n64hub/perfect-dark-recomp"
     ],
@@ -2866,7 +2689,7 @@
     "title": "Pizza Tower",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/genizy/web-port/tree/main/pizza-tower",
       "https://github.com/burnedpopcorn/Pizza-Tower-1.1.0-Web-Port",
@@ -2880,28 +2703,11 @@
     "posterSource": "https://github.com/gn-math/covers/blob/67baf382659b6b386371fdb2f5c56bcc9b5174eb/267.png"
   },
   {
-    "id": "scoutdingo",
-    "title": "Scoutdingo",
-    "genre": "Arcade",
-    "mode": "embed",
-    "load": "unknown",
-    "sources": [
-      "https://github.com/burnedpopcorn/PT-Scoutdigo-Web-Port",
-      "https://github.com/web-ports/scoutdingo"
-    ],
-    "imported": true,
-    "aliases": [
-      "PT Scoutdigo",
-      "Pizza Tower: Scoutdigo"
-    ],
-    "posterSource": "https://github.com/gn-math/covers/blob/67baf382659b6b386371fdb2f5c56bcc9b5174eb/628.png"
-  },
-  {
     "id": "plague-inc",
     "title": "Plague Inc",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/Reeyuki/PlagueIncEvolved"
     ],
@@ -2916,7 +2722,7 @@
     "title": "Plants vs. Zombies",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/wszqkzqk/PvZ-Portable",
       "https://github.com/web-ports/pvz",
@@ -2933,7 +2739,7 @@
     "title": "Pokémon Emerald",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/tripplyons/pokeemerald-wasm"
     ],
@@ -2946,7 +2752,7 @@
     "title": "Pokémon Snap",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/Sorikairox/pokemonsnap-web"
     ],
@@ -2959,7 +2765,7 @@
     "title": "Portal",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/weliveinhell/source-engine",
       "https://github.com/AlexBoops/portal-1-port"
@@ -2972,7 +2778,7 @@
     "title": "POSTAL",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/leahanderson1/POSTAL-WASM"
     ],
@@ -2985,7 +2791,7 @@
     "title": "Power Hover",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/web-ports/power-hover"
     ],
@@ -2997,7 +2803,7 @@
     "title": "Prehistorik",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/cyxx/prehistorik_js"
     ],
@@ -3011,7 +2817,7 @@
     "title": "Prince of Persia",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/midzer/SDLPoP"
     ],
@@ -3024,7 +2830,7 @@
     "title": "Prototype",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/midzer/prototype"
     ],
@@ -3036,7 +2842,7 @@
     "title": "Quake",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/GMH-Code/Qwasm"
     ],
@@ -3052,7 +2858,7 @@
     "title": "Quake 2",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/GMH-Code/Qwasm2",
       "https://github.com/athola/qwasm2-rs"
@@ -3070,7 +2876,7 @@
     "title": "Quake III Arena",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/lrusso/Quake3",
       "https://github.com/lklacar/q3js"
@@ -3087,7 +2893,7 @@
     "title": "Rabbids Go Home",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/teaserlua/rabbids-go-home-web-port"
     ],
@@ -3096,23 +2902,11 @@
     "posterSource": "https://github.com/libretro-thumbnails/Nintendo_-_Nintendo_DS/blob/a119dcab8fa04c9974b9c229eda824318d923322/Named_Boxarts/Rabbids%20Go%20Home%20%28Europe%29%20%28En%2CFr%2CDe%2CEs%2CIt%2CNl%29%20%28NDSi%20Enhanced%29.png"
   },
   {
-    "id": "raldi-s-crackhouse",
-    "title": "Raldi's Crackhouse",
-    "genre": "Arcade",
-    "mode": "embed",
-    "load": "unknown",
-    "sources": [
-      "https://github.com/woahhcrackers/RaldiWeb-LEGACY"
-    ],
-    "imported": true,
-    "posterSource": "https://github.com/gn-math/covers/blob/67baf382659b6b386371fdb2f5c56bcc9b5174eb/670.png"
-  },
-  {
     "id": "raptor-call-of-the-shadows",
     "title": "Raptor - Call of the Shadows",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/midzer/raptor"
     ],
@@ -3125,7 +2919,7 @@
     "title": "Ravenfield",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/degloved-net/Ravenfield"
     ],
@@ -3137,7 +2931,7 @@
     "title": "Rayman 2: The Great Escape",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/n64hub/rayman-2-recomp"
     ],
@@ -3150,7 +2944,7 @@
     "title": "RE:RUN",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/aukak/RE-RUN"
     ],
@@ -3163,7 +2957,7 @@
     "title": "Reset Generation",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/Hubert-Rybak/Reset-Generation-Wasm-Port"
     ],
@@ -3175,7 +2969,7 @@
     "title": "Rolling Sky",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/3kh0/rolling-sky"
     ],
@@ -3187,7 +2981,7 @@
     "title": "Rugby 08",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/mitchivin/rugby08",
       "https://github.com/IFAKA/rugby08-web"
@@ -3201,7 +2995,7 @@
     "title": "S.P.L.I.T",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/degloved-net/s.p.l.i.t"
     ],
@@ -3214,7 +3008,7 @@
     "title": "Saihate Station",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/web-ports/saihate-station"
     ],
@@ -3226,7 +3020,7 @@
     "title": "San Francisco Rush 2049",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/n64hub/rush-2049-recomp"
     ],
@@ -3239,7 +3033,7 @@
     "title": "Saturday Night Slam Masters",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/GinoDaza/ssm-online"
     ],
@@ -3252,7 +3046,7 @@
     "title": "Schoolboy Runaway",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/genizy/web-port/tree/main/schoolboy-runaway"
     ],
@@ -3264,7 +3058,7 @@
     "title": "SCP: Containment Breach",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/larpinguser/q8j"
     ],
@@ -3276,7 +3070,7 @@
     "title": "Serial Experiments Lain",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/ad044/lainTSX"
     ],
@@ -3289,7 +3083,7 @@
     "title": "Shadow Warrior",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/midzer/jfsw"
     ],
@@ -3302,7 +3096,7 @@
     "title": "Shift at Midnight",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/webporting/Shift-At-Midnight",
       "https://github.com/slqntdevss/ShiftAtMidnightPort"
@@ -3315,7 +3109,7 @@
     "title": "Side Effects",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/gn-math/assets/tree/main/318"
     ],
@@ -3327,7 +3121,7 @@
     "title": "Silent Hill",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/SlickAmogus/silent-hill-decomp/tree/pc-port"
     ],
@@ -3340,7 +3134,7 @@
     "title": "SimCity",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/graememcc/micropolisJS"
     ],
@@ -3352,7 +3146,7 @@
     "title": "Slender: The Eight Pages",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/genizy/web-port/tree/main/slender"
     ],
@@ -3367,7 +3161,7 @@
     "title": "Slendytubbies",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/web-ports/slendytubbies"
     ],
@@ -3383,7 +3177,7 @@
     "title": "Slendytubbies 2",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/web-ports/slendytubbies/tree/main/2"
     ],
@@ -3395,7 +3189,7 @@
     "title": "Slendytubbies 2D",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/web-ports/slendytubbies/tree/main/2d"
     ],
@@ -3407,7 +3201,7 @@
     "title": "Slime Rancher",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/web-ports/slime-ranchers",
       "https://github.com/Reeyuki/SlimeRanch"
@@ -3423,7 +3217,7 @@
     "title": "Super Mario Kart",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/burnedpopcorn/SM-Kart-ZX-Web-Port"
     ],
@@ -3438,7 +3232,7 @@
     "title": "SOCOM II: U.S. Navy SEALs",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/Scotho/socom-legacy"
     ],
@@ -3451,7 +3245,7 @@
     "title": "Sokoban",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/midzer/simple-sokoban"
     ],
@@ -3464,7 +3258,7 @@
     "title": "Sonic CD",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/TWS2401/Sonic-CD-WASM"
     ],
@@ -3476,7 +3270,7 @@
     "title": "Sonic Mania",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/VinMannie/SonicManiaWeb",
       "https://github.com/burnedpopcorn/SonicManiaPlusWebPort"
@@ -3493,7 +3287,7 @@
     "title": "Sonic Robo Blast 2",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/chromaticpipe/SRB2-WASM",
       "https://github.com/web-ports/srb2"
@@ -3506,7 +3300,7 @@
     "title": "Sonic the Hedgehog",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/VinMannie/Sonic-1-WASM",
       "https://github.com/mattConn/Sonic-Decompilation-WASM"
@@ -3519,7 +3313,7 @@
     "title": "Sonic the Hedgehog 2",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/mattConn/Sonic-Decompilation-WASM",
       "https://github.com/VinMannie/Sonic-2-WASM"
@@ -3532,7 +3326,7 @@
     "title": "SONIC.EXE",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/genizy/web-port/tree/main/sonic.exe"
     ],
@@ -3544,7 +3338,7 @@
     "title": "Spaceflight Simulator",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/web-ports/spaceflight-simulator"
     ],
@@ -3556,7 +3350,7 @@
     "title": "Speed Stars",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/genizy/web-port/tree/main/speed-stars"
     ],
@@ -3568,7 +3362,7 @@
     "title": "SSX 3",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/andersfischernielsen/ssx3-decomp"
     ],
@@ -3581,7 +3375,7 @@
     "title": "Star Command",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/DrEvil-TitaniumHelix/star-command-remake"
     ],
@@ -3594,7 +3388,7 @@
     "title": "Stardew Valley",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/degloved-net/stardew-wasm"
     ],
@@ -3606,7 +3400,7 @@
     "title": "Starfighter",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/midzer/starfighter"
     ],
@@ -3619,7 +3413,7 @@
     "title": "Stick with It",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/slqntdevss/StickWithItPort"
     ],
@@ -3631,7 +3425,7 @@
     "title": "Stunts",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/mr-finster/stunts-hd"
     ],
@@ -3644,7 +3438,7 @@
     "title": "Supaplex",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/midzer/open-supaplex"
     ],
@@ -3657,7 +3451,7 @@
     "title": "Super Mario 64",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/n64hub/super-mario-64-recomp",
       "https://github.com/andrewnakas/sm64-cleanroom",
@@ -3671,24 +3465,11 @@
     ]
   },
   {
-    "id": "super-mario-64-ds",
-    "title": "Super Mario 64 DS",
-    "genre": "Arcade",
-    "mode": "unavailable",
-    "load": "unknown",
-    "sources": [
-      "https://github.com/wigwoo1/Super-Mario-64-DS-Enhanced-PC-Port"
-    ],
-    "imported": true,
-    "unavailable": "The linked project needs a compatible browser build.",
-    "posterSource": "https://github.com/libretro-thumbnails/Nintendo_-_Nintendo_DS/blob/a119dcab8fa04c9974b9c229eda824318d923322/Named_Boxarts/Super%20Mario%2064%20DS%20%28USA%29.png"
-  },
-  {
     "id": "super-mario-bros-remastered",
     "title": "Super Mario Bros. Remastered",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/bubbls/ports/blob/main/smb-remastered"
     ],
@@ -3701,7 +3482,7 @@
     "title": "Super Mario Galaxy",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/T4ctica1YT/SMGwebport"
     ],
@@ -3713,7 +3494,7 @@
     "title": "Super Smash Bros.",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/n64hub/super-smash-bros-recomp",
       "https://github.com/turtlesoupy/opensmash"
@@ -3727,7 +3508,7 @@
     "title": "Super Smash Bros. Melee",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/999sian/melee-pc"
     ],
@@ -3740,7 +3521,7 @@
     "title": "Syndicate",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/midzer/freesynd"
     ],
@@ -3749,27 +3530,11 @@
     "posterSource": "https://github.com/libretro-thumbnails/DOS/blob/2f6336592694d29272b0c0c343abbd6418827f8f/Named_Boxarts/Syndicate.png"
   },
   {
-    "id": "t-cubed",
-    "title": "T Cubed",
-    "genre": "Arcade",
-    "mode": "embed",
-    "load": "unknown",
-    "sources": [
-      "https://github.com/web-ports/baldi-mods/tree/main/t3",
-      "https://github.com/GlaceonFan77/T-Cubed-Web"
-    ],
-    "imported": true,
-    "aliases": [
-      "t³"
-    ],
-    "posterSource": "https://github.com/gn-math/covers/blob/67baf382659b6b386371fdb2f5c56bcc9b5174eb/818.png"
-  },
-  {
     "id": "tekken-3",
     "title": "Tekken 3",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/n0madic/Tekken3Remake"
     ],
@@ -3782,7 +3547,7 @@
     "title": "Tekken: Dark Resurrection",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/gasparegas/tkdr-recomp"
     ],
@@ -3798,7 +3563,7 @@
     "title": "Terraria",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "http://github.com/mercuryWorkshop/terraria-wasm",
       "https://github.com/web-ports/terraria"
@@ -3811,7 +3576,7 @@
     "title": "Tony Hawk's Pro Skater",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/nascarfan03/thps1-web-port"
     ],
@@ -3824,7 +3589,7 @@
     "title": "Tony Hawk's Underground 2",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/Loosemond/thug2-web"
     ],
@@ -3837,7 +3602,7 @@
     "title": "Turok 2: Seeds of Evil",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/n64hub/turok-2-recomp"
     ],
@@ -3850,7 +3615,7 @@
     "title": "Turok 3: Shadow of Oblivion",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/n64hub/turok-3-recomp"
     ],
@@ -3863,7 +3628,7 @@
     "title": "Turok: Dinosaur Hunter",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/n64hub/turok-recomp"
     ],
@@ -3876,7 +3641,7 @@
     "title": "Tattletail",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/genizy/web-port/tree/main/tattletail"
     ],
@@ -3888,7 +3653,7 @@
     "title": "That's Not My Neighbor",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/genizy/web-port/tree/main/thats-not-my-neighbor"
     ],
@@ -3900,7 +3665,7 @@
     "title": "Tomb Raider",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/XProger/OpenLara"
     ],
@@ -3913,7 +3678,7 @@
     "title": "Totally Accurate Battle Simulator",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/web-ports/tabs",
       "https://github.com/Reeyuki/Tabs"
@@ -3926,7 +3691,7 @@
     "title": "Touhou Mother",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/aukak/gameports/tree/main/touhou%20mother"
     ],
@@ -3939,7 +3704,7 @@
     "title": "Traffic Racer",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/genizy/traffic-racer"
     ],
@@ -3951,7 +3716,7 @@
     "title": "Trees Hate You",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/thirstygithub/fugglelatougin"
     ],
@@ -3963,7 +3728,7 @@
     "title": "Ultima V: Warriors of Destiny",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/synthwave-pixel/ultima5"
     ],
@@ -3976,7 +3741,7 @@
     "title": "Ultrakill",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/genizy/web-port/tree/main/ultrakill"
     ],
@@ -3991,7 +3756,7 @@
     "title": "Ultrapool",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/ParrrotVR/ultrapoolwebport",
       "https://github.com/genizy/ultrapoolwebport-nothreads"
@@ -4004,7 +3769,7 @@
     "title": "Uncharted Waters: New Horizons",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/JohanLi/uncharted-waters-2"
     ],
@@ -4017,7 +3782,7 @@
     "title": "Undertale Yellow",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/genizy/web-port/tree/main/undertale-yellow"
     ],
@@ -4029,7 +3794,7 @@
     "title": "Untitled Goose Game",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/web-ports/untitled-goose-game",
       "https://github.com/webporting/Untitled-Goose-Game"
@@ -4042,7 +3807,7 @@
     "title": "Urban Chaos",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/Carter54git/Urban-Chaos-OpenChaos-ported-to-web"
     ],
@@ -4054,7 +3819,7 @@
     "title": "Urban Reign",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/anmolverma5/urban-reign-wasm"
     ],
@@ -4063,23 +3828,11 @@
     "posterSource": "https://github.com/libretro-thumbnails/Sony_-_PlayStation_2/blob/c2fcaf5f39aa63285008f154fa64daa5f6815187/Named_Boxarts/Urban%20Reign%20%28USA%29.png"
   },
   {
-    "id": "uvuvwevwevweonyetenvewveugwemubwemossas",
-    "title": "UvuvwevwevweOnyetenvewveUgwemubwemOssas",
-    "genre": "Arcade",
-    "mode": "embed",
-    "load": "unknown",
-    "sources": [
-      "https://github.com/bubbls/ports/tree/main/UvuvwevwevweOnyetenvewveUgwemubwemOssas"
-    ],
-    "imported": true,
-    "posterSource": "https://github.com/gn-math/covers/blob/67baf382659b6b386371fdb2f5c56bcc9b5174eb/795.png"
-  },
-  {
     "id": "webfishing",
     "title": "Webfishing",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/genizy/web-port/tree/main/web-fishing"
     ],
@@ -4091,7 +3844,7 @@
     "title": "WipEout",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/phoboslab/wipeout-rewrite"
     ],
@@ -4104,7 +3857,7 @@
     "title": "Witch's Heart",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/genizy/web-port/tree/main/witch-heart"
     ],
@@ -4116,7 +3869,7 @@
     "title": "Wolfenstein 3D",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/midzer/wolf4sdl",
       "https://github.com/lazarv/wolf3d",
@@ -4133,7 +3886,7 @@
     "title": "Worldbox",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://gitlab.com/Shindo957-Official/worldfox"
     ],
@@ -4146,7 +3899,7 @@
     "title": "Your Only Move is Hustle",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/web-ports/yomi-hustle",
       "https://github.com/webporting/Your-Only-Move-Is-HUSTLE"
@@ -4162,7 +3915,7 @@
     "title": "Yume Nikki",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/genizy/web-port/tree/main/yume-nikki"
     ],
@@ -4174,7 +3927,7 @@
     "title": "Zanac EX",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/ultimzeus/zanac-ex-webport"
     ],
@@ -4186,7 +3939,7 @@
     "title": "Zelda II: The Adventure of Link",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/troyedwardsjr/z2rs"
     ],
@@ -4199,7 +3952,7 @@
     "title": "Zeliard",
     "genre": "Arcade",
     "mode": "unavailable",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/nolanvenhola/zeliard"
     ],
@@ -4224,7 +3977,7 @@
     "title": "Hextris",
     "genre": "Puzzle",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/Hextris/hextris"
     ],
@@ -4236,7 +3989,7 @@
     "title": "60 Seconds!",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/usheje883-maker/60-Seconds-Webport"
     ],
@@ -4248,7 +4001,7 @@
     "title": "Arco",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/degloved-net/arco"
     ],
@@ -4260,7 +4013,7 @@
     "title": "Backyard Baseball '97",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/degloved-net/backyard-baseball-97"
     ],
@@ -4272,7 +4025,7 @@
     "title": "Balatro",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/W0W53R/web-balatro"
     ],
@@ -4284,7 +4037,7 @@
     "title": "Bat to Bed Demo",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/gays-studio/BatToBed-DEMO-webport"
     ],
@@ -4296,7 +4049,7 @@
     "title": "Bat to the Heavens",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/gays-studio/bat-to-the-heavens"
     ],
@@ -4308,7 +4061,7 @@
     "title": "The Binding of Isaac: Repentance",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/chiikabu/the-browsing-of-isaac"
     ],
@@ -4320,7 +4073,7 @@
     "title": "Black Hole Fishing",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/mynamescrax/gamesforaetheris/tree/main/blackholefishing"
     ],
@@ -4332,7 +4085,7 @@
     "title": "Cat Goes Fishing",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/Reeyuki/CatFish"
     ],
@@ -4344,7 +4097,7 @@
     "title": "Click to Ten",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/BestSpark687090/bestspark-web-ports/tree/main/click-to-ten"
     ],
@@ -4356,7 +4109,7 @@
     "title": "Dawnfolk",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/degloved-net/dawnfolk"
     ],
@@ -4368,9 +4121,8 @@
     "title": "Deltarune",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
-      "https://github.com/genizy/web-port/tree/main/deltatraveler",
       "https://github.com/Mollomm1/test"
     ],
     "imported": true,
@@ -4384,7 +4136,7 @@
     "title": "Dewdrop Dynasty",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/obsidian-ports/Dewdrop-Dynasty"
     ],
@@ -4396,7 +4148,7 @@
     "title": "Dictators:No Peace Countryballs",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/web-ports/countryballsdictator"
     ],
@@ -4408,7 +4160,7 @@
     "title": "Don't Bite Me Bro",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/usheje883-maker/Dont-Bite-Me-Bro-Web"
     ],
@@ -4420,7 +4172,7 @@
     "title": "Don't Sleep With The Fishes",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/AlexBoops/DSWTF-Port"
     ],
@@ -4432,7 +4184,7 @@
     "title": "Duck Game",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/im-nassinger/duck-game"
     ],
@@ -4444,7 +4196,7 @@
     "title": "Gamble with Your Friends",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/Camzzz-vrgt/gamble-with-your-friends-web/tree/main/game"
     ],
@@ -4456,7 +4208,7 @@
     "title": "Gambonanza",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/AlexBoops/Gambonanza-Port"
     ],
@@ -4468,7 +4220,7 @@
     "title": "Happy Room",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/degloved-net/happy-room"
     ],
@@ -4480,7 +4232,7 @@
     "title": "HAYAI",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/degloved-net/HAYAI"
     ],
@@ -4492,7 +4244,7 @@
     "title": "Horsey Game",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/woahhcrackers/HorseyGameWeb"
     ],
@@ -4504,7 +4256,7 @@
     "title": "HYDROGEN",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/BestSpark687090/bestspark-web-ports/tree/main/hydrogen"
     ],
@@ -4516,7 +4268,7 @@
     "title": "The Message From Deep Space",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/dashiellbenton/ports/tree/main/tmfds"
     ],
@@ -4528,7 +4280,7 @@
     "title": "Meteor 60 Seconds",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/ThatWirdGuy/Meteor-60-Seconds-Web"
     ],
@@ -4540,7 +4292,7 @@
     "title": "Muck",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/gays-studio/muck-webport"
     ],
@@ -4552,7 +4304,7 @@
     "title": "Night in the Woods",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/reeyuki/NightInTheWoods/"
     ],
@@ -4564,7 +4316,7 @@
     "title": "Night of the Consumers",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/linkawaken1979-alt/night-of-the-consumers-web-port"
     ],
@@ -4576,7 +4328,7 @@
     "title": "Nodebuster",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/degloved-net/nodebuster"
     ],
@@ -4588,7 +4340,7 @@
     "title": "One Potion Please!",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/ajtabjs/onepotionplease"
     ],
@@ -4600,7 +4352,7 @@
     "title": "Paint the Town Red",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/Reeyuki/PttrWebport"
     ],
@@ -4612,7 +4364,7 @@
     "title": "Project Zomboid",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/mtnskye/ProjectZomboidTechDemoPort"
     ],
@@ -4624,7 +4376,7 @@
     "title": "Rimworld",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "high",
     "sources": [
       "https://github.com/SomeRandomFella/portsandrips/tree/master/rimworld"
     ],
@@ -4636,7 +4388,7 @@
     "title": "ROUNDS",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/Nawsif/host/tree/main/ROUNDS"
     ],
@@ -4648,7 +4400,7 @@
     "title": "Shrimpio",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/goodmeals/shrimpio"
     ],
@@ -4660,7 +4412,7 @@
     "title": "Super Choppy Orc",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "low",
     "sources": [
       "https://github.com/gays-studio/super-choppy-orc"
     ],
@@ -4672,7 +4424,7 @@
     "title": "Superflight",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/squidward5/superflight-webport"
     ],
@@ -4684,7 +4436,7 @@
     "title": "There's a Butcher Around",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/usheje883-maker/There-s-A-Butcher-Around-Webport"
     ],
@@ -4696,7 +4448,7 @@
     "title": "TriZon",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/degloved-net/trizon"
     ],
@@ -4708,7 +4460,7 @@
     "title": "Trombone Champ",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/degloved-net/trombone-champ"
     ],
@@ -4720,7 +4472,7 @@
     "title": "Upload Labs",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/googoogoob/UploadLabsWebPort"
     ],
@@ -4732,7 +4484,7 @@
     "title": "Void Whispers",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/degloved-net/void-whispers"
     ],
@@ -4744,7 +4496,7 @@
     "title": "while True: learn()",
     "genre": "Arcade",
     "mode": "embed",
-    "load": "unknown",
+    "load": "medium",
     "sources": [
       "https://github.com/dashiellbenton/ports/tree/main/while-true-learn"
     ],

@@ -23,9 +23,6 @@
   "doom": {
     "url": "https://raz0red.github.io/webprboom/"
   },
-  "duke-nukem-3d": {
-    "url": "https://archive.org/embed/3dduke13SW"
-  },
   "fallout": {
     "url": "https://rerunreactor.com/"
   },
@@ -101,9 +98,6 @@
   "yandere-simulator": {
     "url": "https://gn-math.github.io/html/554-fix2.html"
   },
-  "b": {
-    "url": "https://rawcdn.githack.com/web-ports/baldi-mods/debd42e16b6c6a59045e177c791c7ac779aa9c9f/-b/index.html"
-  },
   "20-minutes-till-dawn": {
     "url": "https://rawcdn.githack.com/web-ports/20-minutes/e82366ecffd3ed46f804da050d02a44422986204/index.html"
   },
@@ -121,9 +115,6 @@
   },
   "baldi-s-basics-classic-remastered": {
     "url": "https://rawcdn.githack.com/genizy/web-port/a8bea5fd11f88e5a9192857f434e299c40efe7e6/baldi-remaster/index.html"
-  },
-  "baldi-s-basics-plus": {
-    "url": "https://rawcdn.githack.com/genizy/web-port/a8bea5fd11f88e5a9192857f434e299c40efe7e6/baldi-plus/index.html"
   },
   "a-bite-at-freddy-s": {
     "url": "https://rawcdn.githack.com/freebuisness/assets/6bacc0f4e61e95e6a4e4309a63b189e179d91e34/258/index.html"
@@ -209,20 +200,11 @@
   "fish": {
     "url": "https://rawcdn.githack.com/web-ports/fish/e11b1e847859e1fbba6cb102b7d7ffac576327fc/index.html"
   },
-  "five-nights-at-epstein-s": {
-    "url": "https://rawcdn.githack.com/web-ports/fnae/ce3e15db144629f468916e186bc11547098706a2/index.html"
-  },
   "five-nights-at-candy-s": {
     "url": "https://rawcdn.githack.com/web-ports/fnac/ba0ff4088706af7db1da0a60a77b5b8704863376/1/index.html"
   },
   "five-nights-at-candy-s-2": {
     "url": "https://rawcdn.githack.com/web-ports/fnac/ba0ff4088706af7db1da0a60a77b5b8704863376/2/index.html"
-  },
-  "five-nights-at-freddy-s-4-halloween": {
-    "url": "https://rawcdn.githack.com/genizy/fnaf/7be68ae3d98c60a9a62b4164c2d61a416a0beb1a/4-halloween/index.html"
-  },
-  "five-nights-at-freddy-s-world-refreshed": {
-    "url": "https://rawcdn.githack.com/web-ports/fnaf-world-refreshed/5ad15720ba66d73ff80d7fa9d7a4cbf4a297e7ae/index.html"
   },
   "five-nights-at-freddy-s-sister-location": {
     "url": "https://rawcdn.githack.com/irv77/hd_fnaf/8ddade73bcf0c30f4535d48af778d238f8ffd5a6/sl/index.html"
@@ -241,9 +223,6 @@
   },
   "fundamental-paper-novel": {
     "url": "https://rawcdn.githack.com/bubbls/ports/6358736132208699cda37b554c75510a5fb77e41/fpn-FULLY_RECRAFTED-web/index.html"
-  },
-  "gabriel-s-awesome-schoolhouse": {
-    "url": "https://rawcdn.githack.com/web-ports/gash/2f811e80f6fe649d0dafac7df6599d64e4fee9a3/index.html"
   },
   "gta-3": {
     "url": "https://rawcdn.githack.com/larpinguser/HelloWorldScriptBasicFunctionCSharpIsCool/6a6cf53d66fe8452ca6c1896ce0ce41f1ba12e0e/index.html"
@@ -277,9 +256,6 @@
   },
   "iron-lung": {
     "url": "https://rawcdn.githack.com/web-ports/iron-lung/609540cad01c7cad3de44271423305c9a57ac2bd/index.html"
-  },
-  "jeffrey-epstein-basics-in-education-and-kidnapping": {
-    "url": "https://rawcdn.githack.com/bubbls/ports/6358736132208699cda37b554c75510a5fb77e41/jeffrey-epsteins-basics-in-education-and-kidnapping/index.html"
   },
   "jelly-drift": {
     "url": "https://rawcdn.githack.com/genizy/web-port/a8bea5fd11f88e5a9192857f434e299c40efe7e6/jelly-drift/index.html"
@@ -350,9 +326,6 @@
   "pizza-tower": {
     "url": "https://rawcdn.githack.com/genizy/web-port/a8bea5fd11f88e5a9192857f434e299c40efe7e6/pizza-tower/index.html"
   },
-  "scoutdingo": {
-    "url": "https://rawcdn.githack.com/web-ports/scoutdingo/4ca3ad113377a4131bba76bf41bea35834a7bfcb/index.html"
-  },
   "plague-inc": {
     "url": "https://rawcdn.githack.com/Reeyuki/PlagueIncEvolved/79306ef07b5456ebdc6d25dc023aa61184c1ae27/index.html"
   },
@@ -367,9 +340,6 @@
   },
   "prototype": {
     "url": "https://rawcdn.githack.com/midzer/prototype/6312e8ff26423ad3660a02b863c660be30010ee5/docs/index.html"
-  },
-  "raldi-s-crackhouse": {
-    "url": "https://rawcdn.githack.com/woahhcrackers/RaldiWeb-LEGACY/68281aaf5f06982694d0a7a0079c2f6681f3090c/index.html"
   },
   "ravenfield": {
     "url": "https://rawcdn.githack.com/degloved-net/Ravenfield/8c3bf5eac6b926128d798641350ba2824488bf08/index.html"
@@ -446,9 +416,6 @@
   "super-mario-galaxy": {
     "url": "https://rawcdn.githack.com/T4ctica1YT/SMGwebport/40837804e15e2b3ee6ebc6c41f7afd0bcb158954/index.html"
   },
-  "t-cubed": {
-    "url": "https://rawcdn.githack.com/web-ports/baldi-mods/debd42e16b6c6a59045e177c791c7ac779aa9c9f/t3/index.html"
-  },
   "terraria": {
     "url": "https://rawcdn.githack.com/web-ports/terraria/47731568354ea43e84e73a99a9e63328351d7194/index.html"
   },
@@ -481,9 +448,6 @@
   },
   "urban-chaos": {
     "url": "https://rawcdn.githack.com/Carter54git/Urban-Chaos-OpenChaos-ported-to-web/127cc065fa88d52fba5fa62f0f4f633429c37363/docs/index.html"
-  },
-  "uvuvwevwevweonyetenvewveugwemubwemossas": {
-    "url": "https://rawcdn.githack.com/bubbls/ports/6358736132208699cda37b554c75510a5fb77e41/UvuvwevwevweOnyetenvewveUgwemubwemOssas/index.html"
   },
   "webfishing": {
     "url": "https://rawcdn.githack.com/genizy/web-port/a8bea5fd11f88e5a9192857f434e299c40efe7e6/web-fishing/index.html"
@@ -543,7 +507,7 @@
     "url": "https://rawcdn.githack.com/degloved-net/dawnfolk/dda2a81a1252cfec3891f905c3e01675c51a53ce/index.html"
   },
   "deltarune": {
-    "url": "https://rawcdn.githack.com/genizy/web-port/a8bea5fd11f88e5a9192857f434e299c40efe7e6/deltatraveler/index.html"
+    "url": "https://rawcdn.githack.com/Mollomm1/test/ac1db67df09e8ae48572c5de84b4b6ac5ebd1e67/index.html"
   },
   "dewdrop-dynasty": {
     "url": "https://rawcdn.githack.com/obsidian-ports/Dewdrop-Dynasty/b0d0d75fe0368f5f4668c923e1bd69220ac9c4db/index.html"
