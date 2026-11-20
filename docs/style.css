@@ -236,7 +236,7 @@ dialog .actions{justify-content:space-between;margin-top:1rem}
 .chart-panel::before{width:36%;height:3px}
 .mini-chart li:nth-child(2) .position{color:var(--muted)}
 .mini-chart li:nth-child(3) .position{color:var(--accent-text);opacity:.8}
-.community-bar{display:flex;align-items:center;justify-content:center;gap:1.15rem;margin:1.25rem 0 0}
+.community-bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:1.15rem;margin:1.25rem 0 0}
 .join-discord{display:inline-flex;align-items:center;gap:.75rem;border-radius:.48rem;padding:.6rem .78rem;color:#fff;background:#505be4;box-shadow:0 3px 15px #5865f252,inset 0 1px #ffffff34;line-height:1}
 .join-discord:hover,.join-discord:focus-visible{background:#4451d5;box-shadow:0 4px 20px #5865f267}
 .join-discord>.ico:first-child{width:1.36rem;height:1.36rem}
@@ -292,3 +292,5 @@ dialog .actions{justify-content:space-between;margin-top:1rem}
 .feature-hidden .feature-bar i,.hero:has(:focus-visible) .feature-bar i,body:has(dialog[open]) .feature-bar i{animation-play-state:paused}
 @media(max-width:600px){.hero .hero-body{width:57%;padding:1rem .75rem 3rem}.hero .hero-bg{object-position:65% center}.hero::after{background:linear-gradient(90deg,#09101de8,#09101d8c 54%,#09101d14)}.hero h1{font-size:clamp(1.9rem,8vw,3rem)}}
 @media(prefers-reduced-motion:reduce){.feature-bar[aria-pressed=true] i{animation:feature-fill 6.5s steps(1,end) forwards!important}}
+
+#request-title{width:100%;font:inherit;color:inherit;background:var(--surface,transparent);border:1px solid var(--line,currentColor);border-radius:.5rem;padding:.8rem}

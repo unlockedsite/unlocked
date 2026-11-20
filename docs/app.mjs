@@ -139,8 +139,30 @@ function nextFeature(index = (featureIndex + 1) % featured.length){
 function invite(){
   return inviteHidden?"":'<aside class="tour-invite">'+icon("gamepad")+'<strong>First time in the vault?</strong><button class="tour-open" data-action="tour">Take the quick tour</button><button class="tour-skip" data-action="skip-tour">Skip</button></aside>';
 }
+function requestsPage(){
+  main.innerHTML='<section class="narrow section-page"><a class="back" href="#/library">'+icon("back")+'All games</a><h1 class="panel-title">Request a game</h1><p class="subcopy">Suggest a game for the Unlocked library. Your request goes to the arcade team on Discord.</p><form class="form" id="request-form"><div class="field"><label for="request-title">Game title</label><input id="request-title" name="title" minlength="2" maxlength="80" required></div><button class="btn" type="submit">Send request</button><p class="feedback" role="status"></p></form></section>';
+}
+async function submitGameRequest(form){
+  const input=form.elements.title, button=form.querySelector("button"), status=form.querySelector("[role=status]");
+  if(button.disabled)return;
+  const query=input.value.trim();
+  if(query.length<2){status.textContent="Enter at least two characters.";input.focus();return;}
+  button.disabled=true;
+  status.textContent="Sending request…";
+  try{
+    const result=await api("/v1/requests",{query});
+    if(result.status==="received"){
+      receivedQueries.add(normalize(query));
+      status.textContent="Request received for "+query+".";
+      form.reset();
+    }else if(result.status==="found"){
+      status.textContent=query+" already has a match in the catalog.";
+    }else{throw Error("Couldn’t confirm delivery. Try again.");}
+  }catch(error){status.textContent=error.message;}
+  finally{button.disabled=false;}
+}
 function communityBar(){
-  return '<div class="community-bar"><a class="join-discord" href="https://discord.gg/AezupBCtns" target="_blank" rel="noopener noreferrer">'+icon("discord")+'<span><small>Join us on</small><strong>Discord</strong></span>'+icon("forward")+'</a><div class="community-online">'+presence("all")+'</div></div>';
+  return '<div class="community-bar"><a class="join-discord" href="https://discord.gg/AezupBCtns" target="_blank" rel="noopener noreferrer">'+icon("discord")+'<span><small>Join us on</small><strong>Discord</strong></span>'+icon("forward")+'</a><a class="secondary-btn" href="#/requests">Request a game</a><div class="community-online">'+presence("all")+'</div></div>';
 }
 function currentRanks(){
   return games.filter(g=>g.mode==="embed").sort((a,b)=>(rankedCounts[b.id]||0)-(rankedCounts[a.id]||0)||alphabetical(a,b));
@@ -388,12 +410,13 @@ function route({scroll=true}={}){
   setNav();$("#theme-panel").hidden=true;$("#theme-button").setAttribute("aria-expanded","false");
   if(guide.open)guide.close();
   const game=current.page==="game" && byId.get(current.id);
-  const titles={library:"Game vault",top:"Top games",saved:"Saved games",report:"Report a bug",credits:"Credits",search:"Search"};
+  const titles={library:"Game vault",top:"Top games",saved:"Saved games",report:"Report a bug",requests:"Request a game",credits:"Credits",search:"Search"};
   document.title=(game?.title || titles[current.page] || "Page not found")+" · Unlocked";
   if(current.page==="library" || isSearch)renderLibrary();
   else if(current.page==="saved")renderSaved();
   else if(current.page==="top")drawTop();
   else if(game){gameLayout(game);prepareGame(game,token,current.params.get("start")==="1");}
+  else if(current.page==="requests")requestsPage();
   else if(current.page==="report")renderReport();
   else if(current.page==="credits")showCredits(token);
   else main.innerHTML='<div class="empty"><h1>Page not found</h1><a class="btn" href="#/library">Browse games</a></div>';
@@ -487,6 +510,7 @@ function setup(){
   document.addEventListener("submit",async e=>{
     const form=e.target;
     if(form.id==="guide-search"){e.preventDefault();const str=form.querySelector("input").value.trim();if(str){guide.close();searchView(str);search.focus();}return;}
+    if(form.id==="request-form"){e.preventDefault();submitGameRequest(form);return;}
     if(form.id==="report-form"){e.preventDefault();submitReport(form);return;}
     if(form.id==="redeem"){e.preventDefault();const token=navigation;try{const result=await api("/v1/redeem",{key:$("#access-key").value});if(token!==navigation)return;ticket=result.token || "";saveValue("session",ticket,true);await prepareGame(byId.get(current.id),token);}catch(error){if(token===navigation)feedback("#key-result",error.message);}}
   });
