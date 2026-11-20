@@ -45,7 +45,7 @@ with sync_playwright() as p:
   page.get_by_role('button',name='Leave fullscreen').click()
   page.wait_for_function('!document.fullscreenElement')
   assert page.evaluate('document.querySelector("iframe")===originalFrame')
-  page.evaluate('document.getElementById("stage").requestFullscreen=()=>Promise.reject(new Error("denied"))')
+  page.evaluate('()=>{document.getElementById("stage").requestFullscreen=()=>Promise.reject(new Error("denied"));}')
   page.get_by_role('button',name='Fullscreen',exact=True).click()
   page.wait_for_function('document.getElementById("toast").textContent.includes("blocked")')
   assert not page.evaluate('!!document.fullscreenElement')
