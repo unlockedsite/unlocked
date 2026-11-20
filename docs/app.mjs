@@ -118,11 +118,19 @@ function nextFeature(){
   if (!old) return;
   const refocus = old.querySelector(".hero-next") === document.activeElement;
   featureIndex = (featureIndex + 1) % featured.length;
-  old.outerHTML = hero();
-  const slide = $(".spotlight .hero");
-  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    for (const el of slide.querySelectorAll(".hero-bg,.hero-body"))
-      el.animate([{transform:"translateX(-100%)"},{transform:"translateX(0)"}],{duration:500,easing:"ease-out"});
+  old.querySelector(".feature-outgoing")?.remove();
+  old.insertAdjacentHTML("afterend", hero());
+  const slide = old.nextElementSibling;
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    old.remove();
+  } else {
+    old.inert = true;
+    old.setAttribute("aria-hidden", "true");
+    old.classList.add("feature-outgoing");
+    Object.assign(old.style, {position:"absolute", inset:"0", minHeight:"0", zIndex:"2", pointerEvents:"none", border:"0"});
+    slide.append(old);
+    const fade = old.animate([{opacity:1},{opacity:0}], {duration:700, easing:"ease-in-out", fill:"forwards"});
+    fade.finished.then(()=>old.remove(), ()=>old.remove());
   }
   if (refocus) slide.querySelector(".hero-next").focus();
 
@@ -425,7 +433,7 @@ function updateTheme(value){
 function setup(){
   setInterval(()=>{
     const slide = $(".spotlight .hero");
-    if (slide && !document.hidden && !guide.open && !slide.matches(":hover,:focus-within") && !matchMedia("(prefers-reduced-motion: reduce)").matches) nextFeature();
+    if (slide && !document.hidden && !guide.open && !slide.querySelector(":focus-visible")) nextFeature();
   },6500);
   document.querySelectorAll("[data-icon]").forEach(el=>el.innerHTML=icon(el.dataset.icon));
   updateTheme(document.documentElement.dataset.theme || "system");
