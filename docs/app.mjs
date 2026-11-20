@@ -1,6 +1,6 @@
 import { icon } from "./icons.mjs?v=2";
 import { matches, normalize } from "./search.mjs";
-import { chromeOS, createPlayer } from "./player.mjs?v=4";
+import { chromeOS, createPlayer } from "./player.mjs?v=6";
 
 const API = "https://unlocked-arcade-service.persistingthoughts0.chatgpt.site";
 const $ = selector => document.querySelector(selector);

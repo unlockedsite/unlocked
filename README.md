@@ -3,7 +3,7 @@ The unlocked vault of all your favorite games.
 
 [Play Unlocked](https://unlockedsite.github.io/unlocked/)
 
-The arcade is published from `main /docs` on GitHub Pages. Minecraft: Story Mode is featured. The library sorts titles alphabetically, saves bookmarks and appearance on the current device, and loads a game only when someone starts it. Every game has a Low, Medium, or High estimate of Chromebook hardware demand. For games awaiting a browser build, the estimate is provisional. Individual ports determine their own controls, save support, and touch compatibility. Fullscreen requests native browser fullscreen. On ChromeOS the game keeps its starting viewport while the player scales to fit the screen. High-demand games default to a maximum player size of 1280 by 720 CSS pixels, adjustable before launch. Games with their own fixed render resolution may see no change.
+The arcade is published from `main /docs` on GitHub Pages. Minecraft: Story Mode is featured. The library sorts titles alphabetically, saves bookmarks and appearance on the current device, and loads a game only when someone starts it. Every game has a Low, Medium, or High estimate of Chromebook hardware demand. For games awaiting a browser build, the estimate is provisional. Individual ports determine their own controls, save support, and touch compatibility. Fullscreen requests native browser fullscreen. Fullscreen scales the game to the display aspect ratio while keeping the iframe within its starting render dimensions on Chromebooks. High-demand games default to a maximum player size of 1280 by 720 CSS pixels, adjustable before launch. Games with their own fixed render resolution may see no change.
 
 ## Game catalog
 
