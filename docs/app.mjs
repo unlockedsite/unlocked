@@ -669,7 +669,7 @@ function setup(){
       case "skip-tour":rememberTour();break;
       case "previous-guide":tourStep=Math.max(0,tourStep-1);guidePage();break;
        case "next-guide":tourStep=Math.min(tourStops.length-1,tourStep+1);guidePage();break;
-      case "close-guide":guide.close();break;
+      case "close-guide":{const completedTour=guide.classList.contains("guided") && tourStep===tourStops.length-1;guide.close();if(completedTour)window.scrollTo({top:0,behavior:performanceMode||window.matchMedia("(prefers-reduced-motion: reduce)").matches?"instant":"smooth"});break;}
       case "see-top":guide.close();location.hash="#/top";break;
       case "specs":showSpecs();break;
       case "show-more":visibleCount+=pageSize;if(current.page==="top")drawTop();else if(current.page==="saved")renderSaved();else renderLibrary();break;
