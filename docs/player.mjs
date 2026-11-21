@@ -4,7 +4,7 @@ export const chromeOS = /^(?:Chrome|Chromium) OS$/i.test(navigator.userAgentData
 export function createPlayer(stage, title, onDisplayChange, onError) {
   const exitButton = stage.querySelector(".exit-stage");
   const toolbarButton = document.querySelector(".play-tools [data-action=fullscreen]");
-  let frame, observer, fitFrame;
+  let frame, observer, fitFrame, loadingTimer, loadingOverlay;
   let nativeActive = false, switching = false, disposed = false, fallbackActive = false;
 
   function focusPlayer() {
@@ -78,7 +78,7 @@ export function createPlayer(stage, title, onDisplayChange, onError) {
     frame.tabIndex = 0;
     // Navigation can reset focus after the launch click. Hand it to the loaded game
     // unless the player has already moved to another control.
-    frame.addEventListener("load", () => {
+    loadingOverlay=document.createElement("div");loadingOverlay.className="player-loading";loadingOverlay.setAttribute("role","status");loadingOverlay.innerHTML="<strong>Loading game…</strong><p>Some ports take longer on Chromebooks.</p>";\n    stage.append(loadingOverlay);\n    loadingTimer=setTimeout(()=>{if(!disposed&&loadingOverlay?.isConnected){loadingOverlay.innerHTML="<strong>Still loading?</strong><p>The game may be downloading large files or waiting for its server.</p><button type=\"button\" class=\"secondary-btn\">Keep waiting</button>";loadingOverlay.querySelector("button")?.addEventListener("click",()=>loadingOverlay?.remove(),{once:true});}},18000);\n    frame.addEventListener("load", () => {\n      clearTimeout(loadingTimer);loadingOverlay?.remove();
       if (!disposed && (document.activeElement === frame || document.activeElement === document.body)) focusPlayer();
     }, {once: true});
     frame.allow = "fullscreen; autoplay; gamepad; encrypted-media";
@@ -103,7 +103,7 @@ export function createPlayer(stage, title, onDisplayChange, onError) {
     start, toggle,
     expanded: () => nativeActive,
     dispose() {
-      disposed = true;\n      fallbackActive=false;stage.classList.remove("fallback-fullscreen");document.body.classList.remove("player-fullscreen-open");
+      disposed = true;clearTimeout(loadingTimer);loadingOverlay?.remove();\n      fallbackActive=false;stage.classList.remove("fallback-fullscreen");document.body.classList.remove("player-fullscreen-open");
       observer?.disconnect();
       document.removeEventListener("fullscreenchange", fullscreenChanged);
       document.removeEventListener("webkitfullscreenchange", fullscreenChanged);
