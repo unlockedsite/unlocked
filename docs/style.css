@@ -402,3 +402,8 @@ body.player-fullscreen-open{overflow:hidden}
 .player-loading p{color:#b8c3d8;max-width:24rem}
 .player-loading strong{font-size:1.2rem}
 @media(prefers-reduced-motion:no-preference){.player-loading{animation:unlocked-enter 220ms ease-out both}}
+
+/* Center the homepage QoL action row without affecting folder/history controls. */
+.community-bar+.qol-bar{justify-content:center;width:100%;margin-left:auto;margin-right:auto}
+.community-bar+.qol-bar>.secondary-btn{justify-content:center;white-space:nowrap}
+@media(max-width:540px){.community-bar+.qol-bar{gap:.5rem}.community-bar+.qol-bar>.secondary-btn{flex:1 1 auto}}
