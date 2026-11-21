@@ -440,3 +440,13 @@ body.player-fullscreen-open{overflow:hidden}
 .age-guide:hover .age-tooltip,.age-guide:focus-visible .age-tooltip{display:block}
 .game-meta>.age-guide{position:relative}
 @media(max-width:540px){.roulette-window{height:152px}.roulette-tile{height:130px}.roulette-tile img{height:78px}}
+
+/* Roulette uses the viewport center as its fixed origin. */
+.roulette-reel{position:absolute;top:0;left:50%;transform:translateX(-72px)}
+/* Reveal age guidance on game-card hover or keyboard focus, without blocking clicks. */
+@media(hover:hover){.card:hover{overflow:visible}.card:hover .age-tooltip{display:block}}
+.card:focus-within{overflow:visible}
+.card:focus-within .age-tooltip{display:block}
+.tour-progress{display:flex;gap:.35rem;margin-bottom:.6rem}
+.tour-progress i{flex:1;height:.25rem;border-radius:1rem;background:var(--line)}
+.tour-progress i.on{background:#f6ca51;box-shadow:0 0 10px #f6ca5180}
