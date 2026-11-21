@@ -1,24 +1,10 @@
-// Unlocked player hub: local-only features. No account claims or third-party trackers.
+// Unlocked local-only discovery, history and settings. No accounts or cloud backend.
 import * as store from "./qol.mjs?v=1";
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const day=()=>new Date().toISOString().slice(0,10);
 const week=()=>{const d=new Date();d.setUTCDate(d.getUTCDate()-((d.getUTCDay()+6)%7));return d.toISOString().slice(0,10)};
 export const preferences=()=>({...{accent:"#ffd063",compact:false,contrast:false,largeText:false,showTimer:true},...store.read("preferences",{})});
 export function applySettings(){const p=preferences(),root=document.documentElement;root.style.setProperty("--player-accent",p.accent);root.classList.toggle("hub-compact",!!p.compact);root.classList.toggle("hub-contrast",!!p.contrast);root.classList.toggle("hub-large",!!p.largeText)}
-export function stats(){const h=store.read("history",[]);return {games:h.length,launches:h.reduce((n,x)=>n+(Number(x.visits)||0),0),saved:0}}
-const achievements=[
- ["first","First Launch","Launch your first game",s=>s.launches>=1],
- ["explorer","Explorer","Try 5 different games",s=>s.games>=5],
- ["collector","Collector","Save 10 games",s=>s.saved>=10],
- ["regular","Regular","Launch 25 games",s=>s.launches>=25],
- ["veteran","Veteran","Try 25 different games",s=>s.games>=25],
- ["legend","Vault Legend","Launch 100 games",s=>s.launches>=100],
- ["hour","First Hour","Track 60 minutes of play",()=>minutes()>=60],
- ["tenhours","Dedicated Player","Track 10 hours of play",()=>minutes()>=600],
- ["day","Marathon Player","Track 24 hours of play",()=>minutes()>=1440]
-];
-export function earned(saved){const s={...stats(),saved};return achievements.filter(a=>a[3](s)).map(a=>a[0])}
-export function badgeMarkup(saved){const unlocked=earned(saved);return achievements.map(([id,title,desc])=>'<span class="hub-badge '+(unlocked.includes(id)?"earned":"")+'" title="'+esc(desc)+'">'+(unlocked.includes(id)?"✦":"◇")+' '+esc(title)+'</span>').join("")}
 export function challenges(){const h=store.read("history",[]),today=day(),weekKey=week(),log=store.read("activity",{});const todayEntries=Object.values(log).filter(x=>x.day===today);const weeklyEntries=Object.values(log).filter(x=>x.day>=weekKey);return [{name:"Daily Explorer",goal:"Launch 2 different games today",done:new Set(todayEntries.map(x=>x.id)).size>=2},{name:"Daily Player",goal:"Launch 3 games today",done:todayEntries.reduce((n,x)=>n+x.count,0)>=3},{name:"Weekly Explorer",goal:"Launch 5 different games this week",done:new Set(weeklyEntries.map(x=>x.id)).size>=5}]}
 export function recordActivity(id){const log=store.read("activity",{}),key=day()+":"+id;log[key]={id,day:day(),count:(log[key]?.count||0)+1};const keys=Object.keys(log).sort().slice(-300);store.write("activity",Object.fromEntries(keys.map(k=>[k,log[k]])))}
 export function recordMinutes(id,ms){const minutes=Math.min(Math.max(0,ms),14400000)/60000;if(minutes<0.05)return;const times=store.read("playMinutes",{});times[id]=(times[id]||0)+minutes;store.write("playMinutes",times)}
