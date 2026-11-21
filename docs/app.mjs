@@ -1,7 +1,7 @@
 import { icon } from "./icons.mjs?v=4";
 import { matches, normalize } from "./search.mjs";
 import * as qol from "./qol.mjs?v=1";
-import * as hub from "./hub.mjs?v=2";
+import * as hub from "./hub.mjs?v=3";
 import { chromeOS, createPlayer } from "./player.mjs?v=7";
 
 const $ = selector => document.querySelector(selector);
