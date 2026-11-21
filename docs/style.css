@@ -623,6 +623,27 @@ html{scrollbar-color:var(--accent) var(--bg);scrollbar-width:thin}
 /* Apply wallpaper behind the interface, and scale rem-based UI globally. */
 :root.custom-wallpaper body{background-image:linear-gradient(#090d18bd,#090d18bd),var(--user-wallpaper);background-size:cover;background-position:center;background-attachment:fixed}
 :root.custom-wallpaper body::after{display:none}
-:root{font-size:calc(100% * var(--ui-scale))}
+:root{font-size:100%}
 :root .hub-page{zoom:1}
 :root .hub-discover,:root .library-page,:root .grid,:root .play-tools{font-size:inherit}
+
+/* v45: restore original compact community button sizes and mobile default UI scale. */
+.community-bar>a.join-discord,.community-bar>a.community-action{
+ width:clamp(12rem,22vw,17rem);
+ min-height:3.6rem;
+ max-width:100%;
+ padding:.65rem 2.25rem .65rem 1rem;
+ border-radius:.65rem;
+ font-size:1rem;
+ line-height:1.2;
+}
+@media(max-width:610px){
+ .community-bar{gap:.65rem;max-width:100%}
+ .community-bar>a.join-discord,.community-bar>a.community-action{
+  width:min(100%,17rem);
+  min-height:3.6rem;
+  font-size:.94rem;
+  flex:0 1 17rem;
+ }
+}
+:root .community-bar>a{border-radius:.65rem}
