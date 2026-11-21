@@ -1,7 +1,7 @@
 import { icon } from "./icons.mjs?v=4";
 import { matches, normalize } from "./search.mjs";
 import * as qol from "./qol.mjs?v=1";
-import * as hub from "./hub.mjs?v=3";
+import * as hub from "./hub.mjs?v=4";
 import { chromeOS, createPlayer } from "./player.mjs?v=7";
 
 const $ = selector => document.querySelector(selector);
@@ -394,7 +394,7 @@ function route({scroll=true}={}){
   else if(current.page==="top")drawTop();
    else if(current.page==="history")renderHistory();
    
-   else if(current.page==="settings")main.innerHTML=hub.renderSettings();
+   else if(current.page==="settings"){main.innerHTML=hub.renderSettings();navigator.storage?.persisted?.().then(ok=>{const el=document.querySelector("#storage-status");if(el)el.textContent=ok?"Persistent site storage is enabled. Clearing site data can still erase saves.":"Local data saves normally, but persistent storage has not been granted.";}).catch(()=>{});}
    else if(current.page==="compare")comparePage();
    
    
@@ -466,6 +466,7 @@ function setup(){
     const action=e.target.closest("[data-action]")?.dataset.action;
     switch(action){
       case "random-genre":{const genres=[...new Set(games.filter(g=>g.mode==="embed").map(g=>g.genre))];if(genres.length){genre=genres[Math.floor(Math.random()*genres.length)];availability="play";location.hash="#/library";if(current.page==="library")renderLibrary();toast("Random genre: "+genre);}break;}
+       case "persist-storage":{const el=document.querySelector("#storage-status");if(!el)break;if(!navigator.storage?.persist){el.textContent="This browser does not offer persistent storage requests. Existing local settings still save normally.";break;}navigator.storage.persist().then(granted=>{if(el.isConnected)el.textContent=granted?"Persistent storage granted for this site. Clearing browser data can still erase saves.":"The browser did not grant persistent storage. Your local settings still save, but site data may be cleared by the browser.";}).catch(()=>{if(el.isConnected)el.textContent="Unable to request persistent storage on this browser.";});break;}
        case "save-note":hub.saveNote(current.id,document.querySelector("#hub-game-note")?.value||"");toast("Note saved locally");break;
        case "export-data":hub.downloadBackup();toast("Backup downloaded");break;
        case "import-data":document.querySelector("#hub-import")?.click();break;
