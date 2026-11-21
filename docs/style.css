@@ -301,3 +301,20 @@ dialog .actions{justify-content:space-between;margin-top:1rem}
 #guide.guided #guide-body{isolation:isolate}
 #guide.guided .tour-frame{z-index:-2}
 #guide.guided #guide-body::before{content:"";position:absolute;inset:0;background:var(--surface);border-radius:inherit;z-index:-1}
+
+.ranking-tabs{display:flex;gap:.4rem;margin:.65rem 0}
+.ranking-note{padding-bottom:1rem}
+.recent-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem}
+.recent-game{display:flex;align-items:center;gap:.75rem;padding:.7rem;background:var(--surface);border:1px solid var(--line);border-radius:.8rem;color:var(--text);text-decoration:none;min-width:0}
+.recent-game:hover{border-color:var(--accent)}
+.recent-game img{width:4.2rem;height:4.8rem;object-fit:cover;border-radius:.4rem;flex-shrink:0}
+.recent-game span{min-width:0;flex:1}.recent-game strong{display:block;line-height:1.25;font-size:1rem}.recent-game small{display:block;color:var(--muted);margin-top:.3rem}
+.recent-game>.ico{flex-shrink:0;color:var(--accent)}
+.updates-panel{margin:1.5rem 0;padding:1.1rem 1.25rem;border:1px solid var(--line);border-radius:.85rem;background:var(--surface)}
+.updates-panel h2{font-size:1.3rem;margin:0 0 .7rem;letter-spacing:-.03em}
+.release-note+ .release-note{border-top:1px solid var(--line)}
+.release-note summary{cursor:pointer;padding:.65rem 0;color:var(--text)}
+.release-note time{color:var(--muted);font-size:.875rem;margin-left:.8rem;display:inline-block}
+.release-note ul{padding-left:1.3rem;margin:0 0 .8rem;color:var(--muted);line-height:1.6}
+@media(max-width:1050px){.recent-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:540px){.recent-grid{grid-template-columns:1fr}.recent-game img{width:4.5rem;height:4.5rem}.updates-panel{padding:.85rem}.chart-panel .ranking-tabs{margin:.5rem 0}}
