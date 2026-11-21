@@ -1,7 +1,7 @@
 import { icon } from "./icons.mjs?v=3";
 import { matches, normalize } from "./search.mjs";
 import * as qol from "./qol.mjs?v=1";
-import { chromeOS, createPlayer } from "./player.mjs?v=6";
+import { chromeOS, createPlayer } from "./player.mjs?v=7";
 
 const API = "https://unlocked-arcade-service.persistingthoughts0.chatgpt.site";
 const $ = selector => document.querySelector(selector);
@@ -104,7 +104,7 @@ function moreButton(total) {
 function card(g, {rank=0,count=0}={}) {
   const title=esc(g.title);
   const health=healthReports[g.id];
-  const healthBadge=health==="issue"?'<span class="qol-health" title="You marked this game as having issues">Reported issue</span>':"";
+  const healthBadge=health==="issue"?'<span class="qol-health" title="Personal flag on this device; not a verified outage">My flag</span>':"";
   const starts=rank && chartState==="live"?'<span class="poster-plays">'+playtime(count)+'</span>':'';
   return '<article class="card"><a href="#/game/'+g.id+'" aria-label="'+title+'"><div class="cover">'+poster(g)+specBadge(g.load)+healthBadge+(rank?'<span class="rank">#'+rank+'</span>':'')+'</div><div class="card-copy"><span class="poster-genre">'+esc(g.genre)+'</span><h3>'+title+'</h3><div class="poster-numbers">'+playStatus(g)+starts+'</div></div></a>'+(qol.read("history",[]).some(h=>h.id===g.id)?'<span class="qol-visited" title="Played before">Played</span>':'')+bookmark(g.id,true)+'</article>';
 }
