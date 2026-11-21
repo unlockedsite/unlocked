@@ -150,13 +150,14 @@ function playStatus(g) {
 function moreButton(total) {
   return total > visibleCount ? '<div class="more-games">'+btn("show-more","Show more games",null)+'</div>' : "";
 }
+const postersWithEmbeddedPadding = new Set(["20-minutes-till-dawn","a-bite-at-freddy-s","a-dance-of-fire-and-ice","a-difficult-game-about-climbing"]);
 function card(g, {rank=0,count=0}={}) {
   const title=esc(g.title);
   const health=healthReports[g.id];
   const age=ageGuide(g);
   const healthBadge=health==="issue"?'<span class="qol-health" title="Personal flag on this device; not a verified outage">My flag</span>':"";
   const starts=false?'<span class="poster-plays">'+playtime(count)+'</span>':'';
-  return '<article class="card" data-title-letter="'+esc(g.title.trim().charAt(0).toUpperCase())+'"><a href="#/game/'+g.id+'" aria-label="'+title+'"><div class="cover">'+poster(g)+specBadge(g.load)+ageBadge(g)+healthBadge+(rank?'<span class="rank">#'+rank+'</span>':'')+'</div><div class="card-copy"><span class="poster-genre">'+esc(g.genre)+'</span><h3>'+title+'</h3><div class="poster-numbers">'+playStatus(g)+starts+'</div></div></a>'+(playedIds.has(g.id)?'<span class="qol-visited" title="Played before">Played</span>':'')+bookmark(g.id,true)+'<span class="age-card-tooltip" role="tooltip">'+esc(age.reason)+' · Unofficial '+esc(age.label)+' guidance, not ESRB/PEGI</span></article>';
+  return '<article class="card'+(postersWithEmbeddedPadding.has(g.id)?" poster-fill":"")+'" data-title-letter="'+esc(g.title.trim().charAt(0).toUpperCase())+'"><a href="#/game/'+g.id+'" aria-label="'+title+'"><div class="cover">'+poster(g)+specBadge(g.load)+ageBadge(g)+healthBadge+(rank?'<span class="rank">#'+rank+'</span>':'')+'</div><div class="card-copy"><span class="poster-genre">'+esc(g.genre)+'</span><h3>'+title+'</h3><div class="poster-numbers">'+playStatus(g)+starts+'</div></div></a>'+(playedIds.has(g.id)?'<span class="qol-visited" title="Played before">Played</span>':'')+bookmark(g.id,true)+'<span class="age-card-tooltip" role="tooltip">'+esc(age.reason)+' · Unofficial '+esc(age.label)+' guidance, not ESRB/PEGI</span></article>';
 }
 const grid = (rows) => '<div class="grid">'+rows.map(g=>card(g)).join("")+'</div>';
 const titleBar = (tag,title,count,aside="") => '<div class="shelf-head"><div class="shelf-title"><'+tag+'>'+esc(title)+'</'+tag+'><span class="count" aria-label="'+count+' games">'+count+'</span></div>'+aside+'</div>';
