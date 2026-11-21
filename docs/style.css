@@ -525,7 +525,7 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opa
 .card .cover img{transition:transform .48s cubic-bezier(.2,.75,.2,1),filter .48s ease;will-change:auto}
 @media(hover:hover) and (prefers-reduced-motion:no-preference){
  .card:hover .cover img,.card:focus-within .cover img{transform:scale(1.075);filter:saturate(1.14) brightness(1.07)}
- .card:hover .cover::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(135deg,rgba(255,255,255,.08),transparent 48%)}
+ 
 }
 .launch-cinematic{position:fixed;z-index:9999;object-fit:cover;pointer-events:none;box-shadow:0 0 44px var(--launch-glow,#ffd063);transform-origin:center;contain:paint}
 .arcade-mascot{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;font-size:.82rem;font-weight:750;color:var(--text);margin:.35rem auto .8rem;text-align:center}
