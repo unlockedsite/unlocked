@@ -197,9 +197,8 @@ function continuePlaying(){
   return '<section class="continue-playing" aria-labelledby="continue-title"><div class="shelf-head"><h2 id="continue-title">Continue Playing</h2></div><div class="recent-grid">'+recent.map(g=>'<a class="recent-game" href="#/game/'+g.id+'?start=1">'+poster(g)+'<span><strong>'+esc(g.title)+'</strong><small>Play again</small></span>'+icon("play")+'</a>').join("")+'</div></section>';
 }
 function hubHighlights(){
- const f=hub.featured(games),recommend=hub.recommended(games,saved),collections=hub.collections(games),discovered=hub.discovered(games);
- const feature=(g,label)=>g?'<a class="hub-feature" href="#/game/'+esc(g.id)+'" aria-label="'+esc(label+': '+g.title)+'"><div class="hub-feature-art">'+poster(g)+'</div><div class="hub-feature-copy"><small>'+esc(label)+'</small><strong>'+esc(g.title)+'</strong><span>'+esc(g.genre)+' · '+esc(levels[g.load]||"Unknown")+' demand</span><span class="hub-feature-play">'+icon("play")+' Play game</span></div></a>':"";
- return '<section class="hub-discover"><div class="hub-feature-row">'+feature(f.daily,"Game of the Day")+feature(f.weekly,"Game of the Week")+'</div>'+(recommend.length?'<h2>Recommended for you</h2>'+grid(recommend.slice(0,4)):"")+(discovered.length?'<h2>Recently discovered</h2>'+grid(discovered.slice(0,4)):"")+(collections.length?'<h2>Curated collections</h2>'+collections.map(c=>'<details class="hub-collection"><summary>'+esc(c.title)+' · '+c.games.length+' games</summary>'+grid(c.games)+'</details>').join(""):"")+'</section>';
+ const recommend=hub.recommended(games,saved),collections=hub.collections(games),discovered=hub.discovered(games);
+ return '<section class="hub-discover">'+(recommend.length?'<h2>Recommended for you</h2>'+grid(recommend.slice(0,4)):"")+(discovered.length?'<h2>Recently discovered</h2>'+grid(discovered.slice(0,4)):"")+(collections.length?'<h2>Curated collections</h2>'+collections.map(c=>'<details class="hub-collection"><summary>'+esc(c.title)+' · '+c.games.length+' games</summary>'+grid(c.games)+'</details>').join(""):"")+'</section>';
 }
 function renderLibrary(){
   const searching=current.page==="search";
