@@ -450,3 +450,7 @@ body.player-fullscreen-open{overflow:hidden}
 .tour-progress{display:flex;gap:.35rem;margin-bottom:.6rem}
 .tour-progress i{flex:1;height:.25rem;border-radius:1rem;background:var(--line)}
 .tour-progress i.on{background:#f6ca51;box-shadow:0 0 10px #f6ca5180}
+
+/* Keep age tooltip visible outside the poster without clipping adjacent cards. */
+@media(hover:hover){.card:hover{z-index:12}.card:hover .cover{overflow:visible}}
+.card:focus-within{z-index:12}.card:focus-within .cover{overflow:visible}
