@@ -351,3 +351,29 @@ dialog .actions{justify-content:space-between;margin-top:1rem}
 
 /* Always place live player count on its own centered row below all action buttons. */
 .community-bar>.community-online{flex:0 0 100%;width:100%;box-sizing:border-box;display:flex;justify-content:center;align-items:center;padding:0;margin:.25rem 0 0;border:0}
+
+/* Unlocked motion system — transform/opacity-first for low-end devices. */
+:root{--motion-fast:150ms;--motion-normal:240ms;--motion-slow:380ms;--motion-ease:cubic-bezier(.22,1,.36,1)}
+@keyframes unlocked-enter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes unlocked-pop{from{opacity:0;transform:translate(-50%,9px) scale(.97)}to{opacity:1;transform:translate(-50%,0) scale(1)}}
+@keyframes unlocked-card-enter{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:no-preference){
+  #content>.section-page,#content>.library-page,#content>.detail-page,#content>.narrow,#content>.wrap,#content>.hero,#content>.spotlight,#content>section{animation:unlocked-enter var(--motion-slow) var(--motion-ease) both}
+  .community-bar,.shelf-head,.chart-panel,.feature-panel,.form,.footer{animation:unlocked-enter 420ms var(--motion-ease) both}
+  .grid>.card{animation:unlocked-card-enter 300ms var(--motion-ease) both;animation-delay:calc(min(var(--card-index,0),8)*24ms)}
+  .card,.community-bar>a,.btn,.secondary-btn,.primary-nav a,.icon-btn,.feature-bar,.footer a,.footer button,.back{transition:transform var(--motion-normal) var(--motion-ease),box-shadow var(--motion-normal) ease,border-color var(--motion-fast) ease,background-color var(--motion-fast) ease,color var(--motion-fast) ease,opacity var(--motion-fast) ease}
+  .card:hover{transform:translateY(-4px)}
+  .card:active,.community-bar>a:active,.btn:active,.secondary-btn:active,.icon-btn:active{transform:scale(.975)}
+  .community-bar>a:hover{transform:translateY(-2px)}
+  .community-bar>a:active{transform:translateY(0) scale(.975)}
+  .cover img{transition:transform 380ms var(--motion-ease),filter 240ms ease}
+  .card:hover .cover img{transform:scale(1.045)}
+  .form input,.form select,.form textarea,input,select,textarea{transition:border-color 180ms ease,box-shadow 180ms ease,background-color 180ms ease}
+  .form input:focus,.form select:focus,.form textarea:focus{transition-duration:180ms}
+  #toast:not(:empty){animation:unlocked-pop 260ms var(--motion-ease) both}
+  details>summary{transition:color 180ms ease,background-color 180ms ease}
+  details[open]>:not(summary){animation:unlocked-enter 220ms var(--motion-ease) both}
+}
+@media(prefers-reduced-motion:reduce){
+  #content *,#content *::before,#content *::after,.community-bar *,#toast{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
