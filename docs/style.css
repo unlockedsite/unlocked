@@ -505,3 +505,7 @@ body.player-fullscreen-open{overflow:hidden}
 #takedown-form textarea{resize:vertical;min-height:135px}
 #request-form .btn,#takedown-form .btn{justify-self:start}
 #request-form .feedback,#takedown-form .feedback{min-height:1.4em;margin:0;color:var(--muted)}
+
+/* Header Settings shortcut sits immediately left of Appearance. */
+.preferences .header-settings{display:inline-grid;place-items:center;text-decoration:none;flex:none}
+.preferences .header-settings .ico{width:1.2rem;height:1.2rem}
