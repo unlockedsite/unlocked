@@ -5,7 +5,7 @@ export function createPlayer(stage, title, onDisplayChange, onError) {
   const exitButton = stage.querySelector(".exit-stage");
   const toolbarButton = document.querySelector(".play-tools [data-action=fullscreen]");
   let frame, observer, fitFrame;
-  let nativeActive = false, switching = false, disposed = false;
+  let nativeActive = false, switching = false, disposed = false, fallbackActive = false;
 
   function focusPlayer() {
     const target = frame || stage.querySelector(".startbox button") || exitButton;
@@ -16,7 +16,7 @@ export function createPlayer(stage, title, onDisplayChange, onError) {
   function fullscreenChanged() {
     if (disposed) return;
     const element = document.fullscreenElement || document.webkitFullscreenElement;
-    const active = Boolean(element && stage.contains(element));
+    const active = Boolean(element && stage.contains(element)) || fallbackActive;
     if (nativeActive === active) return;
     nativeActive = active;
     fitFrame?.();
@@ -29,7 +29,7 @@ export function createPlayer(stage, title, onDisplayChange, onError) {
     if (switching || disposed) return;
     switching = true;
     try {
-      if (document.fullscreenElement || document.webkitFullscreenElement) {
+      if (fallbackActive) {\n        fallbackActive=false;stage.classList.remove("fallback-fullscreen");document.body.classList.remove("player-fullscreen-open");\n      } else if (document.fullscreenElement || document.webkitFullscreenElement) {
         await (document.exitFullscreen || document.webkitExitFullscreen).call(document);
       } else if (stage.requestFullscreen) {
         await stage.requestFullscreen({navigationUI: "hide"});
@@ -49,7 +49,7 @@ export function createPlayer(stage, title, onDisplayChange, onError) {
     const initialWidth = Math.max(1, slot.clientWidth);
     const initialHeight = Math.max(1, slot.clientHeight);
     fitFrame = () => {
-      const expanded = Boolean(document.fullscreenElement || document.webkitFullscreenElement);
+      const expanded = Boolean(document.fullscreenElement || document.webkitFullscreenElement || fallbackActive);
       const scaled = chromeOS || expanded;
       frame.classList.toggle("stable-viewport", scaled);
       if (!scaled) {
@@ -103,7 +103,7 @@ export function createPlayer(stage, title, onDisplayChange, onError) {
     start, toggle,
     expanded: () => nativeActive,
     dispose() {
-      disposed = true;
+      disposed = true;\n      fallbackActive=false;stage.classList.remove("fallback-fullscreen");document.body.classList.remove("player-fullscreen-open");
       observer?.disconnect();
       document.removeEventListener("fullscreenchange", fullscreenChanged);
       document.removeEventListener("webkitfullscreenchange", fullscreenChanged);
