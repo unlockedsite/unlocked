@@ -853,3 +853,64 @@ body::before{display:none!important}
 }
 :root[data-motion="off"] .card:hover .cover img,
 :root[data-motion="off"] .card:focus-within .cover img{transform:none!important}
+
+/* v51 — Card highlight is INSIDE the rounded poster, not an outer glow.
+   Tooltip remains an unclipped sibling so it can appear over the card. */
+.card{position:relative;overflow:visible!important;box-shadow:none!important;transition:none!important}
+.card>a{position:relative;display:block;width:100%;height:100%;border-radius:inherit;overflow:hidden}
+.card .cover,.card:hover .cover,.card:focus-within .cover{
+ overflow:hidden!important;border-radius:inherit;clip-path:none!important;
+}
+.card .cover img{display:block;width:100%;height:100%;object-fit:cover}
+.card .card-copy{border-radius:inherit;overflow:hidden}
+.card::after{
+ content:"";position:absolute;inset:0;z-index:9;pointer-events:none;
+ border-radius:inherit;border:2px solid transparent;
+ opacity:0;transition:none;
+}
+.card:hover::after,.card:focus-within::after{
+ border-color:var(--focus);opacity:1;
+}
+.card:hover,.card:focus-within{box-shadow:none!important}
+.card>.age-card-tooltip{z-index:22}
+/* Featured carousel: completed bars remain filled, active bar fills, later bars are empty. */
+.feature-bar[data-state="done"] i{
+ transform:scaleX(1)!important;animation:none!important;
+}
+.feature-bar[data-state="current"] i{
+ transform:scaleX(0);animation:feature-fill 6.5s linear forwards;
+}
+.feature-bar[data-state="upcoming"] i{
+ transform:scaleX(0)!important;animation:none!important;
+}
+.feature-bar[data-state="done"] span{background:#248db9a8}
+.feature-bar[data-state="current"] span{background:#606c85}
+.feature-bar[data-state="upcoming"] span{background:#737d94a9}
+@media(prefers-reduced-motion:reduce){
+ .feature-bar[data-state="current"] i{animation:none!important;transform:scaleX(1)!important}
+}
+:root[data-motion="off"] .feature-bar[data-state="current"] i{
+ animation:none!important;transform:scaleX(1)!important;
+}
+/* Reduce expensive decoration while retaining core controls and the carousel progress. */
+.device-lite .card .cover::before{display:none!important}
+.device-lite .card .cover::after{display:none!important}
+.device-lite .card .cover img,.device-lite .card:hover .cover img,
+.device-lite .card:focus-within .cover img{transform:none!important;filter:none!important;transition:none!important}
+.device-lite .card .card-copy,.device-lite .card .save-mini{transition:none!important}
+.device-lite .grid>.card{animation:none!important}
+.device-lite .game-atmosphere .stage-slot::before{filter:none;opacity:.045}
+.device-lite .community-bar,.device-lite .shelf-head,
+.device-lite .footer,.device-lite #content>.section-page,
+.device-lite #content>.spotlight,.device-lite #toast{animation:none!important}
+.device-lite .hero-bg{filter:none!important}
+.device-lite .launch-cinematic{display:none!important}
+/* Low-powered devices keep a single slow moving aurora, with static stars. */
+.device-lite #arcade-ambient::before{animation-duration:75s;opacity:.7}
+.device-lite #arcade-ambient::after{animation:none;opacity:.6}
+.device-lite #arcade-ambient span{animation:none;opacity:.5}
+/* Simplify motion even further on narrow viewports. */
+@media(max-width:900px){
+ #arcade-ambient::after{animation:none}
+ #arcade-ambient span{animation:none}
+}
