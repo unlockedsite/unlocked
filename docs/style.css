@@ -758,42 +758,98 @@ html{scrollbar-color:#637083 transparent}
 html::-webkit-scrollbar:horizontal{height:0;display:none}
 html::-webkit-scrollbar-thumb{background:#55627a}
 html::-webkit-scrollbar-thumb:hover{background:#78859c}
-/* Light, PlayStation-like ambient orbs and dust particles, without canvas or timers. */
-#arcade-ambient{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0;contain:paint;opacity:.9}
+/* v48: Original "aurora drift" background. Two small compositor-animated lights,
+   six tiny stars, and no full-screen animated gradients, canvas, or blur filters. */
+#arcade-ambient{
+ position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0;
+ contain:layout paint style;opacity:.9;
+}
 #arcade-ambient::before,#arcade-ambient::after{
- content:"";position:absolute;inset:-10%;border-radius:50%;pointer-events:none;
- will-change:transform;animation:ambient-drift 28s ease-in-out infinite alternate;
+ content:"";position:absolute;pointer-events:none;
+ border-radius:44% 56% 63% 37% / 48% 39% 61% 52%;
+ transform:translate3d(0,0,0);
+ animation:aurora-drift-one 34s ease-in-out infinite alternate;
 }
 #arcade-ambient::before{
- background:radial-gradient(ellipse 32% 28% at 24% 26%,#2274cd29,transparent 80%),
- radial-gradient(ellipse 35% 25% at 83% 76%,#7251b92d,transparent 80%);
+ width:min(53vw,610px);height:min(52vw,580px);left:-8%;top:4%;
+ background:radial-gradient(ellipse at 55% 55%,#2577cd28 0%,#345fb31c 33%,transparent 72%);
 }
 #arcade-ambient::after{
- background:radial-gradient(ellipse 22% 28% at 72% 19%,#188fbd20,transparent 80%),
- radial-gradient(ellipse 29% 27% at 26% 85%,#3946c01b,transparent 80%);
- animation-duration:37s;animation-direction:alternate-reverse;
+ width:min(49vw,570px);height:min(49vw,560px);right:-7%;bottom:3%;
+ background:radial-gradient(ellipse at 48% 47%,#7845c528 0%,#1165a418 39%,transparent 73%);
+ animation-name:aurora-drift-two;animation-duration:39s;
 }
 #arcade-ambient span{
- position:absolute;width:3px;height:3px;border-radius:50%;
- background:#b3daff9c;box-shadow:0 0 10px 2px #4d96e66a;
- animation:ambient-dust 18s ease-in-out infinite alternate;will-change:transform;
+ position:absolute;width:2px;height:2px;border-radius:50%;
+ background:#9dc8f9b0;
+ box-shadow:0 0 7px 1px #487bb97a;
+ opacity:.65;animation:aurora-star 18s ease-in-out infinite alternate;
 }
-#arcade-ambient span:nth-child(1){top:15%;left:8%;animation-delay:-3s}
-#arcade-ambient span:nth-child(2){top:29%;left:37%;animation-delay:-11s;width:2px;height:2px}
-#arcade-ambient span:nth-child(3){top:62%;left:17%;animation-delay:-7s}
-#arcade-ambient span:nth-child(4){top:73%;left:72%;animation-delay:-15s;width:2px;height:2px}
-#arcade-ambient span:nth-child(5){top:40%;left:92%;animation-delay:-9s}
-#arcade-ambient span:nth-child(6){top:88%;left:49%;animation-delay:-5s;width:2px;height:2px}
-@keyframes ambient-drift{to{transform:translate3d(2%,-2%,0) scale(1.04)}}
-@keyframes ambient-dust{to{transform:translate3d(15px,-22px,0);opacity:.28}}
+#arcade-ambient span:nth-child(1){left:12%;top:20%;animation-delay:-2s}
+#arcade-ambient span:nth-child(2){left:35%;top:63%;animation-delay:-9s}
+#arcade-ambient span:nth-child(3){left:64%;top:15%;animation-delay:-5s}
+#arcade-ambient span:nth-child(4){left:84%;top:43%;animation-delay:-14s}
+#arcade-ambient span:nth-child(5){left:72%;top:87%;animation-delay:-7s}
+#arcade-ambient span:nth-child(6){left:20%;top:82%;animation-delay:-11s}
+@keyframes aurora-drift-one{to{transform:translate3d(65px,-32px,0) rotate(8deg)}}
+@keyframes aurora-drift-two{to{transform:translate3d(-58px,26px,0) rotate(-9deg)}}
+@keyframes aurora-star{to{transform:translate3d(12px,-17px,0);opacity:.24}}
 #content,.footer{position:relative;z-index:1}
+/* Cursor lighting is fully opt-in; only the isolated ambient layer updates. */
+:root.custom-cursor #arcade-ambient{
+ background:radial-gradient(210px circle at var(--cursor-x,50%) var(--cursor-y,50%),color-mix(in srgb,var(--accent) 11%,transparent),transparent 80%);
+}
+body::before{display:none!important}
 :root[data-theme="light"] #arcade-ambient,:root.custom-wallpaper #arcade-ambient,.low-graphics #arcade-ambient{display:none}
 @media(prefers-color-scheme:light){:root:not([data-theme="dark"]) #arcade-ambient{display:none}}
-@media(prefers-reduced-motion:reduce){
- #arcade-ambient::before,#arcade-ambient::after,#arcade-ambient span{animation:none!important;will-change:auto}
-}
-:root[data-motion="off"] #arcade-ambient::before,:root[data-motion="off"] #arcade-ambient::after,:root[data-motion="off"] #arcade-ambient span{animation:none!important;will-change:auto}
+/* The game page gets a still background so gameplay takes priority. */
+:root.game-atmosphere #arcade-ambient::before,
+:root.game-atmosphere #arcade-ambient::after,
+:root.game-atmosphere #arcade-ambient span,
+:root.feature-hidden #arcade-ambient::before,
+:root.feature-hidden #arcade-ambient::after,
+:root.feature-hidden #arcade-ambient span{animation-play-state:paused}
 @media(max-width:720px){
- #arcade-ambient::before,#arcade-ambient::after{animation-duration:55s;will-change:auto}
+ #arcade-ambient::before,#arcade-ambient::after{animation:none;opacity:.65}
  #arcade-ambient span:nth-child(n+4){display:none}
 }
+@media(prefers-reduced-motion:reduce){
+ #arcade-ambient::before,#arcade-ambient::after,#arcade-ambient span{animation:none!important}
+}
+:root[data-motion="off"] #arcade-ambient::before,
+:root[data-motion="off"] #arcade-ambient::after,
+:root[data-motion="off"] #arcade-ambient span{animation:none!important}
+
+/* Center the age guidance directly over the hovered game, including keyboard focus. */
+.card>.age-card-tooltip{
+ left:50%;right:auto;bottom:calc(100% + .55rem);
+ transform:translateX(-50%);text-align:center;
+ width:clamp(170px,16vw,235px);max-width:calc(100vw - 1.5rem);
+ padding:.62rem .72rem;border-radius:.7rem;
+}
+.card>.age-card-tooltip::after{
+ content:"";position:absolute;left:50%;bottom:-6px;
+ width:10px;height:10px;transform:translateX(-50%) rotate(45deg);
+ background:#0e1729;border-right:1px solid #536580;border-bottom:1px solid #536580;
+}
+/* Avoid animating dozens of thumbnails on every route/search/filter update. */
+.grid>.card{animation:none!important;animation-delay:0!important}
+/* Clipping with overflow and radius is cheaper than a clip-path on every card. */
+.card .cover,.card:hover .cover,.card:focus-within .cover{
+ overflow:hidden!important;clip-path:none!important;border-radius:inherit;
+}
+/* Avoid per-frame image filters and large hover shadows on low-power hardware. */
+.card:hover,.card:focus-within{transform:none!important}
+.card .cover img{filter:none!important;transition:transform 170ms ease-out}
+@media(hover:hover) and (pointer:fine){
+ .card:hover .cover img,.card:focus-within .cover img{
+  transform:scale(1.025)!important;filter:none!important;
+ }
+}
+.card .cover::before{mix-blend-mode:normal!important}
+:root[data-motion="enhanced"] .card:hover{box-shadow:0 0 0 2px var(--focus),0 4px 12px #0003}
+@media(prefers-reduced-motion:reduce){
+ .card:hover .cover img,.card:focus-within .cover img{transform:none!important}
+}
+:root[data-motion="off"] .card:hover .cover img,
+:root[data-motion="off"] .card:focus-within .cover img{transform:none!important}
