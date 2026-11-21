@@ -38,6 +38,7 @@ let healthReports=qol.read("health",{});
 let selectedFolder="All";
 let rouletteTimer=null, rouletteWinner=null;
 let sortMode="az";
+let sessionTicker=null;
 try {
   const stored=JSON.parse(dl("recent","[]"));
   if(Array.isArray(stored))recentGames=[...new Set(stored.filter(id=>typeof id==="string"))].slice(0,4);
@@ -202,6 +203,24 @@ async function submitTakedown(form){
   }catch(error){if(navigation===token)status.textContent=error.message;}
   finally{button.disabled=false;}
 }
+function extraTools(){return '<div class="qol-bar hub-extra-tools"><a class="secondary-btn" href="#/compare">'+icon("grid")+' Compare games</a><a class="secondary-btn" href="#/notifications">'+icon("info")+' Notifications</a><button class="secondary-btn" data-action="random-genre">'+icon("star")+' Random genre</button></div>'}
+function comparePage(){
+ const ready=games.filter(g=>g.mode==="embed");
+ const opts=ready.map(g=>'<option value="'+esc(g.id)+'">'+esc(g.title)+'</option>').join("");
+ main.innerHTML='<section class="section-page hub-page"><h1>Compare games</h1><p class="subcopy">Compare genres and approximate Chromebook hardware demand.</p><div class="qol-bar"><label>Game 1 <select id="compare-one">'+opts+'</select></label><label>Game 2 <select id="compare-two">'+opts+'</select></label></div><div id="compare-result"></div></section>';
+ if(ready.length>1)document.querySelector("#compare-two").selectedIndex=1;
+ updateCompare();
+}
+function updateCompare(){
+ const a=byId.get(document.querySelector("#compare-one")?.value),b=byId.get(document.querySelector("#compare-two")?.value),target=document.querySelector("#compare-result");
+ if(!target)return;
+ if(!a||!b){target.textContent="Choose two playable games.";return;}
+ target.innerHTML='<div class="hub-feature-row">'+[a,b].map(g=>'<a class="hub-feature" href="#/game/'+esc(g.id)+'"><strong>'+esc(g.title)+'</strong><span>'+esc(g.genre)+' · '+esc(levels[g.load]||"Unknown")+' hardware demand</span><span>'+esc(g.description||"No description available")+'</span></a>').join("")+'</div>';
+}
+function notificationsPage(){
+ const c=hub.challenges(),f=hub.featured(games);
+ main.innerHTML='<section class="section-page hub-page"><h1>Notifications</h1><p class="subcopy">Your local activity and site announcements. This is not a push-notification service.</p><div class="hub-challenges">'+c.map(x=>'<div class="hub-challenge"><strong>'+(x.done?"✓":"○")+'</strong><div><strong>'+esc(x.name)+'</strong><p>'+esc(x.goal)+' · '+(x.done?"Completed":"In progress")+'</p></div></div>').join("")+'</div>'+(f.daily?'<p>Today’s featured game: <a href="#/game/'+f.daily.id+'">'+esc(f.daily.title)+'</a></p>':"")+'<a class="secondary-btn" href="#/updates">View release announcements</a></section>';
+}
 function qolBar(){
   return '<div class="qol-bar"><button class="secondary-btn" data-action="random-game">'+icon("play")+' Surprise me</button><button class="secondary-btn" data-action="performance">'+icon("bolt")+' '+(performanceMode?"Normal visuals":"Low graphics")+'</button><a class="secondary-btn" href="#/history">'+icon("clock")+' Play history</a><a class="secondary-btn" href="#/updates">'+icon("info")+' Updates</a></div>';
 }
@@ -306,7 +325,7 @@ function renderLibrary(){
  else if(sortMode==="popular")rows.sort((a,b)=>(rankedCounts[b.id]||0)-(rankedCounts[a.id]||0)||alphabetical(a,b));
   const label=searching ? "Search results" : "Game library";
   const aside='<div class="shelf-aside"><label class="sort-label">Sort <select id="hub-sort"><option value="az" '+(sortMode==="az"?"selected":"")+'>A–Z</option><option value="demand" '+(sortMode==="demand"?"selected":"")+'>Hardware demand</option><option value="popular" '+(sortMode==="popular"?"selected":"")+'>Popularity</option><option value="recent" '+(sortMode==="recent"?"selected":"")+'>Recently played</option></select></label></div>';
-  let html=searching?"":'<div class="spotlight">'+hero()+chartPanel()+'</div>'+communityBar()+qolBar()+hubHighlights()+continuePlaying()+'<section class="updates-panel" aria-labelledby="updates-title"><h2 id="updates-title">What’s new</h2><div id="updates-feed"><p class="hint" role="status">Loading updates…</p></div></section>';
+  let html=searching?"":'<div class="spotlight">'+hero()+chartPanel()+'</div>'+communityBar()+qolBar()+extraTools()+hubHighlights()+continuePlaying()+'<section class="updates-panel" aria-labelledby="updates-title"><h2 id="updates-title">What’s new</h2><div id="updates-feed"><p class="hint" role="status">Loading updates…</p></div></section>';
   html+=titleBar(searching?"h1":"h2",label,rows.length,aside)+filters();
   if(rows.length) html+=grid(rows.slice(0,visibleCount))+moreButton(rows.length);
   else if(full.length || !q) html+='<div class="empty">'+icon("filter")+'<h2>No games with those filters</h2><p>Clear filters to see every matching title.</p>'+btn("reset-filters","Clear filters","filter")+'</div>';
@@ -555,7 +574,7 @@ function route({scroll=true}={}){
   setNav();$("#theme-panel").hidden=true;$("#theme-button").setAttribute("aria-expanded","false");
   if(guide.open)guide.close();
   const game=current.page==="game" && byId.get(current.id);
-  const titles={profile:"My profile",settings:"Settings",library:"Game vault",top:"Top games",saved:"Saved games",report:"Report a bug",requests:"Request a game",takedown:"Takedown Request",credits:"Credits",search:"Search"};
+  const titles={profile:"My profile",settings:"Settings",compare:"Compare games",notifications:"Notifications",library:"Game vault",top:"Top games",saved:"Saved games",report:"Report a bug",requests:"Request a game",takedown:"Takedown Request",credits:"Credits",search:"Search"};
   document.title=(game?.title || titles[current.page] || "Page not found")+" · Unlocked";
   if(current.page==="library" || isSearch)renderLibrary();
   else if(current.page==="saved")renderSaved();
@@ -563,6 +582,8 @@ function route({scroll=true}={}){
    else if(current.page==="history")renderHistory();
    else if(current.page==="profile")main.innerHTML=hub.renderProfile(saved.size);
    else if(current.page==="settings")main.innerHTML=hub.renderSettings();
+   else if(current.page==="compare")comparePage();
+   else if(current.page==="notifications")notificationsPage();
    else if(current.page==="updates")renderUpdateHistory();
   else if(game){gameLayout(game);hub.recordView(game.id);prepareGame(game,token,current.params.get("start")==="1");}
   else if(current.page==="requests")requestsPage();
@@ -662,7 +683,8 @@ function setup(){
     }
     const action=e.target.closest("[data-action]")?.dataset.action;
     switch(action){
-      case "save-note":hub.saveNote(current.id,document.querySelector("#hub-game-note")?.value||"");toast("Note saved locally");break;
+      case "random-genre":{const genres=[...new Set(games.filter(g=>g.mode==="embed").map(g=>g.genre))];if(genres.length){genre=genres[Math.floor(Math.random()*genres.length)];availability="play";location.hash="#/library";if(current.page==="library")renderLibrary();toast("Random genre: "+genre);}break;}
+       case "save-note":hub.saveNote(current.id,document.querySelector("#hub-game-note")?.value||"");toast("Note saved locally");break;
        case "export-data":hub.downloadBackup();toast("Backup downloaded");break;
        case "import-data":document.querySelector("#hub-import")?.click();break;
        case "clear-local":if(confirm("Reset your local nickname, avatar, banner and settings? Your play history and saved games will stay.")){qol.write("profile",{});hub.applySettings();route({scroll:false});}break;
@@ -705,6 +727,7 @@ function setup(){
     if(e.target.id==="more-genres"){genre=e.target.value;renderLibrary();$("#more-genres").focus({preventScroll:true});}
     if(e.target.id==="folder-select"){selectedFolder=e.target.value;renderSaved();}
      if(e.target.id==="hub-sort"){sortMode=e.target.value;renderLibrary();}
+     if(e.target.id==="compare-one"||e.target.id==="compare-two")updateCompare();
      if(e.target.id==="hub-import"){const file=e.target.files?.[0];if(file&&file.size<160000){file.text().then(text=>{if(!confirm("Import backup and replace matching local settings?"))return;hub.importData(text);location.reload();}).catch(()=>toast("Could not import backup"));}else if(file)toast("Backup file is too large");}
      if(e.target.id==="demand"){level=e.target.value;renderLibrary();$("#demand").focus({preventScroll:true});}
   });
