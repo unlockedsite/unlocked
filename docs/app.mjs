@@ -164,8 +164,26 @@ async function submitGameRequest(form){
   }catch(error){status.textContent=error.message;}
   finally{button.disabled=false;}
 }
+function takedownPage(){
+  const selected=byId.get(current.params.get("game"));
+  const options=games.map(g=>'<option value="'+esc(g.id)+'"'+(g===selected?' selected':'')+'>'+esc(g.title)+'</option>').join("");
+  main.innerHTML='<section class="narrow section-page"><a class="back" href="#/library">'+icon("back")+'All games</a><h1 class="panel-title">Takedown Request</h1><p class="subcopy">Request a review or removal of a game. Please explain your concern clearly. Submitting a request does not automatically remove content.</p><form class="form" id="takedown-form"><div class="field"><label for="takedown-game">Game to review</label><select id="takedown-game" required><option value="">Select a game</option>'+options+'</select></div><div class="field"><label for="takedown-reason">Reason for takedown</label><textarea id="takedown-reason" minlength="15" maxlength="1500" required placeholder="Explain why this game should be removed (for example, copyright ownership, licensing, or harmful content)."></textarea></div><p class="hint">Requests are reviewed by the Unlocked team. For formal copyright notices, include your contact details and proof of ownership in your explanation or contact the site owner directly.</p><button class="btn danger-btn" type="submit">Submit takedown request</button><p id="takedown-result" class="feedback" role="status" aria-live="polite"></p></form></section>';
+}
+async function submitTakedown(form){
+  if(!form.reportValidity())return;
+  const button=form.querySelector('button[type="submit"]'), status=$("#takedown-result"), token=navigation;
+  if(button.disabled)return;
+  button.disabled=true;status.textContent="Sending takedown request…";
+  try{
+    const result=await api("/v1/takedowns",{game:$("#takedown-game").value,reason:$("#takedown-reason").value.trim()});
+    if(navigation!==token)return;
+    if(result.status!=="received")throw Error("Delivery was not confirmed.");
+    form.reset();status.textContent="Takedown request received. Receipt: "+result.receipt+". The team will review it.";
+  }catch(error){if(navigation===token)status.textContent=error.message;}
+  finally{button.disabled=false;}
+}
 function communityBar(){
-  return '<div class="community-bar"><a class="join-discord" href="https://discord.gg/AezupBCtns" target="_blank" rel="noopener noreferrer">'+icon("discord")+'<span><small>Join us on</small><strong>Discord</strong></span>'+icon("forward")+'</a><a class="secondary-btn" href="#/requests">Request a game</a><div class="community-online">'+presence("all")+'</div></div>';
+  return '<div class="community-bar"><a class="join-discord" href="https://discord.gg/AezupBCtns" target="_blank" rel="noopener noreferrer">'+icon("discord")+'<span><small>Join us on</small><strong>Discord</strong></span>'+icon("forward")+'</a><a class="secondary-btn" href="#/requests">Request a game</a><a class="secondary-btn danger-btn" href="#/takedown">Takedown Request</a><div class="community-online">'+presence("all")+'</div></div>';
 }
 function rankingCounts(){return rankingPeriod==="week"?weeklyCounts:rankedCounts;}
 function currentRanks(){
@@ -466,13 +484,14 @@ function route({scroll=true}={}){
   setNav();$("#theme-panel").hidden=true;$("#theme-button").setAttribute("aria-expanded","false");
   if(guide.open)guide.close();
   const game=current.page==="game" && byId.get(current.id);
-  const titles={library:"Game vault",top:"Top games",saved:"Saved games",report:"Report a bug",requests:"Request a game",credits:"Credits",search:"Search"};
+  const titles={library:"Game vault",top:"Top games",saved:"Saved games",report:"Report a bug",requests:"Request a game",takedown:"Takedown Request",credits:"Credits",search:"Search"};
   document.title=(game?.title || titles[current.page] || "Page not found")+" · Unlocked";
   if(current.page==="library" || isSearch)renderLibrary();
   else if(current.page==="saved")renderSaved();
   else if(current.page==="top")drawTop();
   else if(game){gameLayout(game);prepareGame(game,token,current.params.get("start")==="1");}
   else if(current.page==="requests")requestsPage();
+  else if(current.page==="takedown")takedownPage();
   else if(current.page==="report")renderReport();
   else if(current.page==="credits")showCredits(token);
   else main.innerHTML='<div class="empty"><h1>Page not found</h1><a class="btn" href="#/library">Browse games</a></div>';
@@ -589,6 +608,7 @@ function setup(){
     const form=e.target;
     if(form.id==="guide-search"){e.preventDefault();const str=form.querySelector("input").value.trim();if(str){guide.close();searchView(str);search.focus();}return;}
     if(form.id==="request-form"){e.preventDefault();submitGameRequest(form);return;}
+    if(form.id==="takedown-form"){e.preventDefault();submitTakedown(form);return;}
     if(form.id==="report-form"){e.preventDefault();submitReport(form);return;}
     if(form.id==="redeem"){e.preventDefault();const token=navigation;try{const result=await api("/v1/redeem",{key:$("#access-key").value});if(token!==navigation)return;ticket=result.token || "";saveValue("session",ticket,true);await prepareGame(byId.get(current.id),token);}catch(error){if(token===navigation)feedback("#key-result",error.message);}}
   });
