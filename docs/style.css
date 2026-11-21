@@ -914,3 +914,13 @@ body::before{display:none!important}
  #arcade-ambient::after{animation:none}
  #arcade-ambient span{animation:none}
 }
+
+/* Final Chromebook refinements: prevent fixed-wallpaper repaint during scroll,
+   keep game play areas clear of costly backdrop effects. */
+.device-lite.custom-wallpaper body{background-attachment:scroll}
+.device-lite .game-atmosphere .game-title{text-shadow:none}
+.device-lite .play-tools>.secondary-btn:hover:not(:disabled){box-shadow:none}
+.device-lite #guide.guided .tour-frame{transition-duration:140ms!important}
+@media(prefers-reduced-motion:reduce){
+ .card::after{transition:none!important}
+}
