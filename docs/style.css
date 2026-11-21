@@ -1001,8 +1001,8 @@ body::before{display:none!important}
  }
 }
 /* Chromebook / reduced-motion users still see a subtle static sheen. */
-.device-lite .card:hover>a::before,
-.device-lite .card:focus-within>a::before,
+/* Even Chromebooks get a transform-only moving shine; only the user's
+   explicit motion-off preference and OS reduced-motion setting make it static. */
 :root[data-motion="off"] .card:hover>a::before,
 :root[data-motion="off"] .card:focus-within>a::before{
  opacity:.23!important;animation:none!important;transform:none!important;
@@ -1011,4 +1011,77 @@ body::before{display:none!important}
  .card:hover>a::before,.card:focus-within>a::before{
   opacity:.23!important;animation:none!important;transform:none!important;
  }
+}
+
+/* v54: Brighter but compositor-friendly ambient motion. No canvas, filter blur,
+   repaints on pointer movement, or expensive full-screen gradient animation. */
+:root:not(.custom-wallpaper) #arcade-ambient{
+ display:block!important;opacity:1;
+}
+#arcade-ambient::before{
+ width:min(65vw,710px);height:min(62vw,650px);left:-10%;top:-2%;
+ background:radial-gradient(ellipse at 50% 50%,
+  rgba(45,107,226,.36) 0%,rgba(34,74,175,.18) 38%,transparent 74%);
+ animation:unlocked-aurora-blue 23s ease-in-out infinite alternate;
+ will-change:transform;
+}
+#arcade-ambient::after{
+ width:min(58vw,650px);height:min(61vw,620px);right:-8%;bottom:-7%;
+ background:radial-gradient(ellipse at 48% 48%,
+  rgba(123,67,197,.33) 0%,rgba(48,87,204,.17) 40%,transparent 77%);
+ animation:unlocked-aurora-violet 27s ease-in-out infinite alternate;
+ will-change:transform;
+}
+@keyframes unlocked-aurora-blue{
+ from{transform:translate3d(-20px,12px,0) rotate(-7deg)}
+ to{transform:translate3d(125px,-54px,0) rotate(8deg)}
+}
+@keyframes unlocked-aurora-violet{
+ from{transform:translate3d(25px,-12px,0) rotate(9deg)}
+ to{transform:translate3d(-112px,48px,0) rotate(-8deg)}
+}
+#arcade-ambient span{width:3px;height:3px;opacity:.78;animation-duration:14s}
+.device-lite #arcade-ambient::before{
+ animation:unlocked-aurora-blue 30s ease-in-out infinite alternate;
+ opacity:.9;
+}
+.device-lite #arcade-ambient::after{
+ animation:unlocked-aurora-violet 34s ease-in-out infinite alternate;
+ opacity:.8;
+}
+@media(max-width:900px){
+ #arcade-ambient::before{animation:unlocked-aurora-blue 30s ease-in-out infinite alternate}
+ #arcade-ambient::after{animation:unlocked-aurora-violet 34s ease-in-out infinite alternate}
+}
+@media(max-width:720px){
+ #arcade-ambient::before{width:380px;height:420px;opacity:.85}
+ #arcade-ambient::after{width:350px;height:390px;opacity:.72}
+ #arcade-ambient span:nth-child(n+4){display:none}
+}
+:root[data-theme="light"] #arcade-ambient{opacity:.5}
+@media(prefers-color-scheme:light){
+ :root:not([data-theme="dark"]) #arcade-ambient{opacity:.5}
+}
+/* Animate the highlight on regular AND low-spec devices. The anchor clips it
+   to the poster, and the yellow inset outline is layered above it. */
+@media(hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
+ :root:not([data-motion="off"]) .card:hover>a::before,
+ :root:not([data-motion="off"]) .card:focus-within>a::before{
+  opacity:.96!important;
+  animation:unlocked-poster-sweep 760ms cubic-bezier(.2,.75,.25,1) 1 both!important;
+ }
+}
+/* Respect user and OS motion preferences even if earlier rules enabled effects. */
+@media(prefers-reduced-motion:reduce){
+ #arcade-ambient::before,#arcade-ambient::after,#arcade-ambient span{
+  animation:none!important;will-change:auto;
+ }
+ .card:hover>a::before,.card:focus-within>a::before{
+  animation:none!important;opacity:.22!important;transform:none!important;
+ }
+}
+:root[data-motion="off"] #arcade-ambient::before,
+:root[data-motion="off"] #arcade-ambient::after,
+:root[data-motion="off"] #arcade-ambient span{
+ animation:none!important;will-change:auto;
 }
