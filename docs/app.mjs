@@ -38,6 +38,7 @@ let healthReports=qol.read("health",{});
 let selectedFolder="All";
 let rouletteTimer=null, rouletteWinner=null;
 let sortMode="az";
+let playedIds=new Set(qol.read("history",[]).map(h=>h.id));
 let sessionTicker=null;
 try {
   const stored=JSON.parse(dl("recent","[]"));
@@ -121,7 +122,7 @@ function card(g, {rank=0,count=0}={}) {
   const health=healthReports[g.id];
   const healthBadge=health==="issue"?'<span class="qol-health" title="Personal flag on this device; not a verified outage">My flag</span>':"";
   const starts=rank && chartState==="live"?'<span class="poster-plays">'+playtime(count)+'</span>':'';
-  return '<article class="card"><a href="#/game/'+g.id+'" aria-label="'+title+'"><div class="cover">'+poster(g)+specBadge(g.load)+ageBadge(g)+healthBadge+(rank?'<span class="rank">#'+rank+'</span>':'')+'</div><div class="card-copy"><span class="poster-genre">'+esc(g.genre)+'</span><h3>'+title+'</h3><div class="poster-numbers">'+playStatus(g)+starts+'</div></div></a>'+(qol.read("history",[]).some(h=>h.id===g.id)?'<span class="qol-visited" title="Played before">Played</span>':'')+bookmark(g.id,true)+'</article>';
+  return '<article class="card"><a href="#/game/'+g.id+'" aria-label="'+title+'"><div class="cover">'+poster(g)+specBadge(g.load)+ageBadge(g)+healthBadge+(rank?'<span class="rank">#'+rank+'</span>':'')+'</div><div class="card-copy"><span class="poster-genre">'+esc(g.genre)+'</span><h3>'+title+'</h3><div class="poster-numbers">'+playStatus(g)+starts+'</div></div></a>'+(playedIds.has(g.id)?'<span class="qol-visited" title="Played before">Played</span>':'')+bookmark(g.id,true)+'</article>';
 }
 const grid = (rows) => '<div class="grid">'+rows.map(g=>card(g)).join("")+'</div>';
 const titleBar = (tag,title,count,aside="") => '<div class="shelf-head"><div class="shelf-title"><'+tag+'>'+esc(title)+'</'+tag+'><span class="count" aria-label="'+count+' games">'+count+'</span></div>'+aside+'</div>';
@@ -288,6 +289,14 @@ function loadUpdates(){
     if(!Array.isArray(data.updates))throw Error("Updates unavailable");
     updateNotes=data.updates;
     updatesFetchedAt=Date.now();
+    if(updateNotes.length && hub.profile().notifications){
+      const version=String(updateNotes[0].version||"");
+      const seen=dl("lastUpdate","");
+      if(version && seen && seen!==version && !guide.open && current.page==="library"){
+        displayDialog('<h2 id="guide-title">What’s new in Unlocked v'+esc(version)+'</h2><p>'+esc(String(updateNotes[0].notes||"").slice(0,500))+'</p><div class="actions"><a class="secondary-btn" href="#/updates">All updates</a>'+btn("close-guide","Got it",null,"btn")+'</div>');
+      }
+      if(version)saveValue("lastUpdate",version);
+    }
     renderUpdates();
   }).catch(()=>{
     if(!updateNotes && $("#updates-feed"))$("#updates-feed").innerHTML='<p class="hint">Couldn’t load the update notes.</p>'+btn("retry-updates","Try again",null);
@@ -529,7 +538,7 @@ function recordPlay(id){
 }
 function startGame(g){
   if(!player || !currentLaunch || currentLaunch.id!==g.id)return;
-  if(player.start(currentLaunch.url,$("#limit-resolution")?.checked)){recordPlay(g.id);qol.historyEntry(g);hub.recordActivity(g.id);}
+  if(player.start(currentLaunch.url,$("#limit-resolution")?.checked)){recordPlay(g.id);qol.historyEntry(g);playedIds.add(g.id);hub.recordActivity(g.id);}
 }
 function renderReport(){
   const selected=byId.get(current.params.get("game")), page=current.params.get("from") || "report";
@@ -697,7 +706,7 @@ function setup(){
        case "mark-issue":healthReports[current.id]="issue";qol.write("health",healthReports);guide.close();toast("Flagged on this device");break;
        case "clear-issue":delete healthReports[current.id];qol.write("health",healthReports);guide.close();toast("Local flag cleared");break;
        case "preview-game":{const g=byId.get(current.id);if(g)displayDialog('<h2>'+esc(g.title)+'</h2><p>'+esc(g.description||"Browser game")+'</p><p>Genre: '+esc(g.genre)+' · Performance: '+esc(levels[g.load]||"Unknown")+'</p>'+btn("close-guide","Close",null));break;}
-       case "clear-history":qol.write("history",[]);renderHistory();break;
+       case "clear-history":qol.write("history",[]);playedIds.clear();renderHistory();break;
        case "new-folder":{const name=prompt("New favorites folder name (up to 30 characters):")?.trim().slice(0,30);if(name&&!["All","__proto__","constructor","prototype"].includes(name)){qol.storeFolder(name,[]);selectedFolder=name;renderSaved();}break;}
        case "add-to-folder":{const available=games.filter(g=>saved.has(g.id)&&!(qol.folders()[selectedFolder]||[]).includes(g.id));if(!available.length){toast("No additional saved games to add");break;}displayDialog('<h2>Add to '+esc(selectedFolder)+'</h2><div class="qol-folder-list">'+available.map(g=>'<button class="secondary-btn" data-add-folder="'+esc(g.id)+'">'+esc(g.title)+'</button>').join("")+'</div>'+btn("close-guide","Done",null));break;}
        case "delete-folder":qol.removeFolder(selectedFolder);selectedFolder="All";renderSaved();break;
