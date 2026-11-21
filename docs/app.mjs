@@ -187,7 +187,27 @@ function rouletteView(){
  },reduce?80:4250);
 }
 function renderHistory(){const rows=qol.read("history",[]).map(h=>({h,g:byId.get(h.id)})).filter(x=>x.g);main.innerHTML='<section class="section-page"><h1>Play history</h1><p class="subcopy">Stored on this device only.</p><div class="qol-bar">'+btn("clear-history","Clear history","close")+'</div><div class="qol-history">'+rows.map(({h,g})=>'<a href="#/game/'+esc(g.id)+'"><strong>'+esc(g.title)+'</strong><small>'+new Date(h.last).toLocaleDateString()+' · '+h.visits+' launches</small></a>').join("")+'</div></section>';}
-function communityBar(){return '<div class="community-bar"><a class="join-discord" href="https://discord.gg/AezupBCtns" target="_blank" rel="noopener noreferrer">'+icon("discord")+'<span><small>Join us on</small><strong>Discord</strong></span>'+icon("forward")+'</a></div>';}
+function communityBar(){return '<div class="community-bar"><a class="join-discord" href="https://discord.gg/AezupBCtns" target="_blank" rel="noopener noreferrer">'+icon("discord")+'<span><small>Join us on</small><strong>Discord</strong></span>'+icon("forward")+'</a><a class="community-action community-request" href="#/requests">'+icon("plus")+'<span>Request a game</span>'+icon("forward")+'</a><a class="community-action community-takedown" href="#/takedown">'+icon("shield")+'<span>Takedown Request</span>'+icon("forward")+'</a></div>';}
+const SUBMISSION_API="https://unlocked-arcade-service.persistingthoughts0.chatgpt.site";
+async function submitCommunityForm(form,path,payload){
+ const button=form.querySelector('button[type="submit"]'),status=form.querySelector('[role="status"]');
+ button.disabled=true;button.textContent="Sending…";status.textContent="";
+ try{
+  const response=await fetch(SUBMISSION_API+path,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload),credentials:"omit",signal:AbortSignal.timeout(15000)});
+  const data=await response.json().catch(()=>({}));
+  if(!response.ok)throw Error(data.error||"The submission service is unavailable.");
+  status.textContent=data.status==="found"?"This game is already in the vault.":data.status==="received"?"Submitted successfully to the team.":"Submission received.";
+  if(data.status==="received")form.reset();
+ }catch(error){status.textContent=error.name==="TimeoutError"?"The request timed out. Please try again.":error instanceof TypeError?"Unable to reach the submission service. Please try again later.":error.message;}
+ finally{button.disabled=false;button.textContent=path==="/v1/requests"?"Send game request":"Submit takedown request";}
+}
+function requestsPage(){
+ main.innerHTML='<section class="section-page narrow"><a class="back" href="#/library">'+icon("back")+'All games</a><h1>Request a game</h1><p class="subcopy">Suggest a game for the Unlocked vault. Requests are delivered to our team through Discord.</p><form id="request-form" class="form"><label for="request-title">Game title</label><input id="request-title" name="query" maxlength="80" minlength="2" required autocomplete="off" placeholder="Enter the game name"><button class="btn" type="submit">Send game request</button><p role="status" class="feedback" aria-live="polite"></p></form></section>';
+}
+function takedownPage(){
+ const opts=games.map(g=>'<option value="'+esc(g.id)+'">'+esc(g.title)+'</option>').join("");
+ main.innerHTML='<section class="section-page narrow"><a class="back" href="#/library">'+icon("back")+'All games</a><h1>Takedown Request</h1><p class="subcopy">For rights holders and authorized representatives requesting review or removal of content. Submissions are delivered privately to the team through Discord.</p><form id="takedown-form" class="form"><label for="takedown-game">Game or content</label><select id="takedown-game" name="game" required><option value="">Select a game</option>'+opts+'</select><label for="takedown-reason">Reason for removal</label><textarea id="takedown-reason" name="reason" minlength="15" maxlength="1500" rows="6" required placeholder="Describe your rights and why this content should be removed."></textarea><button class="btn" type="submit">Submit takedown request</button><p role="status" class="feedback" aria-live="polite"></p></form><p class="hint">Submitting a request does not automatically remove content. Please do not include sensitive personal information.</p></section>';
+}
 function rankingCounts(){const counts={};for(const h of qol.read("history",[]))counts[h.id]=Number(h.visits)||0;return counts;}
 function currentRanks(){const counts=rankingCounts();return games.filter(g=>g.mode==="embed").sort((a,b)=>(counts[b.id]||0)-(counts[a.id]||0)||alphabetical(a,b));}
 function rankingTabs(){return "";}
@@ -246,7 +266,7 @@ function displayDialog(html){
 }
 const tourStops = [
   [".spotlight .hero", "Featured games", "Geometry Dash, 60 Seconds!, and R.E.P.O. rotate here. Select a progress bar to switch games, or choose Play game to jump in."],
-  [".community-bar", "Community", "Join the Unlocked Discord to suggest games or get help."],
+  [".community-bar", "Community", "Join Discord, request a game, or submit a takedown request."],
   [".qol-bar", "Surprise Me and quick tools", "Open a game roulette, switch to Low graphics, or view your play history and settings."],
   [".filters", "Find a game for your device", "Choose a genre or Chromebook spec to narrow the library. Low-demand games are the lightest to run."],
   [".grid", "Game ratings and details", "Hover over or focus an age badge for an unofficial estimate. Hardware-demand badges give approximate Chromebook requirements."]
@@ -365,10 +385,12 @@ function route({scroll=true}={}){
   setNav();$("#theme-panel").hidden=true;$("#theme-button").setAttribute("aria-expanded","false");
   if(guide.open)guide.close();
   const game=current.page==="game" && byId.get(current.id);
-  const titles={settings:"Settings",compare:"Compare games",library:"Game vault",top:"Most played locally",saved:"Saved games",credits:"Credits",search:"Search"};
+  const titles={requests:"Request a game",takedown:"Takedown Request",settings:"Settings",compare:"Compare games",library:"Game vault",top:"Most played locally",saved:"Saved games",credits:"Credits",search:"Search"};
   document.title=(game?.title || titles[current.page] || "Page not found")+" · Unlocked";
   if(current.page==="library" || isSearch)renderLibrary();
   else if(current.page==="saved")renderSaved();
+   else if(current.page==="requests")requestsPage();
+   else if(current.page==="takedown")takedownPage();
   else if(current.page==="top")drawTop();
    else if(current.page==="history")renderHistory();
    
@@ -493,6 +515,8 @@ function setup(){
   });
   document.addEventListener("submit",async e=>{
     const form=e.target;
+    if(form.id==="request-form"){e.preventDefault();await submitCommunityForm(form,"/v1/requests",{query:form.elements.query.value.trim()});return;}
+    if(form.id==="takedown-form"){e.preventDefault();await submitCommunityForm(form,"/v1/takedowns",{game:form.elements.game.value,reason:form.elements.reason.value.trim()});return;}
     if(form.id==="hub-settings"){e.preventDefault();hub.settingsFromForm(form);toast("Settings saved");route({scroll:false});return;}
      if(form.id==="guide-search"){e.preventDefault();const str=form.querySelector("input").value.trim();if(str){guide.close();searchView(str);search.focus();}return;}
     
