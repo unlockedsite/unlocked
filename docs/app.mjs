@@ -66,7 +66,8 @@ let currentLaunch=null, searchMessage="";
 
 let playSession=null, player=null, launchCatalog;
 let recentGames=[];
-let performanceMode=qol.read("performance",false);
+// Legacy Low Graphics toggle was removed from the homepage. Performance is now controlled by Settings.
+const performanceMode=false;
 let healthReports=qol.read("health",{});
 let selectedFolder="All";
 let rouletteTimer=null, rouletteWinner=null;
@@ -528,7 +529,7 @@ function setup(){
        case "random-game":rouletteView();break;
        case "roulette-again":rouletteView();break;
        case "roulette-play":if(rouletteWinner){const id=rouletteWinner;guide.close();location.hash="#/game/"+id;}break;
-       case "performance":performanceMode=!performanceMode;qol.write("performance",performanceMode);document.documentElement.classList.toggle("low-graphics",performanceMode);if(current.page==="library")renderLibrary();break;
+
        case "share-game":qol.safeCopy(location.href).then(()=>toast("Game link copied")).catch(()=>displayDialog('<h2>Share this game</h2><p>'+esc(location.href)+'</p>'+btn("close-guide","Close",null)));break;
        case "health-game":{const g=byId.get(current.id);if(g)displayDialog('<h2>Game status: '+esc(g.title)+'</h2><p>Live automated game checks are not available. You can flag a problem on this device.</p><div class="actions">'+btn("mark-issue","Mark issue","bug")+btn("clear-issue","Clear flag","check")+btn("close-guide","Close",null)+'</div>');break;}
        case "mark-issue":healthReports[current.id]="issue";qol.write("health",healthReports);guide.close();toast("Flagged on this device");break;
