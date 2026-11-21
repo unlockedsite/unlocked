@@ -28,8 +28,14 @@ let games = [], byId = new Map(), genre = "", level = "", q = "", navigation = 0
 let current = {page:"library",id:"",params:new URLSearchParams()}, tourStep=0, toastTimer;
 let ticket=dl("session","",true), inviteHidden=dl("tour","")==="seen";
 let currentLaunch=null, topCache=null, currentReport="", searchMessage="", sendingSearch="", lastSearchKey="";
-let rankedCounts={}, activeCounts={}, chartState="loading", chartRequest=null, chartTimer;
+let rankedCounts={}, weeklyCounts={}, rankingPeriod="all", weekStartsAt=null, activeCounts={}, chartState="loading", chartRequest=null, chartTimer;
 let playSession=null, heartbeatTimer, player=null, launchCatalog;
+let recentGames=[];
+try {
+  const stored=JSON.parse(dl("recent","[]"));
+  if(Array.isArray(stored))recentGames=[...new Set(stored.filter(id=>typeof id==="string"))].slice(0,4);
+} catch { /* Ignore invalid saved history. */ }
+let updateNotes=null, updatesRequest=null, updatesFetchedAt=0;
 const receivedQueries = new Set();
 const pageSize = 48;
 let visibleCount = pageSize;
@@ -161,8 +167,35 @@ async function submitGameRequest(form){
 function communityBar(){
   return '<div class="community-bar"><a class="join-discord" href="https://discord.gg/AezupBCtns" target="_blank" rel="noopener noreferrer">'+icon("discord")+'<span><small>Join us on</small><strong>Discord</strong></span>'+icon("forward")+'</a><a class="secondary-btn" href="#/requests">Request a game</a><div class="community-online">'+presence("all")+'</div></div>';
 }
+function rankingCounts(){return rankingPeriod==="week"?weeklyCounts:rankedCounts;}
 function currentRanks(){
-  return games.filter(g=>g.mode==="embed").sort((a,b)=>(rankedCounts[b.id]||0)-(rankedCounts[a.id]||0)||alphabetical(a,b));
+  const counts=rankingCounts();
+  return games.filter(g=>g.mode==="embed" && (rankingPeriod!=="week" || counts[g.id]>0)).sort((a,b)=>(counts[b.id]||0)-(counts[a.id]||0)||alphabetical(a,b));
+}
+function rankingTabs(){
+  return '<div class="ranking-tabs" role="group" aria-label="Ranking period">'+[["all","All time"],["week","This week"]].map(([value,label])=>'<button type="button" class="chip" data-period="'+value+'" aria-pressed="'+(rankingPeriod===value)+'">'+label+'</button>').join("")+'</div>';
+}
+function continuePlaying(){
+  const recent=recentGames.map(id=>byId.get(id)).filter(g=>g?.mode==="embed");
+  if(!recent.length)return "";
+  return '<section class="continue-playing" aria-labelledby="continue-title"><div class="shelf-head"><h2 id="continue-title">Continue Playing</h2></div><div class="recent-grid">'+recent.map(g=>'<a class="recent-game" href="#/game/'+g.id+'?start=1">'+poster(g)+'<span><strong>'+esc(g.title)+'</strong><small>Play again</small></span>'+icon("play")+'</a>').join("")+'</div></section>';
+}
+function renderUpdates(){
+  const container=$("#updates-feed");
+  if(!container || !updateNotes)return;
+  container.innerHTML=updateNotes.length?updateNotes.map((release,i)=>'<details class="release-note" '+(i===0?'open':'')+'><summary><strong>Update v'+esc(release.version)+'</strong>'+(release.published?'<time datetime="'+esc(release.published)+'">'+esc(new Date(release.published).toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"}))+'</time>':"")+'</summary><ul>'+release.notes.split("\n").filter(Boolean).map(note=>'<li>'+esc(note.replace(/^•\s*/,""))+'</li>').join("")+'</ul></details>').join(""):'<p class="hint">Release notes will appear here after the next update.</p>';
+}
+function loadUpdates(){
+  renderUpdates();
+  if(updatesRequest || (updateNotes && Date.now()-updatesFetchedAt<60000))return;
+  updatesRequest=api("/v1/updates").then(data=>{
+    if(!Array.isArray(data.updates))throw Error("Updates unavailable");
+    updateNotes=data.updates;
+    updatesFetchedAt=Date.now();
+    renderUpdates();
+  }).catch(()=>{
+    if(!updateNotes && $("#updates-feed"))$("#updates-feed").innerHTML='<p class="hint">Couldn’t load the update notes.</p>'+btn("retry-updates","Try again",null);
+  }).finally(()=>{updatesRequest=null;});
 }
 function playtime(seconds){
   if (seconds < 60) return seconds+"s played";
@@ -176,11 +209,11 @@ function chartStatus(){
 }
 function chartPanel(){
   const ranks=currentRanks().filter(g=>!featured.includes(g.id)).slice(0,3);
-  return '<aside class="chart-panel" id="home-chart" aria-label="Top games"><div class="chart-title"><h2>'+icon("trophy")+'Top games</h2>'+chartStatus()+'</div><ol class="mini-chart">'+ranks.map((g,i)=>{
-    const plays=Number(rankedCounts[g.id])||0;
+  return '<aside class="chart-panel" id="home-chart" aria-label="Top games"><div class="chart-title"><h2>'+icon("trophy")+'Top games</h2>'+chartStatus()+'</div>'+rankingTabs()+'<ol class="mini-chart">'+ranks.map((g,i)=>{
+    const plays=Number(rankingCounts()[g.id])||0;
     const countText=chartState==="live"?'<span class="chart-plays">'+playtime(plays)+'</span>':"";
     return '<li><a href="#/game/'+g.id+'"><span class="position">'+String(i+1).padStart(2,"0")+'</span><img src="'+(g.imported?posterAsset(g.id):relativeAsset(g.id))+'" alt="" width="96" height="62" decoding="async"><span class="chart-copy"><strong>'+esc(g.title)+'</strong><small><span class="chart-genre">'+esc(g.genre)+(countText?' · ':'')+'</span>'+countText+'</small></span></a></li>';
-  }).join("")+'</ol><a class="chart-all" href="#/top">'+icon("grid")+'Full rankings</a></aside>';
+  }).join("")+'</ol>'+(!ranks.length?'<p class="hint">No playtime recorded this week yet.</p>':"")+'<a class="chart-all" href="#/top">'+icon("grid")+'Full rankings</a></aside>';
 }
 function renderLibrary(){
   const searching=current.page==="search";
@@ -188,7 +221,7 @@ function renderLibrary(){
   const rows=full.filter(g=>(!genre || g.genre===genre)&&(!level || g.load===level) && (availability==="all" || (g.mode==="embed")===(availability==="play")));
   const label=searching ? "Search results" : "Game library";
   const aside='<div class="shelf-aside"><span class="sort-label">A–Z</span></div>';
-  let html=searching?"":'<div class="spotlight">'+hero()+chartPanel()+'</div>'+communityBar();
+  let html=searching?"":'<div class="spotlight">'+hero()+chartPanel()+'</div>'+communityBar()+continuePlaying()+'<section class="updates-panel" aria-labelledby="updates-title"><h2 id="updates-title">What’s new</h2><div id="updates-feed"><p class="hint" role="status">Loading updates…</p></div></section>';
   html+=titleBar(searching?"h1":"h2",label,rows.length,aside)+filters();
   if(rows.length) html+=grid(rows.slice(0,visibleCount))+moreButton(rows.length);
   else if(full.length || !q) html+='<div class="empty">'+icon("filter")+'<h2>No games with those filters</h2><p>Clear filters to see every matching title.</p>'+btn("reset-filters","Clear filters","filter")+'</div>';
@@ -198,6 +231,7 @@ function renderLibrary(){
     (sent?"":'<button class="btn" data-action="request" '+(sendingSearch===normalize(q)?"disabled":"")+'>'+ (sendingSearch===normalize(q)?"Sending…":"Request this game")+'</button>')+'<p class="feedback" role="status" id="request-feedback">'+esc(searchMessage)+'</p></div>';
   }
   main.innerHTML=html;
+  if(!searching)loadUpdates();
 }
 function renderSaved() {
   const rows=games.filter(g=>saved.has(g.id));
@@ -206,20 +240,21 @@ function renderSaved() {
 function drawTop(){
   const ranks=currentRanks();
   main.innerHTML='<section class="section-page"><div class="shelf-head"><div><h1>Top games</h1><p class="subcopy">Ranked by total time played across the arcade.</p></div><div class="top-live">'+chartStatus()+presence("all")+'</div></div>'+
+    rankingTabs()+(rankingPeriod==="week"?'<p class="ranking-note hint">'+(weekStartsAt?'Week of '+esc(new Date(weekStartsAt*1000).toLocaleDateString(undefined,{month:"short",day:"numeric",timeZone:"UTC"}))+' · ':"")+'Resets Monday at 00:00 UTC.</p>':"")+(!ranks.length?'<p class="hint">No playtime recorded this week yet.</p>':"")+
     (chartState==="offline"?'<p class="hint">Live counts are unavailable. The chart will retry automatically.</p>':"")+
-    '<div class="grid">'+ranks.slice(0,visibleCount).map((g,i)=>card(g,{rank:i+1,count:Number(rankedCounts[g.id])||0})).join("")+'</div>'+moreButton(ranks.length)+'</section>';
+    '<div class="grid">'+ranks.slice(0,visibleCount).map((g,i)=>card(g,{rank:i+1,count:Number(rankingCounts()[g.id])||0})).join("")+'</div>'+moreButton(ranks.length)+'</section>';
 }
 function refreshChart(force=false){
   if(document.hidden || (playSession || player?.expanded()) || !["library","top","search","saved","game"].includes(current.page) || (topCache && !force && Date.now()-topCache.time<20000)) return;
   if(chartRequest)return chartRequest;
-  const previousState=chartState,previousCounts=JSON.stringify(rankedCounts);
-  chartRequest=api("/v1/top").then(({playtimeSeconds:plays,active})=>{
+  const previousState=chartState,previousCounts=JSON.stringify([rankedCounts,weeklyCounts,weekStartsAt]);
+  chartRequest=api("/v1/top").then(({playtimeSeconds:plays,weeklyPlaytimeSeconds:weekly,weekStartsAt:start,active})=>{
     if(!plays || !active || typeof plays!=="object" || typeof active!=="object")throw Error("Chart unavailable");
-    rankedCounts=plays;activeCounts=active;topCache={time:Date.now()};chartState="live";
+    rankedCounts=plays;weeklyCounts=weekly || {};weekStartsAt=start;activeCounts=active;topCache={time:Date.now()};chartState="live";
   }).catch(()=>{chartState="offline";}).finally(()=>{
     chartRequest=null;
     document.querySelectorAll("[data-active]").forEach(el=>{el.textContent=activeText(el.dataset.active);});
-    if(previousState===chartState && previousCounts===JSON.stringify(rankedCounts))return;
+    if(previousState===chartState && previousCounts===JSON.stringify([rankedCounts,weeklyCounts,weekStartsAt]))return;
     if(current.page==="top")drawTop();
     if(current.page==="library" && $("#home-chart"))$("#home-chart").outerHTML=chartPanel();
   });
@@ -372,6 +407,8 @@ function endPlay(){
   playSession=null;
 }
 function recordPlay(id){
+  recentGames=[id,...recentGames.filter(game=>game!==id)].slice(0,4);
+  saveValue("recent",JSON.stringify(recentGames));
   topCache=null;
   const gameplay={id,session:crypto.randomUUID(),registered:false};
   playSession=gameplay;
@@ -504,9 +541,27 @@ function setup(){
     const filter=e.target.closest("[data-genre]");if(filter){genre=filter.dataset.genre;visibleCount=pageSize;renderLibrary();document.querySelector('[data-genre="'+genre+'"]')?.focus({preventScroll:true});return;}
     const link=e.target.closest("a[data-page],a.brand");
     if(link && link.getAttribute("href")==="#/library"){genre="";level="";if(current.page==="library")renderLibrary();}
-    const footerBug=e.target.closest('.footer a[href="#/report"]');if(footerBug && current.page!=="report"){e.preventDefault();location.hash=reportUrl();}
+    const reportLink=e.target.closest('a.report-link,.footer a[href="#/report"]');
+    if(reportLink && current.page!=="report"){
+      e.preventDefault();
+      if(playSession){
+        displayDialog('<h2 id="guide-title">Leave your game to report a bug?</h2><p><strong>This WILL take you out of your current game session.</strong> Unsaved progress may be lost.</p><div class="actions">'+btn("close-guide","Stay in game",null)+btn("leave-and-report","Leave and report",null,"btn")+'</div>');
+      }else location.hash=reportUrl();
+      return;
+    }
+    const period=e.target.closest("[data-period]")?.dataset.period;
+    if(period){
+      rankingPeriod=period;
+      visibleCount=pageSize;
+      if(current.page==="top")drawTop();
+      else if($("#home-chart"))$("#home-chart").outerHTML=chartPanel();
+      document.querySelector('[data-period="'+period+'"]').focus({preventScroll:true});
+      return;
+    }
     const action=e.target.closest("[data-action]")?.dataset.action;
     switch(action){
+      case "leave-and-report":guide.close();location.hash=reportUrl();break;
+      case "retry-updates":loadUpdates();break;
       case "tour":
         rememberTour();
         if(current.page!=="library"){history.pushState(null,"","#/library");route();}

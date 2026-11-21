@@ -1,4 +1,4 @@
-import { announce } from "./updates.mjs";
+import { announce, publishedUpdates } from "./updates.mjs";
 import games from "../docs/games.json" with { type: "json" };
 import ports from "./ports.json" with { type: "json" };
 import { matches, normalize } from "../docs/search.mjs";
@@ -136,6 +136,9 @@ async function bug(request, env, data) {
 }
 
 const presenceWindow = 90;
+const weekSeconds = 7 * 86400;
+// Unix epoch began on a Thursday. Weeks start Monday at 00:00 UTC.
+const weekStart = now => Math.floor((now - 4 * 86400) / weekSeconds) * weekSeconds + 4 * 86400;
 async function sessionKey(value, env) {
   if (typeof value !== "string" || !/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(value)) reject(400, "Invalid game session.");
   if (!env.RATE_SALT) reject(503, "Player counts are temporarily unavailable.");
@@ -152,11 +155,22 @@ async function updatePresence(env, data) {
     SELECT ?, ? - seen FROM presence WHERE session=? AND game=? AND seen BETWEEN ? AND ?
     ON CONFLICT(game) DO UPDATE SET count=count+excluded.count`)
     .bind("seconds:"+data.game, now, key, data.game, now-presenceWindow, now-1);
+  const week = weekStart(now);
+  const weeklyCredit = env.DB.prepare(`INSERT INTO plays(game,count)
+    SELECT ?, ? - MAX(seen,?) FROM presence
+    WHERE session=? AND game=? AND seen BETWEEN ? AND ? AND ?>MAX(seen,?)
+    ON CONFLICT(game) DO UPDATE SET count=count+excluded.count`)
+    .bind("week:"+week+":"+data.game, now, week, key, data.game, now-presenceWindow, now-1, now, week);
+  const previousWeekCredit = env.DB.prepare(`INSERT INTO plays(game,count)
+    SELECT ?, ? - seen FROM presence
+    WHERE session=? AND game=? AND seen BETWEEN ? AND ? AND seen<?
+    ON CONFLICT(game) DO UPDATE SET count=count+excluded.count`)
+    .bind("week:"+(week-weekSeconds)+":"+data.game, week, key, data.game, now-presenceWindow, now-1, week);
   const update = data.state === "left"
     ? env.DB.prepare("DELETE FROM presence WHERE session=? AND game=?").bind(key, data.game)
     : env.DB.prepare("UPDATE presence SET seen=? WHERE session=? AND game=? AND abs(seen)<=?")
       .bind(data.state === "paused" ? -now : now, key, data.game, now);
-  await env.DB.batch([credit, update]);
+  await env.DB.batch([credit, weeklyCredit, previousWeekCredit, update]);
   return { ok: true };
 }
 
@@ -198,13 +212,17 @@ async function routes(request, env, ctx) {
     return { ready: Boolean(schema?.n === 4 && env.BUG_HOOK && env.REQUEST_HOOK && env.RATE_SALT), mode: accessMode(env) };
   }
   if (path === "/v1/top" && request.method === "GET") {
-    const [totals, online] = await env.DB.batch([
+    const week = weekStart(seconds());
+    const prefix = "week:"+week+":";
+    const [totals, online, weekly] = await env.DB.batch([
       env.DB.prepare("SELECT substr(game,9) AS game,count FROM plays WHERE game LIKE 'seconds:%'"),
-      env.DB.prepare("SELECT game,COUNT(*) AS count FROM presence WHERE seen>? GROUP BY game").bind(seconds()-presenceWindow)
+      env.DB.prepare("SELECT game,COUNT(*) AS count FROM presence WHERE seen>? GROUP BY game").bind(seconds()-presenceWindow),
+      env.DB.prepare("SELECT substr(game,?) AS game,count FROM plays WHERE game LIKE ?").bind(prefix.length+1,prefix+"%")
     ]);
     const counts = rows => Object.fromEntries(rows.filter(row => byId.has(row.game)).map(row => [row.game, row.count]));
-    return { playtimeSeconds: counts(totals.results), active: counts(online.results), windowSeconds: presenceWindow };
+    return { playtimeSeconds: counts(totals.results), weeklyPlaytimeSeconds: counts(weekly.results), weekStartsAt: week, active: counts(online.results), windowSeconds: presenceWindow };
   }
+  if (path === "/v1/updates" && request.method === "GET") return publishedUpdates(env);
   if (request.method !== "POST") reject(404, "Page not found.");
   const data = await jsonBody(request);
   if (path === "/v1/redeem") return redeem(request, env, data);

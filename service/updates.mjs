@@ -4,6 +4,24 @@ const priorDeployment = 7950404824;
 const arcade = "https://unlockedsite.github.io/unlocked/";
 const releases = "arcade_announcements";
 
+async function prepareNotes(db) {
+  await db.prepare(`CREATE TABLE IF NOT EXISTS arcade_release_notes (
+    version INTEGER PRIMARY KEY, notes TEXT NOT NULL, published TEXT NOT NULL
+  )`).run();
+}
+
+export async function publishedUpdates(env) {
+  await prepareNotes(env.DB);
+  const {results} = await env.DB.prepare(`SELECT a.version,a.sha,n.notes,n.published
+    FROM arcade_announcements a LEFT JOIN arcade_release_notes n ON a.version=n.version
+    WHERE a.receipt IS NOT NULL ORDER BY a.version DESC LIMIT 5`).all();
+  const previousNotes = {
+    "96b5dc0d4875ef7c7387a752b72ce4aef9ee6ba6": "• Added a game request page beside Discord.\n• Updated the featured carousel with widescreen artwork and timed controls.\n• Ranked games by playtime and removed the broken Cuphead port.",
+    "4f28bdeabd735c7922fb38b7eec55886f79752d8": "• Add an optional spotlight tour and remove Block Blast from the arcade"
+  };
+  return {updates:results.map(row=>({version:"1."+row.version, notes:row.notes || previousNotes[row.sha] || "• Published arcade improvements.", published:row.published, url:"https://github.com/"+repository+"/commit/"+row.sha}))};
+}
+
 async function github(path) {
   const res = await fetch("https://api.github.com/repos/" + repository + path, {
     headers: { "User-Agent": "Unlocked-Release-Notes", Accept: "application/vnd.github+json" }
@@ -49,13 +67,17 @@ export async function announce(id, env) {
   if ((await db.prepare(`SELECT receipt FROM ${releases} WHERE deployment=?`).bind(id).first())?.receipt)
     return Response.json({duplicate:true});
   const version = "1."+row.version;
+  const published = statuses.find(s=>s.state==="success").created_at;
+  await prepareNotes(db);
+  await db.prepare("INSERT INTO arcade_release_notes(version,notes,published) VALUES (?,?,?) ON CONFLICT(version) DO UPDATE SET notes=excluded.notes,published=excluded.published")
+    .bind(row.version,notes,published).run();
   const url = new URL(env.UPDATE_HOOK);
   url.searchParams.set("wait","true");
   const result = await fetch(url, {method:"POST",redirect:"manual",headers:{"Content-Type":"application/json"},body:JSON.stringify({
     content:"<@&"+role+">",allowed_mentions:{parse:[],roles:[role]},
     embeds:[{title:"Unlocked | Update v"+version,url:arcade,color:0xFFD05B,
       description:notes,fields:[{name:"Play the update",value:"[Open Unlocked]("+arcade+") · [View changes](https://github.com/"+repository+"/commit/"+sha+")"}],
-      footer:{text:"Unlocked Arcade • Release notes"},timestamp:statuses.find(s=>s.state==="success").created_at}]
+      footer:{text:"Unlocked Arcade • Release notes"},timestamp:published}]
   })});
   if (!result.ok) {
     if (result.status>=400 && result.status<500) await db.prepare(`DELETE FROM ${releases} WHERE deployment=? AND receipt IS NULL`).bind(id).run();

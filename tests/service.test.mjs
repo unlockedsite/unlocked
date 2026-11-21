@@ -139,3 +139,61 @@ test("paused sessions exclude hidden time and retries cannot double-count playti
   await ping("left");
   assert.deepEqual((await call("/v1/top")).data.playtimeSeconds, {doom:16});
 });
+
+test("weekly totals split an active session at Monday UTC without crediting retries or hidden time", async t => {
+  const {call,env}=fixture(t);
+  const monday=Date.parse("2026-11-23T00:00:00Z");
+  t.mock.timers.enable({apis:["Date"],now:monday-20000});
+  const session=crypto.randomUUID();
+  const ping=state=>call("/v1/presence",{game:"doom",session,state});
+  await call("/v1/play/doom",{session});
+  t.mock.timers.tick(10000);
+  await ping("active");
+  assert.deepEqual((await call("/v1/top")).data.weeklyPlaytimeSeconds,{doom:10});
+  t.mock.timers.tick(20000);
+  await ping("paused");
+  await ping("paused");
+  let top=(await call("/v1/top")).data;
+  assert.equal(top.weekStartsAt,monday/1000);
+  assert.deepEqual(top.playtimeSeconds,{doom:30});
+  assert.deepEqual(top.weeklyPlaytimeSeconds,{doom:10});
+  assert.equal((await env.DB.prepare("SELECT count FROM plays WHERE game=?").bind("week:"+(monday/1000-604800)+":doom").first()).count,20);
+  t.mock.timers.tick(50000);
+  await ping("active");
+  t.mock.timers.tick(10000);
+  await ping("left");
+  await ping("left");
+  top=(await call("/v1/top")).data;
+  assert.deepEqual(top.weeklyPlaytimeSeconds,{doom:20});
+  assert.deepEqual(top.playtimeSeconds,{doom:40});
+});
+
+test("weekly rankings reset while all-time totals and legacy records remain valid",async t=>{
+  const {call,env}=fixture(t);
+  t.mock.timers.enable({apis:["Date"],now:Date.parse("2026-11-22T12:00:00Z")});
+  await env.DB.prepare("INSERT INTO plays VALUES ('seconds:doom',900)").run();
+  const session=crypto.randomUUID();
+  await call("/v1/play/doom",{session});
+  t.mock.timers.tick(10000);
+  await call("/v1/presence",{game:"doom",session,state:"left"});
+  t.mock.timers.tick(86400000);
+  const top=(await call("/v1/top")).data;
+  assert.deepEqual(top.playtimeSeconds,{doom:910});
+  assert.deepEqual(top.weeklyPlaytimeSeconds,{});
+});
+
+test("public release notes include confirmed updates and exclude pending Discord deliveries",async t=>{
+  const {call,env}=fixture(t);
+  await env.DB.prepare("CREATE TABLE arcade_announcements (version INTEGER PRIMARY KEY,deployment TEXT,sha TEXT,receipt TEXT)").run();
+  await env.DB.prepare("INSERT INTO arcade_announcements VALUES (2,'2','4f28bdeabd735c7922fb38b7eec55886f79752d8','receipt'),(3,'3','pending',NULL)").run();
+  let response=await call("/v1/updates");
+  assert.equal(response.status,200);
+  assert.equal(response.data.updates.length,1);
+  assert.match(response.data.updates[0].notes,/spotlight tour/);
+  await env.DB.prepare("INSERT INTO arcade_release_notes VALUES (3,'• Added weekly playtime rankings.','2026-11-21T00:00:00Z')").run();
+  await env.DB.prepare("UPDATE arcade_announcements SET receipt='confirmed' WHERE version=3").run();
+  response=await call("/v1/updates");
+  assert.equal(response.data.updates[0].version,"1.3");
+  assert.equal(response.data.updates[0].notes,"• Added weekly playtime rankings.");
+  assert.equal(JSON.stringify(response.data).includes("receipt"),false);
+});
