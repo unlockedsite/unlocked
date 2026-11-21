@@ -577,3 +577,45 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opa
 }
 @media(max-width:370px){.play-tools>.secondary-btn{font-size:.76rem;gap:.3rem}}
 @media(prefers-reduced-motion:reduce){.play-tools>.secondary-btn{transition:none!important}}
+
+/* Unlocked v44: shine, scrollbar, alphabet navigator, local theme builder */
+html{scrollbar-color:var(--accent) var(--bg);scrollbar-width:thin}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--accent) 72%,var(--line));border:2px solid var(--bg);border-radius:99px}
+::-webkit-scrollbar-thumb:hover{background:var(--accent)}
+.alphabet-jump{display:flex;align-items:center;flex-wrap:wrap;gap:.25rem;margin:.85rem 0 1.15rem;padding:.65rem;border:1px solid var(--line);border-radius:.8rem;background:var(--surface)}
+.alphabet-jump>span{font-size:.8rem;font-weight:850;color:var(--muted);padding:0 .5rem;white-space:nowrap}
+.alphabet-jump button{min-width:1.8rem;min-height:2rem;border:0;border-radius:.4rem;background:transparent;color:var(--text);font-size:.78rem;font-weight:800;cursor:pointer}
+.alphabet-jump button:hover:not(:disabled),.alphabet-jump button:focus-visible{background:var(--accent);color:#171b24}
+.alphabet-jump button:disabled{opacity:.24;cursor:default}
+@media(max-width:540px){.alphabet-jump{gap:.12rem;padding:.45rem}.alphabet-jump button{min-width:1.65rem;min-height:1.85rem}}
+.card .cover{isolation:isolate}
+.card .cover::before{content:"";position:absolute;z-index:2;inset:-30% -80%;pointer-events:none;background:linear-gradient(110deg,transparent 37%,rgba(255,255,255,.0) 43%,rgba(255,255,255,.28) 50%,rgba(255,255,255,.0) 57%,transparent 63%);transform:translateX(-115%) rotate(0deg);opacity:0}
+@media(hover:hover) and (prefers-reduced-motion:no-preference){
+ :root:not(.low-graphics):not([data-motion="off"]) .card:hover .cover::before{opacity:.8;animation:unlocked-shine .75s cubic-bezier(.18,.62,.2,1) 1}
+}
+@keyframes unlocked-shine{from{transform:translateX(-115%)}to{transform:translateX(115%)}}
+:root.custom-background{--bg:var(--custom-bg)}
+:root.custom-wallpaper body::after{content:"";position:fixed;inset:0;z-index:-1;background-image:linear-gradient(#090d18b8,#090d18b8),var(--user-wallpaper);background-size:cover;background-position:center;pointer-events:none}
+:root.custom-wallpaper body{background:transparent}
+:root.custom-wallpaper #content{background:transparent}
+:root{--custom-radius:12px;--glow-opacity:.35;--ui-scale:1}
+:root .card,:root .hub-settings,:root .play-tools,:root .secondary-btn,:root .icon-btn,:root .community-bar>a{border-radius:var(--custom-radius)}
+:root .hub-page{zoom:var(--ui-scale)}
+:root .hub-discover,:root .library-page,:root .grid,:root .play-tools{font-size:calc(1rem * var(--ui-scale))}
+:root .game-atmosphere .stage-slot::before{opacity:calc(var(--glow-opacity) * .4)}
+:root[data-motion="off"] *, :root[data-motion="off"] *::before,:root[data-motion="off"] *::after{animation-duration:.001ms!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+:root[data-motion="subtle"] *, :root[data-motion="subtle"] *::before,:root[data-motion="subtle"] *::after{animation-duration:.18s!important;transition-duration:.18s!important}
+:root[data-motion="enhanced"] .card:hover{box-shadow:0 0 22px color-mix(in srgb,var(--accent) 35%,transparent)}
+:root.custom-cursor:not(.low-graphics) body::before{opacity:var(--glow-opacity);background:radial-gradient(280px circle at var(--cursor-x,50%) var(--cursor-y,28%),color-mix(in srgb,var(--accent) 30%,transparent),transparent 75%)}
+.settings-colors{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem}
+.hub-settings input[type="range"]{accent-color:var(--accent);width:100%}
+.hub-settings output{float:right;color:var(--accent-text);font-variant-numeric:tabular-nums}
+.hub-settings h2{margin:.8rem 0 0}
+.hub-settings .hub-check{display:flex;align-items:center;gap:.6rem}
+.hub-settings .hub-check input{accent-color:var(--accent)}
+.hub-settings input[type="file"]{max-width:100%}
+@media(max-width:540px){.settings-colors{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.card .cover::before{display:none}:root.custom-cursor body::before{display:none}}
+.low-graphics .card .cover::before,.low-graphics.custom-cursor body::before{display:none}
