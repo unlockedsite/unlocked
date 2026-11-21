@@ -337,3 +337,8 @@ dialog .actions{justify-content:space-between;margin-top:1rem}
 .brand-mark i{display:none}
 .community-bar>a.community-action{gap:.55rem}
 .community-bar>a.community-action>.ico{width:1.15rem;height:1.15rem;flex-shrink:0}
+
+/* Larger, clearer header logo while retaining responsive masthead. */
+.brand .brand-mark{width:3.15rem;height:3.15rem;flex:0 0 3.15rem;background-size:contain}
+@media(max-width:780px){.brand .brand-mark{width:2.65rem;height:2.65rem;flex-basis:2.65rem}}
+@media(max-width:540px){.brand .brand-mark{width:2.45rem;height:2.45rem;flex-basis:2.45rem}}
