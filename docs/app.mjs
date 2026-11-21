@@ -34,12 +34,22 @@ function launchCinematic(anchor,game){
  anim.finished.then(()=>clone.remove(),()=>clone.remove());
 }
 function initAmbientGlow(){
- if(!matchMedia("(pointer:fine)").matches)return;
+ // Only follow the cursor when users explicitly enable it.
+ // Updating the full document on every pointer movement caused costly repaints.
+ const ambient=document.getElementById("arcade-ambient");
+ if(!ambient||!matchMedia("(pointer:fine)").matches)return;
+ const reduced=matchMedia("(prefers-reduced-motion: reduce)");
  let pending=false,x=0,y=0;
  document.addEventListener("pointermove",e=>{
-  if(performanceMode||matchMedia("(prefers-reduced-motion: reduce)").matches)return;
-  x=e.clientX;y=e.clientY;if(pending)return;pending=true;
-  requestAnimationFrame(()=>{pending=false;document.documentElement.style.setProperty("--cursor-x",x+"px");document.documentElement.style.setProperty("--cursor-y",y+"px");});
+  if(reduced.matches||document.hidden||!document.documentElement.classList.contains("custom-cursor")||document.documentElement.classList.contains("game-atmosphere"))return;
+  x=e.clientX;y=e.clientY;
+  if(pending)return;
+  pending=true;
+  requestAnimationFrame(()=>{
+   pending=false;
+   ambient.style.setProperty("--cursor-x",x+"px");
+   ambient.style.setProperty("--cursor-y",y+"px");
+  });
  },{passive:true});
 }
 
