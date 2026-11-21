@@ -1085,3 +1085,32 @@ body::before{display:none!important}
 :root[data-motion="off"] #arcade-ambient span{
  animation:none!important;will-change:auto;
 }
+
+/* v55: restored shared playtime leaderboard (server-backed metrics only). */
+.global-rankings{max-width:88rem;margin-inline:auto}
+.global-rankings .global-rank-head{align-items:center;gap:1rem;margin-top:.35rem;margin-bottom:1.25rem}
+.global-rank-head>div:first-child{flex:1 1 22rem;min-width:0}
+.global-rank-head .subcopy{max-width:40rem}
+.global-rankings .top-live{display:flex;flex-wrap:wrap;align-items:center;gap:.8rem}
+.global-rankings .live-state,.global-rankings .quiet-state{
+ display:inline-flex;align-items:center;gap:.4rem;
+ padding:.35rem .65rem;border:1px solid var(--line);border-radius:999px;
+ background:var(--surface);font-size:.8rem;font-weight:800
+}
+.global-rankings .live-state{color:#43ca96}
+.global-online{display:inline-flex;align-items:center;gap:.35rem;color:var(--muted);font-size:.85rem;font-weight:700}
+.global-online>.ico{color:var(--accent-text)}
+.global-rankings .ranking-tabs{display:flex;flex-wrap:wrap;gap:.55rem;margin:0 0 1rem}
+.global-rankings .ranking-tabs>.chip{min-width:6.5rem;padding:.55rem 1rem;border-radius:.65rem}
+.global-rankings .ranking-tabs>.chip[aria-pressed="true"]{
+ background:var(--accent);border-color:var(--accent);color:#171b23
+}
+.global-leader-grid{margin-top:1.25rem}
+.global-rankings .global-leader-grid .rank{z-index:3}
+.global-rankings .global-leader-grid .poster-plays{color:#fff;font-weight:800}
+.global-rankings .ranking-note{margin:-.3rem 0 1.2rem}
+@media(max-width:600px){
+ .global-rank-head{flex-direction:column;align-items:flex-start!important}
+ .global-rankings .top-live{gap:.5rem}
+ .global-rankings .ranking-tabs>.chip{flex:1 1 0}
+}
