@@ -13,7 +13,10 @@ const achievements=[
  ["collector","Collector","Save 10 games",s=>s.saved>=10],
  ["regular","Regular","Launch 25 games",s=>s.launches>=25],
  ["veteran","Veteran","Try 25 different games",s=>s.games>=25],
- ["legend","Vault Legend","Launch 100 games",s=>s.launches>=100]
+ ["legend","Vault Legend","Launch 100 games",s=>s.launches>=100],
+ ["hour","First Hour","Track 60 minutes of play",()=>minutes()>=60],
+ ["tenhours","Dedicated Player","Track 10 hours of play",()=>minutes()>=600],
+ ["day","Marathon Player","Track 24 hours of play",()=>minutes()>=1440]
 ];
 export function earned(saved){const s={...stats(),saved};return achievements.filter(a=>a[3](s)).map(a=>a[0])}
 export function badgeMarkup(saved){const unlocked=earned(saved);return achievements.map(([id,title,desc])=>'<span class="hub-badge '+(unlocked.includes(id)?"earned":"")+'" title="'+esc(desc)+'">'+(unlocked.includes(id)?"✦":"◇")+' '+esc(title)+'</span>').join("")}
