@@ -150,14 +150,98 @@ function playStatus(g) {
 function moreButton(total) {
   return total > visibleCount ? '<div class="more-games">'+btn("show-more","Show more games",null)+'</div>' : "";
 }
-const postersWithEmbeddedPadding = new Set(["20-minutes-till-dawn","a-bite-at-freddy-s","a-dance-of-fire-and-ice","a-difficult-game-about-climbing"]);
+// These posters visibly contain blurred bars baked into the source artwork.
+const postersWithEmbeddedPadding = new Set([
+ "20-minutes-till-dawn","a-bite-at-freddy-s","a-dance-of-fire-and-ice",
+ "a-difficult-game-about-climbing","andy-s-apple-farm","animal-crossing","antonblast"
+]);
+const posterFitCache=new Map();
+const posterFitQueue=[];
+let posterFitPending=false,posterSampleContext=null;
+function scoreBandRows(img){
+ // One tiny, idle-time sample per source image; never inspect full-resolution pixels.
+ if(!posterSampleContext){
+  const canvas=document.createElement("canvas");canvas.width=64;canvas.height=96;
+  posterSampleContext=canvas.getContext("2d",{willReadFrequently:true});
+ }
+ const ctx=posterSampleContext;
+ if(!ctx)return 0;
+ const w=64,h=96;
+ ctx.clearRect(0,0,w,h);
+ ctx.drawImage(img,0,0,w,h);
+ const pix=ctx.getImageData(0,0,w,h).data;
+ const texture=new Float32Array(h),seam=new Float32Array(h);
+ for(let y=0;y<h;y++){
+  let hDiff=0,vDiff=0;
+  for(let xx=1;xx<w;xx++){
+   const k=(y*w+xx)*4,l=k-4;
+   hDiff+=Math.abs(pix[k]-pix[l])+Math.abs(pix[k+1]-pix[l+1])+Math.abs(pix[k+2]-pix[l+2]);
+  }
+  texture[y]=hDiff/(3*(w-1));
+  if(y>0)for(let xx=0;xx<w;xx++){
+   const k=(y*w+xx)*4,l=k-w*4;
+   vDiff+=Math.abs(pix[k]-pix[l])+Math.abs(pix[k+1]-pix[l+1])+Math.abs(pix[k+2]-pix[l+2]);
+  }
+  seam[y]=vDiff/(3*w);
+ }
+ const avg=(values,a,b)=>{let sum=0;for(let j=a;j<b;j++)sum+=values[j];return sum/Math.max(1,b-a);};
+ const peak=(lo,hi)=>{
+  let best={pos:0,score:0};
+  for(let y=lo;y<=hi;y++){
+   const neighbors=(seam[y-3]+seam[y-2]+seam[y-1]+seam[y+1]+seam[y+2]+seam[y+3])/6;
+   const strength=seam[y]/(neighbors+2.5);
+   if(seam[y]>11&&strength>1.45&&seam[y]*strength>best.score)best={pos:y,score:seam[y]*strength};
+  }
+  return best;
+ };
+ const top=peak(12,26),bottom=peak(71,85);
+ if(!top.pos||!bottom.pos)return 0;
+ const topTexture=avg(texture,0,top.pos-2);
+ const centerTexture=avg(texture,top.pos+5,bottom.pos-5);
+ const bottomTexture=avg(texture,bottom.pos+2,h);
+ if(centerTexture<4.5||topTexture>centerTexture*.72||bottomTexture>centerTexture*.72)return 0;
+ const contentFraction=(bottom.pos-top.pos)/h;
+ if(contentFraction<.53||contentFraction>.79)return 0;
+ return Math.min(1.83,Math.max(1.28,1/contentFraction+.025));
+}
+function analyzePosterWhenIdle(){
+ posterFitPending=false;
+ // Two samples per idle slice to keep scrolling and game input responsive.
+ for(let n=0;n<2&&posterFitQueue.length;n++){
+  const img=posterFitQueue.shift(),card=img.closest(".card"),id=card?.dataset.posterId;
+  if(!card?.isConnected||!id||!img.naturalWidth)continue;
+  let factor=posterFitCache.get(id);
+  if(factor===undefined){
+   try{factor=scoreBandRows(img)}catch{factor=0;}
+   posterFitCache.set(id,factor);
+  }
+  if(factor){card.classList.add("poster-fill");card.style.setProperty("--poster-scale-y",String(factor));}
+ }
+ if(posterFitQueue.length)schedulePosterAnalysis();
+}
+function schedulePosterAnalysis(){
+ if(posterFitPending)return;
+ posterFitPending=true;
+ if(typeof requestIdleCallback==="function")requestIdleCallback(analyzePosterWhenIdle,{timeout:1200});
+ else setTimeout(analyzePosterWhenIdle,180);
+}
+function enqueuePosterAnalysis(image){
+ const card=image.closest(".card"),id=card?.dataset.posterId;
+ if(!id||!image.naturalWidth||postersWithEmbeddedPadding.has(id))return;
+ const cached=posterFitCache.get(id);
+ if(cached!==undefined){
+  if(cached){card.classList.add("poster-fill");card.style.setProperty("--poster-scale-y",String(cached));}
+  return;
+ }
+ posterFitQueue.push(image);schedulePosterAnalysis();
+}
 function card(g, {rank=0,count=0}={}) {
   const title=esc(g.title);
   const health=healthReports[g.id];
   const age=ageGuide(g);
   const healthBadge=health==="issue"?'<span class="qol-health" title="Personal flag on this device; not a verified outage">My flag</span>':"";
   const starts=false?'<span class="poster-plays">'+playtime(count)+'</span>':'';
-  return '<article class="card'+(postersWithEmbeddedPadding.has(g.id)?" poster-fill":"")+'" data-title-letter="'+esc(g.title.trim().charAt(0).toUpperCase())+'"><a href="#/game/'+g.id+'" aria-label="'+title+'"><div class="cover">'+poster(g)+specBadge(g.load)+ageBadge(g)+healthBadge+(rank?'<span class="rank">#'+rank+'</span>':'')+'</div><div class="card-copy"><span class="poster-genre">'+esc(g.genre)+'</span><h3>'+title+'</h3><div class="poster-numbers">'+playStatus(g)+starts+'</div></div></a>'+(playedIds.has(g.id)?'<span class="qol-visited" title="Played before">Played</span>':'')+bookmark(g.id,true)+'<span class="age-card-tooltip" role="tooltip">'+esc(age.reason)+' · Unofficial '+esc(age.label)+' guidance, not ESRB/PEGI</span></article>';
+  return '<article class="card'+(postersWithEmbeddedPadding.has(g.id)||posterFitCache.get(g.id)?" poster-fill":"")+'" data-poster-id="'+esc(g.id)+'" style="--poster-scale-y:'+(posterFitCache.get(g.id)||1.51)+'" data-title-letter="'+esc(g.title.trim().charAt(0).toUpperCase())+'"><a href="#/game/'+g.id+'" aria-label="'+title+'"><div class="cover">'+poster(g)+specBadge(g.load)+ageBadge(g)+healthBadge+(rank?'<span class="rank">#'+rank+'</span>':'')+'</div><div class="card-copy"><span class="poster-genre">'+esc(g.genre)+'</span><h3>'+title+'</h3><div class="poster-numbers">'+playStatus(g)+starts+'</div></div></a>'+(playedIds.has(g.id)?'<span class="qol-visited" title="Played before">Played</span>':'')+bookmark(g.id,true)+'<span class="age-card-tooltip" role="tooltip">'+esc(age.reason)+' · Unofficial '+esc(age.label)+' guidance, not ESRB/PEGI</span></article>';
 }
 const grid = (rows) => '<div class="grid">'+rows.map(g=>card(g)).join("")+'</div>';
 const titleBar = (tag,title,count,aside="") => '<div class="shelf-head"><div class="shelf-title"><'+tag+'>'+esc(title)+'</'+tag+'><span class="count" aria-label="'+count+' games">'+count+'</span></div>'+aside+'</div>';
@@ -499,6 +583,11 @@ function updateTheme(value){
   $("#theme-button").title="Appearance: "+value;$("#theme-button").setAttribute("aria-label","Change theme. Current setting: "+value);
 }
 function setup(){
+ // Image load doesn't bubble, so capture it once for every game-card thumbnail.
+ document.addEventListener("load",e=>{
+  const img=e.target;
+  if(img instanceof HTMLImageElement && img.matches(".card .cover img"))enqueuePosterAnalysis(img);
+ },true);
   document.addEventListener("animationend", e=>{
     // Only an active bar may advance the carousel. Without this guard, an
     // "Off" animation preset can complete in 1ms and rapidly rebuild the hero.
