@@ -98,7 +98,7 @@ function card(g, {rank=0,count=0}={}) {
   const title=esc(g.title);
   const health=healthReports[g.id];
   const healthBadge=health==="issue"?'<span class="qol-health" title="Personal flag on this device; not a verified outage">My flag</span>':"";
-  const starts=rank && chartState==="live"?'<span class="poster-plays">'+playtime(count)+'</span>':'';
+  const starts=false?'<span class="poster-plays">'+playtime(count)+'</span>':'';
   return '<article class="card"><a href="#/game/'+g.id+'" aria-label="'+title+'"><div class="cover">'+poster(g)+specBadge(g.load)+ageBadge(g)+healthBadge+(rank?'<span class="rank">#'+rank+'</span>':'')+'</div><div class="card-copy"><span class="poster-genre">'+esc(g.genre)+'</span><h3>'+title+'</h3><div class="poster-numbers">'+playStatus(g)+starts+'</div></div></a>'+(playedIds.has(g.id)?'<span class="qol-visited" title="Played before">Played</span>':'')+bookmark(g.id,true)+'</article>';
 }
 const grid = (rows) => '<div class="grid">'+rows.map(g=>card(g)).join("")+'</div>';
@@ -206,7 +206,7 @@ function continuePlaying(){
 }
 function hubHighlights(){
  const f=hub.featured(games),recommend=hub.recommended(games,saved),collections=hub.collections(games),discovered=hub.discovered(games);
- const trending=chartState==="live"?games.filter(g=>g.mode==="embed"&&(weeklyCounts[g.id]||0)>0).sort((a,b)=>(weeklyCounts[b.id]||0)-(weeklyCounts[a.id]||0)).slice(0,4):[];
+ const trending=[];
  const feature=(g,label)=>g?'<a class="hub-feature" href="#/game/'+esc(g.id)+'"><small>'+label+'</small><strong>'+esc(g.title)+'</strong><span>'+esc(g.genre)+' · '+esc(levels[g.load]||"Unknown")+' demand</span></a>':"";
  return '<section class="hub-discover"><div class="hub-feature-row">'+feature(f.daily,"Game of the Day")+feature(f.weekly,"Game of the Week")+'</div>'+(recommend.length?'<h2>Recommended for you</h2>'+grid(recommend.slice(0,4)):"")+(trending.length?'<h2>Trending this week</h2>'+grid(trending):"")+(discovered.length?'<h2>Recently discovered</h2>'+grid(discovered.slice(0,4)):"")+(collections.length?'<h2>Curated collections</h2>'+collections.map(c=>'<details class="hub-collection"><summary>'+esc(c.title)+' · '+c.games.length+' games</summary>'+grid(c.games)+'</details>').join(""):"")+'</section>';
 }
@@ -216,20 +216,20 @@ function renderLibrary(){
   let rows=full.filter(g=>(!genre || g.genre===genre)&&(!level || g.load===level) && (availability==="all" || (g.mode==="embed")===(availability==="play")));
  if(sortMode==="demand")rows.sort((a,b)=>(["low","medium","high"].indexOf(a.load)-["low","medium","high"].indexOf(b.load))||alphabetical(a,b));
  else if(sortMode==="recent"){const dates=new Map(qol.read("history",[]).map(x=>[x.id,x.last]));rows.sort((a,b)=>(dates.get(b.id)||0)-(dates.get(a.id)||0)||alphabetical(a,b));}
- else if(sortMode==="popular")rows.sort((a,b)=>(rankedCounts[b.id]||0)-(rankedCounts[a.id]||0)||alphabetical(a,b));
+ else if(sortMode==="popular"){const counts=rankingCounts();rows.sort((a,b)=>(counts[b.id]||0)-(counts[a.id]||0)||alphabetical(a,b));}
   const label=searching ? "Search results" : "Game library";
   const aside='<div class="shelf-aside"><label class="sort-label">Sort <select id="hub-sort"><option value="az" '+(sortMode==="az"?"selected":"")+'>A–Z</option><option value="demand" '+(sortMode==="demand"?"selected":"")+'>Hardware demand</option><option value="popular" '+(sortMode==="popular"?"selected":"")+'>Popularity</option><option value="recent" '+(sortMode==="recent"?"selected":"")+'>Recently played</option></select></label></div>';
-  let html=searching?"":'<div class="spotlight">'+hero()+chartPanel()+'</div>'+communityBar()+qolBar()+extraTools()+hubHighlights()+continuePlaying()+'<section class="updates-panel" aria-labelledby="updates-title"><h2 id="updates-title">What’s new</h2><div id="updates-feed"><p class="hint" role="status">Loading updates…</p></div></section>';
+  let html=searching?"":'<div class="spotlight">'+hero()+'</div>'+communityBar()+qolBar()+extraTools()+hubHighlights()+continuePlaying()+'<section class="updates-panel" aria-labelledby="updates-title"><h2 id="updates-title">What’s new</h2><div id="updates-feed"><p class="hint" role="status">Loading updates…</p></div></section>';
   html+=titleBar(searching?"h1":"h2",label,rows.length,aside)+filters();
   if(rows.length) html+=grid(rows.slice(0,visibleCount))+moreButton(rows.length);
   else if(full.length || !q) html+='<div class="empty">'+icon("filter")+'<h2>No games with those filters</h2><p>Clear filters to see every matching title.</p>'+btn("reset-filters","Clear filters","filter")+'</div>';
   else {
-    const sent=receivedQueries.has(normalize(q));
-    html+='<div class="empty">'+icon("search")+'<h2>'+ (sent?"Request received":"No games found") +'</h2><p>'+(sent?"Aw shucks! We don’t seem to have that game yet, however we saw your search, and will attempt to add it soon!":"There’s no match for “"+esc(q)+"”. Submit this title to send it to the arcade’s game requests on Discord.")+'</p>'+
-    (sent?"":'<button class="btn" data-action="request" '+(sendingSearch===normalize(q)?"disabled":"")+'>'+ (sendingSearch===normalize(q)?"Sending…":"Request this game")+'</button>')+'<p class="feedback" role="status" id="request-feedback">'+esc(searchMessage)+'</p></div>';
+    const sent=false;
+    html+='<div class="empty">'+icon("search")+'<h2>'+ "No games found" +'</h2><p>'+"There’s no match for “"+esc(q)+"”. You can suggest games in our Discord server."+'</p>'+
+    '<a class="btn" href="https://discord.gg/AezupBCtns" target="_blank" rel="noopener noreferrer">Suggest on Discord</a>'+'<p class="feedback" role="status" id="request-feedback">'+esc(searchMessage)+'</p></div>';
   }
   main.innerHTML=html;
-  if(!searching)loadUpdates();
+  
 }
 function renderSaved() {
   const groups=qol.folders();const rows=games.filter(g=>selectedFolder==="All"?saved.has(g.id):(groups[selectedFolder]||[]).includes(g.id));
@@ -300,7 +300,7 @@ function gameLayout(g){
   const stageImage=g.imported?posterAsset(g.id):relativeAsset(g.id);
   main.innerHTML='<a class="back" href="#/library">'+icon("back")+'All games</a><h1 class="game-title">'+esc(g.title)+'</h1><div class="game-meta">'+specBadge(g.load)+'<span>'+esc(g.genre)+'</span>'+ageBadge(g)+(g.edition?'<span class="edition">'+esc(g.edition)+'</span>':'')+playStatus(g)+'</div>'+
     '<div class="stage-slot"><div id="stage" class="stage centered"><div class="stage-art" style="background-image:url(\''+stageImage+'\')" ></div><div class="startbox" id="startbox"><p role="status">Preparing the player…</p></div><button type="button" class="icon-btn exit-stage" data-action="fullscreen" title="'+exitLabel+'" aria-label="'+exitLabel+'">'+icon("close")+'</button></div></div>'+
-    '<div class="play-tools">'+(hub.profile().showTimer?'<span class="hub-timer" id="hub-session-timer" aria-label="Current session duration">Session 0:00</span>':"")+btn("share-game","Share game","external")+btn("preview-game","Quick preview","info")+btn("health-game","Game status","info")+(g.mode==="embed"?btn("fullscreen",displayLabel,"expand"):"")+bookmark(g.id)+'<a class="secondary-btn report-link" href="'+reportUrl()+'">'+icon("bug")+'Report a bug</a></div><div id="key-area"></div>'+
+    '<div class="play-tools">'+(hub.preferences().showTimer?'<span class="hub-timer" id="hub-session-timer" aria-label="Current session duration">Session 0:00</span>':"")+btn("share-game","Share game","external")+btn("preview-game","Quick preview","info")+btn("health-game","Game status","info")+(g.mode==="embed"?btn("fullscreen",displayLabel,"expand"):"")+bookmark(g.id)+'<a class="secondary-btn report-link" href="'+reportUrl()+'">'+icon("bug")+'Report a bug</a></div><div id="key-area"></div>'+
     '<div class="details"><section class="pane"><h2>About this game</h2><p>'+esc(g.description || (g.mode==="embed"?"Browser build from the linked source project.":"Listed in the Ultimate Catalog of Web Game Ports."))+'</p><details><summary>Port details &amp; sources</summary><ul>'+g.sources.map((u,i)=>'<li><a target="_blank" rel="noopener noreferrer" href="'+esc(u)+'">'+esc(u.includes("github.com/")?u.replace("https://github.com/",""):new URL(u).hostname)+(g.sources.length>1?" · source "+(i+1):"")+'</a></li>').join("")+'</ul>'+(g.posterSource?'<a class="text-link" href="'+esc(g.posterSource)+'" target="_blank" rel="noopener noreferrer">Preview artwork</a>':'')+'<div id="other-ports"></div></details></section>'+
     '<section class="pane"><h2>Playing on a Chromebook</h2><p>'+esc(g.notes || "Chromebook performance varies by port and device.")+'</p><button class="text-link" data-action="specs">See the spec guide</button><details><summary>Controls & troubleshooting</summary><p>Click or tap inside the game to focus it. Keyboard and controller support depend on the individual port and have not been verified for every game.</p><p>Try Escape to leave native fullscreen. If input stops responding, reload the game. On Chromebooks, use Low graphics to reduce website effects.</p></details></section></div><section class="hub-game-extras"><h2>Similar games</h2>'+grid(hub.similar(g,games))+'<h2>My game notes</h2><p class="hint">Private notes saved only on this browser.</p><textarea id="hub-game-note" rows="4" maxlength="1200" placeholder="Your notes about this game…">'+esc(hub.notes(g.id))+'</textarea><div class="qol-bar">'+btn("save-note","Save note","check")+'</div><p class="hint">Session playtime: '+hub.minutes(g.id)+' minutes tracked (approximate).</p></section>';
   if(g.mode==="embed"){
@@ -335,8 +335,8 @@ async function prepareGame(g, token, autoStart=false){
     if(launch.alternates?.length) $("#other-ports").innerHTML=launch.alternates.map(a=>'<a class="text-link" href="'+esc(safeGameUrl(a.url))+'" rel="noopener noreferrer" target="_blank">'+esc(a.label)+'</a>').join(" · ");
   }catch(error){
     if(token!==navigation)return;
-    if(error.status===401){
-      ticket="";saveValue("session","",true);
+    if(false){
+      
       $("#startbox").innerHTML='<p>Enter your arcade key below to launch.</p>';
       $("#key-area").innerHTML='<form class="keybox" id="redeem"><label for="access-key">Arcade access key</label><input id="access-key" type="password" autocomplete="off" maxlength="128" required><div class="actions"><button class="btn">Unlock player</button></div><p class="feedback" role="status" id="key-result"></p></form>';
     }else{
@@ -349,16 +349,12 @@ function recordPlay(id){
   recentGames=[id,...recentGames.filter(game=>game!==id)].slice(0,4);
   saveValue("recent",JSON.stringify(recentGames));
   topCache=null;
-  const gameplay={id,session:crypto.randomUUID(),registered:false,startedAt:Date.now()};
+  const gameplay={id,startedAt:Date.now()};
   playSession=gameplay;
   clearInterval(sessionTicker);
   if(hub.profile().showTimer){sessionTicker=setInterval(()=>{const target=document.querySelector("#hub-session-timer");if(!target||playSession!==gameplay)return;const seconds=Math.floor((Date.now()-gameplay.startedAt)/1000);target.textContent="Session "+Math.floor(seconds/60)+":"+String(seconds%60).padStart(2,"0");},1000);}
-  clearInterval(chartTimer);
-  api("/v1/play/"+id,{session:gameplay.session}).then(()=>{
-    gameplay.registered=true;
-    if(playSession!==gameplay){signalPresence(gameplay,"left");return;}
-    scheduleHeartbeat();
-  }).catch(()=>{ /* Play continues if the count service is offline. */ });
+
+
 }
 function startGame(g){
   if(!player || !currentLaunch || currentLaunch.id!==g.id)return;
@@ -385,28 +381,28 @@ function route({scroll=true}={}){
   setNav();$("#theme-panel").hidden=true;$("#theme-button").setAttribute("aria-expanded","false");
   if(guide.open)guide.close();
   const game=current.page==="game" && byId.get(current.id);
-  const titles={profile:"My profile",settings:"Settings",compare:"Compare games",notifications:"Notifications",library:"Game vault",top:"Top games",saved:"Saved games",report:"Report a bug",requests:"Request a game",takedown:"Takedown Request",credits:"Credits",search:"Search"};
+  const titles={settings:"Settings",compare:"Compare games",library:"Game vault",top:"Most played locally",saved:"Saved games",credits:"Credits",search:"Search"};
   document.title=(game?.title || titles[current.page] || "Page not found")+" · Unlocked";
   if(current.page==="library" || isSearch)renderLibrary();
   else if(current.page==="saved")renderSaved();
   else if(current.page==="top")drawTop();
    else if(current.page==="history")renderHistory();
-   else if(current.page==="profile")main.innerHTML=hub.renderProfile(saved.size);
+   
    else if(current.page==="settings")main.innerHTML=hub.renderSettings();
    else if(current.page==="compare")comparePage();
-   else if(current.page==="notifications")notificationsPage();
-   else if(current.page==="updates")renderUpdateHistory();
+   
+   
   else if(game){gameLayout(game);hub.recordView(game.id);prepareGame(game,token,current.params.get("start")==="1");}
-  else if(current.page==="requests")requestsPage();
-  else if(current.page==="takedown")takedownPage();
-  else if(current.page==="report")renderReport();
+  
+  
+  
   else if(current.page==="credits")showCredits(token);
   else main.innerHTML='<div class="empty"><h1>Page not found</h1><a class="btn" href="#/library">Browse games</a></div>';
   scheduleChart();
   if(scroll){window.scrollTo(0,0);main.focus({preventScroll:true});}
   if(current.page==="library")offerTour();
    hub.applySettings();
-   const dock=document.querySelector("#hub-dock");if(dock)dock.innerHTML=hub.dock();
+   
    document.documentElement.classList.toggle("low-graphics",performanceMode);
 }
 function searchView(value){
