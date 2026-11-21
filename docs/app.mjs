@@ -1,6 +1,7 @@
 import { icon } from "./icons.mjs?v=4";
 import { matches, normalize } from "./search.mjs";
 import * as qol from "./qol.mjs?v=1";
+import * as hub from "./hub.mjs?v=1";
 import { chromeOS, createPlayer } from "./player.mjs?v=7";
 
 const API = "https://unlocked-arcade-service.persistingthoughts0.chatgpt.site";
@@ -36,6 +37,7 @@ let performanceMode=qol.read("performance",false);
 let healthReports=qol.read("health",{});
 let selectedFolder="All";
 let rouletteTimer=null, rouletteWinner=null;
+let sortMode="az";
 try {
   const stored=JSON.parse(dl("recent","[]"));
   if(Array.isArray(stored))recentGames=[...new Set(stored.filter(id=>typeof id==="string"))].slice(0,4);
@@ -290,13 +292,21 @@ function chartPanel(){
     return '<li><a href="#/game/'+g.id+'"><span class="position">'+String(i+1).padStart(2,"0")+'</span><img src="'+(g.imported?posterAsset(g.id):relativeAsset(g.id))+'" alt="" width="96" height="62" decoding="async"><span class="chart-copy"><strong>'+esc(g.title)+'</strong><small><span class="chart-genre">'+esc(g.genre)+(countText?' · ':'')+'</span>'+countText+'</small></span></a></li>';
   }).join("")+'</ol>'+(!ranks.length?'<p class="hint">No playtime recorded this week yet.</p>':"")+'<a class="chart-all" href="#/top">'+icon("grid")+'Full rankings</a></aside>';
 }
+function hubHighlights(){
+ const f=hub.featured(games),recommend=hub.recommended(games,saved),collections=hub.collections(games);
+ const feature=(g,label)=>g?'<a class="hub-feature" href="#/game/'+esc(g.id)+'"><small>'+label+'</small><strong>'+esc(g.title)+'</strong><span>'+esc(g.genre)+' · '+esc(levels[g.load]||"Unknown")+' demand</span></a>':"";
+ return '<section class="hub-discover"><div class="hub-feature-row">'+feature(f.daily,"Game of the Day")+feature(f.weekly,"Game of the Week")+'</div>'+(recommend.length?'<h2>Recommended for you</h2>'+grid(recommend.slice(0,4)):"")+(collections.length?'<h2>Curated collections</h2>'+collections.map(c=>'<details class="hub-collection"><summary>'+esc(c.title)+' · '+c.games.length+' games</summary>'+grid(c.games)+'</details>').join(""):"")+'</section>';
+}
 function renderLibrary(){
   const searching=current.page==="search";
   const full=searching ? games.filter(g=>!q || matches(g,q) || qol.searchScore(g,q)>0).sort((a,b)=>qol.searchScore(b,q)-qol.searchScore(a,q)||alphabetical(a,b)) : games;
-  const rows=full.filter(g=>(!genre || g.genre===genre)&&(!level || g.load===level) && (availability==="all" || (g.mode==="embed")===(availability==="play")));
+  let rows=full.filter(g=>(!genre || g.genre===genre)&&(!level || g.load===level) && (availability==="all" || (g.mode==="embed")===(availability==="play")));
+ if(sortMode==="demand")rows.sort((a,b)=>(["low","medium","high"].indexOf(a.load)-["low","medium","high"].indexOf(b.load))||alphabetical(a,b));
+ else if(sortMode==="recent")rows.sort((a,b)=>(qol.read("history",[]).find(x=>x.id===b.id)?.last||0)-(qol.read("history",[]).find(x=>x.id===a.id)?.last||0)||alphabetical(a,b));
+ else if(sortMode==="popular")rows.sort((a,b)=>(rankedCounts[b.id]||0)-(rankedCounts[a.id]||0)||alphabetical(a,b));
   const label=searching ? "Search results" : "Game library";
-  const aside='<div class="shelf-aside"><span class="sort-label">A–Z</span></div>';
-  let html=searching?"":'<div class="spotlight">'+hero()+chartPanel()+'</div>'+communityBar()+qolBar()+continuePlaying()+'<section class="updates-panel" aria-labelledby="updates-title"><h2 id="updates-title">What’s new</h2><div id="updates-feed"><p class="hint" role="status">Loading updates…</p></div></section>';
+  const aside='<div class="shelf-aside"><label class="sort-label">Sort <select id="hub-sort"><option value="az" '+(sortMode==="az"?"selected":"")+'>A–Z</option><option value="demand" '+(sortMode==="demand"?"selected":"")+'>Hardware demand</option><option value="popular" '+(sortMode==="popular"?"selected":"")+'>Popularity</option><option value="recent" '+(sortMode==="recent"?"selected":"")+'>Recently played</option></select></label></div>';
+  let html=searching?"":'<div class="spotlight">'+hero()+chartPanel()+'</div>'+communityBar()+qolBar()+hubHighlights()+continuePlaying()+'<section class="updates-panel" aria-labelledby="updates-title"><h2 id="updates-title">What’s new</h2><div id="updates-feed"><p class="hint" role="status">Loading updates…</p></div></section>';
   html+=titleBar(searching?"h1":"h2",label,rows.length,aside)+filters();
   if(rows.length) html+=grid(rows.slice(0,visibleCount))+moreButton(rows.length);
   else if(full.length || !q) html+='<div class="empty">'+icon("filter")+'<h2>No games with those filters</h2><p>Clear filters to see every matching title.</p>'+btn("reset-filters","Clear filters","filter")+'</div>';
@@ -499,7 +509,7 @@ function recordPlay(id){
 }
 function startGame(g){
   if(!player || !currentLaunch || currentLaunch.id!==g.id)return;
-  if(player.start(currentLaunch.url,$("#limit-resolution")?.checked)){recordPlay(g.id);qol.historyEntry(g);}
+  if(player.start(currentLaunch.url,$("#limit-resolution")?.checked)){recordPlay(g.id);qol.historyEntry(g);hub.recordActivity(g.id);}
 }
 function renderReport(){
   const selected=byId.get(current.params.get("game")), page=current.params.get("from") || "report";
@@ -544,12 +554,14 @@ function route({scroll=true}={}){
   setNav();$("#theme-panel").hidden=true;$("#theme-button").setAttribute("aria-expanded","false");
   if(guide.open)guide.close();
   const game=current.page==="game" && byId.get(current.id);
-  const titles={library:"Game vault",top:"Top games",saved:"Saved games",report:"Report a bug",requests:"Request a game",takedown:"Takedown Request",credits:"Credits",search:"Search"};
+  const titles={profile:"My profile",settings:"Settings",library:"Game vault",top:"Top games",saved:"Saved games",report:"Report a bug",requests:"Request a game",takedown:"Takedown Request",credits:"Credits",search:"Search"};
   document.title=(game?.title || titles[current.page] || "Page not found")+" · Unlocked";
   if(current.page==="library" || isSearch)renderLibrary();
   else if(current.page==="saved")renderSaved();
   else if(current.page==="top")drawTop();
    else if(current.page==="history")renderHistory();
+   else if(current.page==="profile")main.innerHTML=hub.renderProfile(saved.size);
+   else if(current.page==="settings")main.innerHTML=hub.renderSettings();
    else if(current.page==="updates")renderUpdateHistory();
   else if(game){gameLayout(game);prepareGame(game,token,current.params.get("start")==="1");}
   else if(current.page==="requests")requestsPage();
@@ -560,6 +572,7 @@ function route({scroll=true}={}){
   scheduleChart();
   if(scroll){window.scrollTo(0,0);main.focus({preventScroll:true});}
   if(current.page==="library")offerTour();
+   hub.applySettings();
    document.documentElement.classList.toggle("low-graphics",performanceMode);
 }
 function searchView(value){
@@ -647,7 +660,10 @@ function setup(){
     }
     const action=e.target.closest("[data-action]")?.dataset.action;
     switch(action){
-      case "random-game":rouletteView();break;
+      case "export-data":hub.downloadBackup();toast("Backup downloaded");break;
+       case "import-data":document.querySelector("#hub-import")?.click();break;
+       case "clear-local":if(confirm("Reset your local nickname, avatar, banner and settings? Your play history and saved games will stay.")){qol.write("profile",{});hub.applySettings();route({scroll:false});}break;
+       case "random-game":rouletteView();break;
        case "roulette-again":rouletteView();break;
        case "roulette-play":if(rouletteWinner){const id=rouletteWinner;guide.close();location.hash="#/game/"+id;}break;
        case "performance":performanceMode=!performanceMode;qol.write("performance",performanceMode);document.documentElement.classList.toggle("low-graphics",performanceMode);if(current.page==="library")renderLibrary();break;
@@ -685,11 +701,14 @@ function setup(){
     if(e.target.id==="availability"){availability=e.target.value;renderLibrary();$("#availability").focus({preventScroll:true});}
     if(e.target.id==="more-genres"){genre=e.target.value;renderLibrary();$("#more-genres").focus({preventScroll:true});}
     if(e.target.id==="folder-select"){selectedFolder=e.target.value;renderSaved();}
+     if(e.target.id==="hub-sort"){sortMode=e.target.value;renderLibrary();}
+     if(e.target.id==="hub-import"){const file=e.target.files?.[0];if(file&&file.size<160000){file.text().then(text=>{if(!confirm("Import backup and replace matching local settings?"))return;hub.importData(text);location.reload();}).catch(()=>toast("Could not import backup"));}else if(file)toast("Backup file is too large");}
      if(e.target.id==="demand"){level=e.target.value;renderLibrary();$("#demand").focus({preventScroll:true});}
   });
   document.addEventListener("submit",async e=>{
     const form=e.target;
-    if(form.id==="guide-search"){e.preventDefault();const str=form.querySelector("input").value.trim();if(str){guide.close();searchView(str);search.focus();}return;}
+    if(form.id==="hub-settings"){e.preventDefault();hub.settingsFromForm(form);toast("Settings saved");route({scroll:false});return;}
+     if(form.id==="guide-search"){e.preventDefault();const str=form.querySelector("input").value.trim();if(str){guide.close();searchView(str);search.focus();}return;}
     if(form.id==="request-form"){e.preventDefault();submitGameRequest(form);return;}
     if(form.id==="takedown-form"){e.preventDefault();submitTakedown(form);return;}
     if(form.id==="report-form"){e.preventDefault();submitReport(form);return;}
