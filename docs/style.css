@@ -647,3 +647,7 @@ html{scrollbar-color:var(--accent) var(--bg);scrollbar-width:thin}
  }
 }
 :root .community-bar>a{border-radius:.65rem}
+
+/* Scaling remains opt-in on larger screens; phones keep the original layout. */
+@media(min-width:721px){:root body{zoom:var(--ui-scale)}}
+@media(max-width:720px){:root body{zoom:1}}
