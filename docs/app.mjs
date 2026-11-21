@@ -155,10 +155,6 @@ function updateCompare(){
  if(!a||!b){target.textContent="Choose two playable games.";return;}
  target.innerHTML='<div class="hub-feature-row">'+[a,b].map(g=>'<a class="hub-feature" href="#/game/'+esc(g.id)+'"><strong>'+esc(g.title)+'</strong><span>'+esc(g.genre)+' · '+esc(levels[g.load]||"Unknown")+' hardware demand</span><span>'+esc(g.description||"No description available")+'</span></a>').join("")+'</div>';
 }
-function notificationsPage(){
- const c=hub.challenges(),f=hub.featured(games);
- main.innerHTML='<section class="section-page hub-page"><h1>Notifications</h1><p class="subcopy">Your local activity and site announcements. This is not a push-notification service.</p><div class="hub-challenges">'+c.map(x=>'<div class="hub-challenge"><strong>'+(x.done?"✓":"○")+'</strong><div><strong>'+esc(x.name)+'</strong><p>'+esc(x.goal)+' · '+(x.done?"Completed":"In progress")+'</p></div></div>').join("")+'</div>'+(f.daily?'<p>Today’s featured game: <a href="#/game/'+f.daily.id+'">'+esc(f.daily.title)+'</a></p>':"")+'<a class="secondary-btn" href="#/updates">View release announcements</a></section>';
-}
 function qolBar(){
   return '<div class="qol-bar"><button class="secondary-btn" data-action="random-game">'+icon("play")+' Surprise me</button><button class="secondary-btn" data-action="performance">'+icon("bolt")+' '+(performanceMode?"Normal visuals":"Low graphics")+'</button><a class="secondary-btn" href="#/history">'+icon("clock")+' Play history</a><a class="secondary-btn" href="#/updates">'+icon("info")+' Updates</a></div>';
 }
@@ -219,7 +215,7 @@ function renderLibrary(){
  else if(sortMode==="popular"){const counts=rankingCounts();rows.sort((a,b)=>(counts[b.id]||0)-(counts[a.id]||0)||alphabetical(a,b));}
   const label=searching ? "Search results" : "Game library";
   const aside='<div class="shelf-aside"><label class="sort-label">Sort <select id="hub-sort"><option value="az" '+(sortMode==="az"?"selected":"")+'>A–Z</option><option value="demand" '+(sortMode==="demand"?"selected":"")+'>Hardware demand</option><option value="popular" '+(sortMode==="popular"?"selected":"")+'>Popularity</option><option value="recent" '+(sortMode==="recent"?"selected":"")+'>Recently played</option></select></label></div>';
-  let html=searching?"":'<div class="spotlight">'+hero()+'</div>'+communityBar()+qolBar()+extraTools()+hubHighlights()+continuePlaying()+'<section class="updates-panel" aria-labelledby="updates-title"><h2 id="updates-title">What’s new</h2><div id="updates-feed"><p class="hint" role="status">Loading updates…</p></div></section>';
+  let html=searching?"":'<div class="spotlight">'+hero()+'</div>'+communityBar()+qolBar()+extraTools()+hubHighlights()+continuePlaying();
   html+=titleBar(searching?"h1":"h2",label,rows.length,aside)+filters();
   if(rows.length) html+=grid(rows.slice(0,visibleCount))+moreButton(rows.length);
   else if(full.length || !q) html+='<div class="empty">'+icon("filter")+'<h2>No games with those filters</h2><p>Clear filters to see every matching title.</p>'+btn("reset-filters","Clear filters","filter")+'</div>';
@@ -348,11 +344,11 @@ function endPlay(){clearInterval(sessionTicker);sessionTicker=null;if(playSessio
 function recordPlay(id){
   recentGames=[id,...recentGames.filter(game=>game!==id)].slice(0,4);
   saveValue("recent",JSON.stringify(recentGames));
-  topCache=null;
+  
   const gameplay={id,startedAt:Date.now()};
   playSession=gameplay;
   clearInterval(sessionTicker);
-  if(hub.profile().showTimer){sessionTicker=setInterval(()=>{const target=document.querySelector("#hub-session-timer");if(!target||playSession!==gameplay)return;const seconds=Math.floor((Date.now()-gameplay.startedAt)/1000);target.textContent="Session "+Math.floor(seconds/60)+":"+String(seconds%60).padStart(2,"0");},1000);}
+  if(hub.preferences().showTimer){sessionTicker=setInterval(()=>{const target=document.querySelector("#hub-session-timer");if(!target||playSession!==gameplay)return;const seconds=Math.floor((Date.now()-gameplay.startedAt)/1000);target.textContent="Session "+Math.floor(seconds/60)+":"+String(seconds%60).padStart(2,"0");},1000);}
 
 
 }
@@ -372,7 +368,7 @@ function route({scroll=true}={}){
   endPlay();
   player?.dispose();player=null;
   const previousPage=current.page;
-  const token=++navigation;current=readRoute();currentLaunch=null;currentReport="";
+  const token=++navigation;current=readRoute();currentLaunch=null;
   const isSearch=current.page==="search";
   if(isSearch && previousPage!=="search")availability="all";
   if(current.page==="library" && previousPage!=="library")availability="play";
@@ -409,7 +405,7 @@ function searchView(value){
   const raw=value.slice(0,80), next=raw.trim();searchMessage="";
   if(next===q && current.page==="search")return;
   const hash=next?"#/search?"+new URLSearchParams({q:next}):"#/library";
-  if(current.page!=="search") {genre="";level="";lastSearchKey="";}
+  if(current.page!=="search") {genre="";level="";}
   if(current.page==="search")history.replaceState(null,"",hash);
   else if(location.hash!==hash)history.pushState(null,"",hash);
   route({scroll:false});search.value=raw;
@@ -436,9 +432,9 @@ function setup(){
   search.addEventListener("input",()=>{if(games.length)searchView(search.value);});
   $("#search-form").addEventListener("submit",e=>{e.preventDefault();if(games.length)requestMissing();});
   window.addEventListener("hashchange",()=>route());
-  document.addEventListener("visibilitychange",()=>{scheduleHeartbeat();scheduleChart();});
-  window.addEventListener("pagehide",e=>{if(!e.persisted)endPlay();else if(playSession?.registered)signalPresence(playSession,"paused");clearInterval(heartbeatTimer);});
-  window.addEventListener("pageshow",e=>{if(e.persisted){scheduleHeartbeat();scheduleChart();}});
+  
+  window.addEventListener("pagehide",e=>{if(!e.persisted)endPlay();});
+  
   document.querySelector(".skip").addEventListener("click",e=>{e.preventDefault();main.focus();});
   document.addEventListener("keydown",e=>{
     if(e.key==="g" && e.altKey && !e.repeat){e.preventDefault();location.hash="#/library";}
@@ -457,36 +453,19 @@ function setup(){
     const filter=e.target.closest("[data-genre]");if(filter){genre=filter.dataset.genre;visibleCount=pageSize;renderLibrary();document.querySelector('[data-genre="'+genre+'"]')?.focus({preventScroll:true});return;}
     const link=e.target.closest("a[data-page],a.brand");
     if(link && link.getAttribute("href")==="#/library"){genre="";level="";if(current.page==="library")renderLibrary();}
-    const reportLink=e.target.closest('a.report-link,.footer a[href="#/report"]');
-    if(reportLink && current.page!=="report"){
-      e.preventDefault();
-      if(playSession){
-        displayDialog('<h2 id="guide-title">Leave your game to report a bug?</h2><p><strong>This WILL take you out of your current game session.</strong> Unsaved progress may be lost.</p><div class="actions">'+btn("close-guide","Stay in game",null)+btn("leave-and-report","Leave and report",null,"btn")+'</div>');
-      }else location.hash=reportUrl();
-      return;
-    }
-    const period=e.target.closest("[data-period]")?.dataset.period;
-    if(period){
-      rankingPeriod=period;
-      visibleCount=pageSize;
-      if(current.page==="top")drawTop();
-      else if($("#home-chart"))$("#home-chart").outerHTML=chartPanel();
-      document.querySelector('[data-period="'+period+'"]').focus({preventScroll:true});
-      return;
-    }
     const action=e.target.closest("[data-action]")?.dataset.action;
     switch(action){
       case "random-genre":{const genres=[...new Set(games.filter(g=>g.mode==="embed").map(g=>g.genre))];if(genres.length){genre=genres[Math.floor(Math.random()*genres.length)];availability="play";location.hash="#/library";if(current.page==="library")renderLibrary();toast("Random genre: "+genre);}break;}
        case "save-note":hub.saveNote(current.id,document.querySelector("#hub-game-note")?.value||"");toast("Note saved locally");break;
        case "export-data":hub.downloadBackup();toast("Backup downloaded");break;
        case "import-data":document.querySelector("#hub-import")?.click();break;
-       case "clear-local":if(confirm("Reset your local nickname, avatar, banner and settings? Your play history and saved games will stay.")){qol.write("profile",{});hub.applySettings();route({scroll:false});}break;
+       case "clear-local":if(confirm("Reset local appearance settings? Your favorites and play history will stay.")){qol.write("preferences",{});hub.applySettings();route({scroll:false});}break;
        case "random-game":rouletteView();break;
        case "roulette-again":rouletteView();break;
        case "roulette-play":if(rouletteWinner){const id=rouletteWinner;guide.close();location.hash="#/game/"+id;}break;
        case "performance":performanceMode=!performanceMode;qol.write("performance",performanceMode);document.documentElement.classList.toggle("low-graphics",performanceMode);if(current.page==="library")renderLibrary();break;
        case "share-game":qol.safeCopy(location.href).then(()=>toast("Game link copied")).catch(()=>displayDialog('<h2>Share this game</h2><p>'+esc(location.href)+'</p>'+btn("close-guide","Close",null)));break;
-       case "health-game":{const g=byId.get(current.id);if(g)displayDialog('<h2>Game status: '+esc(g.title)+'</h2><p>Live automated game checks are not available. You can flag a problem on this device, or submit a bug report to the team.</p><div class="actions">'+btn("mark-issue","Mark issue","bug")+btn("clear-issue","Clear flag","check")+btn("close-guide","Close",null)+'</div>');break;}
+       case "health-game":{const g=byId.get(current.id);if(g)displayDialog('<h2>Game status: '+esc(g.title)+'</h2><p>Live automated game checks are not available. You can flag a problem on this device.</p><div class="actions">'+btn("mark-issue","Mark issue","bug")+btn("clear-issue","Clear flag","check")+btn("close-guide","Close",null)+'</div>');break;}
        case "mark-issue":healthReports[current.id]="issue";qol.write("health",healthReports);guide.close();toast("Flagged on this device");break;
        case "clear-issue":delete healthReports[current.id];qol.write("health",healthReports);guide.close();toast("Local flag cleared");break;
        case "preview-game":{const g=byId.get(current.id);if(g)displayDialog('<h2>'+esc(g.title)+'</h2><p>'+esc(g.description||"Browser game")+'</p><p>Genre: '+esc(g.genre)+' · Performance: '+esc(levels[g.load]||"Unknown")+'</p>'+btn("close-guide","Close",null));break;}
@@ -494,8 +473,8 @@ function setup(){
        case "new-folder":{const name=prompt("New favorites folder name (up to 30 characters):")?.trim().slice(0,30);if(name&&!["All","__proto__","constructor","prototype"].includes(name)){qol.storeFolder(name,[]);selectedFolder=name;renderSaved();}break;}
        case "add-to-folder":{const available=games.filter(g=>saved.has(g.id)&&!(qol.folders()[selectedFolder]||[]).includes(g.id));if(!available.length){toast("No additional saved games to add");break;}displayDialog('<h2>Add to '+esc(selectedFolder)+'</h2><div class="qol-folder-list">'+available.map(g=>'<button class="secondary-btn" data-add-folder="'+esc(g.id)+'">'+esc(g.title)+'</button>').join("")+'</div>'+btn("close-guide","Done",null));break;}
        case "delete-folder":qol.removeFolder(selectedFolder);selectedFolder="All";renderSaved();break;
-       case "leave-and-report":guide.close();location.hash=reportUrl();break;
-      case "retry-updates":loadUpdates();break;
+       
+      
       case "tour":
         rememberTour();
         if(current.page!=="library"){history.pushState(null,"","#/library");route();}
@@ -508,7 +487,7 @@ function setup(){
       case "specs":showSpecs();break;
       case "show-more":visibleCount+=pageSize;if(current.page==="top")drawTop();else if(current.page==="saved")renderSaved();else renderLibrary();break;
       case "reset-filters":genre="";level="";availability="all";visibleCount=pageSize;renderLibrary();break;
-      case "request":requestMissing();break;
+      
       case "start-game":startGame(byId.get(current.id));break;
       case "retry-game":$("#startbox").innerHTML='<p role="status">Preparing the player…</p>';prepareGame(byId.get(current.id),navigation);break;
       case "fullscreen":player?.toggle();break;
@@ -526,12 +505,12 @@ function setup(){
   });
   document.addEventListener("submit",async e=>{
     const form=e.target;
-    if(form.id==="hub-settings"){e.preventDefault();hub.settingsFromForm(form);try{await hub.uploadProfileImage(form.elements.avatarFile.files?.[0],"avatar");await hub.uploadProfileImage(form.elements.bannerFile.files?.[0],"banner");toast("Settings saved");route({scroll:false});}catch(err){toast(err.message||"Image upload failed");}return;}
+    if(form.id==="hub-settings"){e.preventDefault();hub.settingsFromForm(form);toast("Settings saved");route({scroll:false});return;}
      if(form.id==="guide-search"){e.preventDefault();const str=form.querySelector("input").value.trim();if(str){guide.close();searchView(str);search.focus();}return;}
-    if(form.id==="request-form"){e.preventDefault();submitGameRequest(form);return;}
-    if(form.id==="takedown-form"){e.preventDefault();submitTakedown(form);return;}
-    if(form.id==="report-form"){e.preventDefault();submitReport(form);return;}
-    if(form.id==="redeem"){e.preventDefault();const token=navigation;try{const result=await api("/v1/redeem",{key:$("#access-key").value});if(token!==navigation)return;ticket=result.token || "";saveValue("session",ticket,true);await prepareGame(byId.get(current.id),token);}catch(error){if(token===navigation)feedback("#key-result",error.message);}}
+    
+    
+    
+    
   });
 }
 async function readJson(path){
