@@ -9,6 +9,40 @@ const main = $("#content"), search = $("#search"), guide = $("#guide");
 const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const relativeAsset = id => "./assets/covers/" + encodeURIComponent(id) + ".webp";
 const posterAsset = id => "./assets/posters/" + encodeURIComponent(id) + ".webp";
+
+const gameTints=["#ffd063","#67c5fa","#b38bff","#67e4c0","#ff9b75","#f68dc0"];
+function tintFor(id){let n=0;for(const c of String(id))n=(Math.imul(n,31)+c.charCodeAt(0))|0;return gameTints[(n>>>0)%gameTints.length];}
+function setGameAtmosphere(game){
+ const root=document.documentElement;
+ if(game){root.style.setProperty("--game-glow",tintFor(game.id));root.classList.add("game-atmosphere");}
+ else {root.classList.remove("game-atmosphere");root.style.removeProperty("--game-glow");}
+}
+function arcadeMascot(message="Loading game"){
+ return '<div class="arcade-mascot" role="status" aria-label="'+esc(message)+'"><span class="arcade-mascot-face" aria-hidden="true"><i></i><i></i><b></b></span><span>'+esc(message)+'</span></div>';
+}
+function launchCinematic(anchor,game){
+ if(performanceMode||matchMedia("(prefers-reduced-motion: reduce)").matches||!anchor?.getBoundingClientRect)return;
+ const img=anchor.querySelector(".cover img");
+ if(!img)return;
+ const rect=img.getBoundingClientRect();
+ if(rect.width<20||rect.height<20)return;
+ const clone=document.createElement("img");
+ clone.className="launch-cinematic";clone.src=img.currentSrc||img.src;clone.alt="";
+ Object.assign(clone.style,{left:rect.left+"px",top:rect.top+"px",width:rect.width+"px",height:rect.height+"px","--launch-glow":tintFor(game.id)});
+ document.body.append(clone);
+ const anim=clone.animate([{opacity:.95,transform:"scale(1)",borderRadius:"12px"},{opacity:.5,transform:"scale(1.1)",borderRadius:"22px",offset:.55},{opacity:0,transform:"translateY(-14px) scale(1.24)",borderRadius:"26px"}],{duration:430,easing:"cubic-bezier(.2,.7,.2,1)",fill:"forwards"});
+ anim.finished.then(()=>clone.remove(),()=>clone.remove());
+}
+function initAmbientGlow(){
+ if(!matchMedia("(pointer:fine)").matches)return;
+ let pending=false,x=0,y=0;
+ document.addEventListener("pointermove",e=>{
+  if(performanceMode||matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  x=e.clientX;y=e.clientY;if(pending)return;pending=true;
+  requestAnimationFrame(()=>{pending=false;document.documentElement.style.setProperty("--cursor-x",x+"px");document.documentElement.style.setProperty("--cursor-y",y+"px");});
+ },{passive:true});
+}
+
 const featured = ["geometry-dash", "60-seconds", "repo"];
 let featureIndex = 0;
 const levels = { low: "Low", medium: "Medium", high: "High" };
@@ -340,7 +374,7 @@ async function prepareGame(g, token, autoStart=false){
     const externalImport = g.imported && new URL(playerUrl).origin !== location.origin;
     const resolutionOption=chromeOS && (g.load==="high" || externalImport)
       ? '<label class="resolution-option"><input id="limit-resolution" type="checkbox" '+(g.load==="high"?"checked":"")+'> Limit player size to 1280 × 720</label>' : "";
-    $("#startbox").innerHTML=btn("start-game",g.edition==="Classic demo"?"Play demo":"Play game","play","btn")+resolutionOption;
+    $("#startbox").innerHTML='<div class="arcade-ready">'+arcadeMascot("Ready to play")+'</div>'+btn("start-game",g.edition==="Classic demo"?"Play demo":"Play game","play","btn")+resolutionOption;
     if(autoStart) startGame(g);
     if(launch.alternates?.length) $("#other-ports").innerHTML=launch.alternates.map(a=>'<a class="text-link" href="'+esc(safeGameUrl(a.url))+'" rel="noopener noreferrer" target="_blank">'+esc(a.label)+'</a>').join(" · ");
   }catch(error){
@@ -385,6 +419,7 @@ function route({scroll=true}={}){
   setNav();$("#theme-panel").hidden=true;$("#theme-button").setAttribute("aria-expanded","false");
   if(guide.open)guide.close();
   const game=current.page==="game" && byId.get(current.id);
+  setGameAtmosphere(game);
   const titles={requests:"Request a game",takedown:"Takedown Request",settings:"Settings",compare:"Compare games",library:"Game vault",top:"Most played locally",saved:"Saved games",credits:"Credits",search:"Search"};
   document.title=(game?.title || titles[current.page] || "Page not found")+" · Unlocked";
   if(current.page==="library" || isSearch)renderLibrary();
@@ -461,6 +496,8 @@ function setup(){
      const remove=e.target.closest("[data-folder-remove]");if(remove&&selectedFolder!=="All"){qol.storeFolder(selectedFolder,(qol.folders()[selectedFolder]||[]).filter(id=>id!==remove.dataset.folderRemove));renderSaved();return;}
      const save=e.target.closest("[data-save]");if(save){rememberGame(save.dataset.save);return;}
     const filter=e.target.closest("[data-genre]");if(filter){genre=filter.dataset.genre;visibleCount=pageSize;renderLibrary();document.querySelector('[data-genre="'+genre+'"]')?.focus({preventScroll:true});return;}
+    const launchLink=e.target.closest('.card>a[href^="#/game/"]');
+    if(launchLink){const id=decodeURIComponent(launchLink.getAttribute("href").split("/game/")[1]?.split("?")[0]||"");const game=byId.get(id);if(game)launchCinematic(launchLink,game);}
     const link=e.target.closest("a[data-page],a.brand");
     if(link && link.getAttribute("href")==="#/library"){genre="";level="";if(current.page==="library")renderLibrary();}
     const action=e.target.closest("[data-action]")?.dataset.action;
