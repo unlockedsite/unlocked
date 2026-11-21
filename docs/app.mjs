@@ -141,7 +141,7 @@ function nextFeature(index = (featureIndex + 1) % featured.length){
   if (refocus) slide.querySelector('.feature-bar[aria-pressed="true"]').focus({preventScroll:true});
 
 }
-function extraTools(){return '<div class="qol-bar hub-extra-tools"><a class="secondary-btn" href="#/compare">'+icon("grid")+' Compare games</a><a class="secondary-btn" href="#/notifications">'+icon("info")+' Notifications</a><button class="secondary-btn" data-action="random-genre">'+icon("star")+' Random genre</button></div>'}
+function extraTools(){return '<div class="qol-bar hub-extra-tools"><a class="secondary-btn" href="#/compare">'+icon("grid")+' Compare games</a><button class="secondary-btn" data-action="random-genre">'+icon("star")+' Random genre</button></div>'}
 function comparePage(){
  const ready=games.filter(g=>g.mode==="embed");
  const opts=ready.map(g=>'<option value="'+esc(g.id)+'">'+esc(g.title)+'</option>').join("");
