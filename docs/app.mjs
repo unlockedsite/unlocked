@@ -81,7 +81,9 @@ let current = {page:"library",id:"",params:new URLSearchParams()}, tourStep=0, t
 let inviteHidden=dl("tour","")==="seen";
 let currentLaunch=null, searchMessage="";
 
-let playSession=null, player=null, launchCatalog;
+let playSession=null, heartbeatTimer=null, player=null, launchCatalog;
+let rankedCounts={}, weeklyCounts={}, activeCounts={}, rankingPeriod="all", weekStartsAt=null;
+let chartState="loading",chartRequest=null,chartTimer=null,chartUpdatedAt=0;
 let recentGames=[];
 // Legacy Low Graphics toggle was removed from the homepage. Performance is now controlled by Settings.
 const performanceMode=false;
@@ -240,7 +242,7 @@ function card(g, {rank=0,count=0}={}) {
   const health=healthReports[g.id];
   const age=ageGuide(g);
   const healthBadge=health==="issue"?'<span class="qol-health" title="Personal flag on this device; not a verified outage">My flag</span>':"";
-  const starts=false?'<span class="poster-plays">'+playtime(count)+'</span>':'';
+  const starts=rank && chartState==="live" ? '<span class="poster-plays">'+globalPlaytime(count)+'</span>' : '';
   return '<article class="card'+(postersWithEmbeddedPadding.has(g.id)||posterFitCache.get(g.id)?" poster-fill":"")+'" data-poster-id="'+esc(g.id)+'" style="--poster-scale-y:'+(posterFitCache.get(g.id)||1.51)+'" data-title-letter="'+esc(g.title.trim().charAt(0).toUpperCase())+'"><a href="#/game/'+g.id+'" aria-label="'+title+'"><div class="cover">'+poster(g)+specBadge(g.load)+ageBadge(g)+healthBadge+(rank?'<span class="rank">#'+rank+'</span>':'')+'</div><div class="card-copy"><span class="poster-genre">'+esc(g.genre)+'</span><h3>'+title+'</h3><div class="poster-numbers">'+playStatus(g)+starts+'</div></div></a>'+(playedIds.has(g.id)?'<span class="qol-visited" title="Played before">Played</span>':'')+bookmark(g.id,true)+'<span class="age-card-tooltip" role="tooltip">'+esc(age.reason)+' · Unofficial '+esc(age.label)+' guidance, not ESRB/PEGI</span></article>';
 }
 const grid = (rows) => '<div class="grid">'+rows.map(g=>card(g)).join("")+'</div>';
@@ -340,6 +342,75 @@ function rouletteView(){
 function renderHistory(){const rows=qol.read("history",[]).map(h=>({h,g:byId.get(h.id)})).filter(x=>x.g);main.innerHTML='<section class="section-page"><h1>Play history</h1><p class="subcopy">Stored on this device only.</p><div class="qol-bar">'+btn("clear-history","Clear history","close")+'</div><div class="qol-history">'+rows.map(({h,g})=>'<a href="#/game/'+esc(g.id)+'"><strong>'+esc(g.title)+'</strong><small>'+new Date(h.last).toLocaleDateString()+' · '+h.visits+' launches</small></a>').join("")+'</div></section>';}
 function communityBar(){return '<div class="community-bar"><a class="join-discord" href="https://discord.gg/AezupBCtns" target="_blank" rel="noopener noreferrer">'+icon("discord")+'<span><small>Join us on</small><strong>Discord</strong></span>'+icon("forward")+'</a><a class="community-action community-request" href="#/requests">'+icon("plus")+'<span>Request a game</span>'+icon("forward")+'</a><a class="community-action community-takedown" href="#/takedown">'+icon("shield")+'<span>Takedown Request</span>'+icon("forward")+'</a></div>';}
 const SUBMISSION_API="https://unlocked-arcade-service.persistingthoughts0.chatgpt.site";
+
+const RANKING_REFRESH_MS=60000;
+function cleanGlobalCounts(data){
+ if(!data || typeof data!=="object" || Array.isArray(data))throw Error("Invalid leaderboard data.");
+ const clean={};
+ for(const [id,count] of Object.entries(data)){
+  if(!byId.has(id))continue;
+  const value=Number(count);
+  if(Number.isFinite(value)&&value>=0)clean[id]=Math.floor(value);
+ }
+ return clean;
+}
+async function fetchGlobalTop(){
+ const abort=new AbortController();
+ const timeout=setTimeout(()=>abort.abort(),9000);
+ try{
+  const response=await fetch(SUBMISSION_API+"/v1/top",{
+   credentials:"omit",cache:"no-store",referrerPolicy:"no-referrer",signal:abort.signal
+  });
+  if(!response.ok)throw Error("Global leaderboard unavailable.");
+  const data=await response.json();
+  if(!data || typeof data!=="object" || !data.playtimeSeconds || !data.active || !data.weeklyPlaytimeSeconds)
+   throw Error("Global leaderboard data unavailable.");
+  return data;
+ }finally{clearTimeout(timeout)}
+}
+function globalPlaytime(seconds){
+ const value=Math.max(0,Math.floor(Number(seconds)||0));
+ if(value<60)return value+"s played";
+ const minutes=Math.floor(value/60);
+ if(minutes<60)return minutes+"m played";
+ const hours=Math.floor(minutes/60);
+ return hours+"h "+String(minutes%60).padStart(2,"0")+"m played";
+}
+function globalOnlineTotal(){return Object.values(activeCounts).reduce((total,n)=>total+n+(Number(n)||0),0);}
+function rankingCounts(){return rankingPeriod==="week"?weeklyCounts:rankedCounts;}
+function currentRanks(){
+ const counts=rankingCounts();
+ return games.filter(g=>g.mode==="embed"&&(counts[g.id]||0)>0)
+  .sort((a,b)=>(counts[b.id]||0)-(counts[a.id]||0)||alphabetical(a,b));
+}
+function rankingTabs(){
+ return '<div class="ranking-tabs" role="group" aria-label="Global leaderboard period">'+
+ [["all","All Time"],["week","This Week"]].map(([value,label])=>
+ '<button type="button" class="chip" data-period="'+value+'" aria-pressed="'+(rankingPeriod===value)+'">'+label+'</button>').join("")+
+ '</div>';
+}
+function refreshGlobalTop(force=false){
+ if(document.hidden || (current.page!=="top"&&!(["library","search"].includes(current.page)&&sortMode==="popular")))return chartRequest;
+ if(chartRequest)return chartRequest;
+ if(!force&&chartState==="live"&&Date.now()-chartUpdatedAt<RANKING_REFRESH_MS)return null;
+ const wasLive=chartState==="live";
+ chartRequest=fetchGlobalTop().then(data=>{
+  const old=JSON.stringify([rankedCounts,weeklyCounts,activeCounts,weekStartsAt]);
+  rankedCounts=cleanGlobalCounts(data.playtimeSeconds);
+  weeklyCounts=cleanGlobalCounts(data.weeklyPlaytimeSeconds);
+  activeCounts=cleanGlobalCounts(data.active);
+  weekStartsAt=Number(data.weekStartsAt)||null;
+  chartUpdatedAt=Date.now();chartState="live";
+  const changed=!wasLive||old!==JSON.stringify([rankedCounts,weeklyCounts,activeCounts,weekStartsAt]);
+  if(current.page==="top"&&changed)drawTop();
+  else if(["library","search"].includes(current.page)&&sortMode==="popular"&&changed)renderLibrary();
+ }).catch(()=>{
+  chartState="offline";chartUpdatedAt=Date.now();
+  if(current.page==="top")drawTop();
+ }).finally(()=>{chartRequest=null;});
+ return chartRequest;
+}
+
 async function submitCommunityForm(form,path,payload){
  const button=form.querySelector('button[type="submit"]'),status=form.querySelector('[role="status"]');
  button.disabled=true;button.textContent="Sending…";status.textContent="";
@@ -359,9 +430,6 @@ function takedownPage(){
  const opts=games.map(g=>'<option value="'+esc(g.id)+'">'+esc(g.title)+'</option>').join("");
  main.innerHTML='<section class="section-page narrow"><a class="back" href="#/library">'+icon("back")+'All games</a><h1>Takedown Request</h1><p class="subcopy">For rights holders and authorized representatives requesting review or removal of content. Submissions are delivered privately to the team through Discord.</p><form id="takedown-form" class="form"><label for="takedown-game">Game or content</label><select id="takedown-game" name="game" required><option value="">Select a game</option>'+opts+'</select><label for="takedown-reason">Reason for removal</label><textarea id="takedown-reason" name="reason" minlength="15" maxlength="1500" rows="6" required placeholder="Describe your rights and why this content should be removed."></textarea><button class="btn" type="submit">Submit takedown request</button><p role="status" class="feedback" aria-live="polite"></p></form><p class="hint">Submitting a request does not automatically remove content. Please do not include sensitive personal information.</p></section>';
 }
-function rankingCounts(){const counts={};for(const h of qol.read("history",[]))counts[h.id]=Number(h.visits)||0;return counts;}
-function currentRanks(){const counts=rankingCounts();return games.filter(g=>g.mode==="embed").sort((a,b)=>(counts[b.id]||0)-(counts[a.id]||0)||alphabetical(a,b));}
-function rankingTabs(){return "";}
 function continuePlaying(){
   const recent=recentGames.map(id=>byId.get(id)).filter(g=>g?.mode==="embed");
   if(!recent.length)return "";
@@ -377,9 +445,9 @@ function renderLibrary(){
   let rows=full.filter(g=>(!genre || g.genre===genre)&&(!level || g.load===level) && (availability==="all" || (g.mode==="embed")===(availability==="play")));
  if(sortMode==="demand")rows.sort((a,b)=>(["low","medium","high"].indexOf(a.load)-["low","medium","high"].indexOf(b.load))||alphabetical(a,b));
  else if(sortMode==="recent"){const dates=new Map(qol.read("history",[]).map(x=>[x.id,x.last]));rows.sort((a,b)=>(dates.get(b.id)||0)-(dates.get(a.id)||0)||alphabetical(a,b));}
- else if(sortMode==="popular"){const counts=rankingCounts();rows.sort((a,b)=>(counts[b.id]||0)-(counts[a.id]||0)||alphabetical(a,b));}
+ else if(sortMode==="popular"){const counts=rankedCounts;rows.sort((a,b)=>(counts[b.id]||0)-(counts[a.id]||0)||alphabetical(a,b));}
   const label=searching ? "Search results" : "Game library";
-  const aside='<div class="shelf-aside"><label class="sort-label">Sort <select id="hub-sort"><option value="az" '+(sortMode==="az"?"selected":"")+'>A–Z</option><option value="demand" '+(sortMode==="demand"?"selected":"")+'>Hardware demand</option><option value="popular" '+(sortMode==="popular"?"selected":"")+'>Popularity</option><option value="recent" '+(sortMode==="recent"?"selected":"")+'>Recently played</option></select></label></div>';
+  const aside='<div class="shelf-aside"><label class="sort-label">Sort <select id="hub-sort"><option value="az" '+(sortMode==="az"?"selected":"")+'>A–Z</option><option value="demand" '+(sortMode==="demand"?"selected":"")+'>Hardware demand</option><option value="popular" '+(sortMode==="popular"?"selected":"")+'>Global playtime</option><option value="recent" '+(sortMode==="recent"?"selected":"")+'>Recently played</option></select></label></div>';
   let html=searching?"":'<div class="spotlight">'+hero()+'</div>'+communityBar()+qolBar()+hubHighlights()+continuePlaying();
   html+=titleBar(searching?"h1":"h2",label,rows.length,aside)+filters();
   if(!searching){const letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");const available=new Set(rows.map(g=>g.title.trim().charAt(0).toUpperCase()));html+='<nav class="alphabet-jump" aria-label="Jump to game by letter"><span>A–Z</span>'+letters.map(letter=>'<button type="button" data-jump-letter="'+letter+'" '+(available.has(letter)?"":'disabled aria-disabled="true"')+'>'+letter+'</button>').join("")+'</nav>';}
