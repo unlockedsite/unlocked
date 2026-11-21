@@ -252,7 +252,7 @@ function displayDialog(html){
 }
 const tourStops = [
   [".spotlight .hero", "Featured games", "Geometry Dash, 60 Seconds!, and R.E.P.O. rotate here. Select a progress bar to switch games, or choose Play game to jump in."],
-  [".community-bar", "Request a game", "Missing a favorite? Use Request a game beside Discord to send its title to the arcade team."],
+  [".community-bar", "Community", "Join the Unlocked Discord to suggest games or get help."],
   [".qol-bar", "Surprise Me and quick tools", "Open a game roulette, switch to Low graphics, or view your play history and updates."],
   [".filters", "Find a game for your device", "Choose a genre or Chromebook spec to narrow the library. Low-demand games are the lightest to run."],
   [".grid", "Game ratings and details", "Hover over or focus an age badge for an unofficial estimate. Hardware-demand badges give approximate Chromebook requirements."]
@@ -296,7 +296,7 @@ function gameLayout(g){
   const stageImage=g.imported?posterAsset(g.id):relativeAsset(g.id);
   main.innerHTML='<a class="back" href="#/library">'+icon("back")+'All games</a><h1 class="game-title">'+esc(g.title)+'</h1><div class="game-meta">'+specBadge(g.load)+'<span>'+esc(g.genre)+'</span>'+ageBadge(g)+(g.edition?'<span class="edition">'+esc(g.edition)+'</span>':'')+playStatus(g)+'</div>'+
     '<div class="stage-slot"><div id="stage" class="stage centered"><div class="stage-art" style="background-image:url(\''+stageImage+'\')" ></div><div class="startbox" id="startbox"><p role="status">Preparing the player…</p></div><button type="button" class="icon-btn exit-stage" data-action="fullscreen" title="'+exitLabel+'" aria-label="'+exitLabel+'">'+icon("close")+'</button></div></div>'+
-    '<div class="play-tools">'+(hub.preferences().showTimer?'<span class="hub-timer" id="hub-session-timer" aria-label="Current session duration">Session 0:00</span>':"")+btn("share-game","Share game","external")+btn("preview-game","Quick preview","info")+btn("health-game","Game status","info")+(g.mode==="embed"?btn("fullscreen",displayLabel,"expand"):"")+bookmark(g.id)+'<a class="secondary-btn report-link" href="'+reportUrl()+'">'+icon("bug")+'Report a bug</a></div><div id="key-area"></div>'+
+    '<div class="play-tools">'+(hub.preferences().showTimer?'<span class="hub-timer" id="hub-session-timer" aria-label="Current session duration">Session 0:00</span>':"")+btn("share-game","Share game","external")+btn("preview-game","Quick preview","info")+btn("health-game","Game status","info")+(g.mode==="embed"?btn("fullscreen",displayLabel,"expand"):"")+bookmark(g.id)+'</div><div id="key-area"></div>'+
     '<div class="details"><section class="pane"><h2>About this game</h2><p>'+esc(g.description || (g.mode==="embed"?"Browser build from the linked source project.":"Listed in the Ultimate Catalog of Web Game Ports."))+'</p><details><summary>Port details &amp; sources</summary><ul>'+g.sources.map((u,i)=>'<li><a target="_blank" rel="noopener noreferrer" href="'+esc(u)+'">'+esc(u.includes("github.com/")?u.replace("https://github.com/",""):new URL(u).hostname)+(g.sources.length>1?" · source "+(i+1):"")+'</a></li>').join("")+'</ul>'+(g.posterSource?'<a class="text-link" href="'+esc(g.posterSource)+'" target="_blank" rel="noopener noreferrer">Preview artwork</a>':'')+'<div id="other-ports"></div></details></section>'+
     '<section class="pane"><h2>Playing on a Chromebook</h2><p>'+esc(g.notes || "Chromebook performance varies by port and device.")+'</p><button class="text-link" data-action="specs">See the spec guide</button><details><summary>Controls & troubleshooting</summary><p>Click or tap inside the game to focus it. Keyboard and controller support depend on the individual port and have not been verified for every game.</p><p>Try Escape to leave native fullscreen. If input stops responding, reload the game. On Chromebooks, use Low graphics to reduce website effects.</p></details></section></div><section class="hub-game-extras"><h2>Similar games</h2>'+grid(hub.similar(g,games))+'<h2>My game notes</h2><p class="hint">Private notes saved only on this browser.</p><textarea id="hub-game-note" rows="4" maxlength="1200" placeholder="Your notes about this game…">'+esc(hub.notes(g.id))+'</textarea><div class="qol-bar">'+btn("save-note","Save note","check")+'</div><p class="hint">Session playtime: '+hub.minutes(g.id)+' minutes tracked (approximate).</p></section>';
   if(g.mode==="embed"){
@@ -331,13 +331,7 @@ async function prepareGame(g, token, autoStart=false){
     if(launch.alternates?.length) $("#other-ports").innerHTML=launch.alternates.map(a=>'<a class="text-link" href="'+esc(safeGameUrl(a.url))+'" rel="noopener noreferrer" target="_blank">'+esc(a.label)+'</a>').join(" · ");
   }catch(error){
     if(token!==navigation)return;
-    if(false){
-      
-      $("#startbox").innerHTML='<p>Enter your arcade key below to launch.</p>';
-      $("#key-area").innerHTML='<form class="keybox" id="redeem"><label for="access-key">Arcade access key</label><input id="access-key" type="password" autocomplete="off" maxlength="128" required><div class="actions"><button class="btn">Unlock player</button></div><p class="feedback" role="status" id="key-result"></p></form>';
-    }else{
-      $("#startbox").innerHTML='<p>'+esc(error.message)+'</p>'+btn("retry-game","Try again","play","btn");
-    }
+    $("#startbox").innerHTML='<p>'+esc(error.message)+'</p>'+btn("retry-game","Try again","play","btn");
   }
 }
 function endPlay(){clearInterval(sessionTicker);sessionTicker=null;if(playSession?.startedAt)hub.recordMinutes(playSession.id,Date.now()-playSession.startedAt);playSession=null;}
