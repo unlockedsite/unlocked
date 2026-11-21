@@ -35,6 +35,7 @@ let recentGames=[];
 let performanceMode=qol.read("performance",false);
 let healthReports=qol.read("health",{});
 let selectedFolder="All";
+let rouletteTimer=null, rouletteWinner=null;
 try {
   const stored=JSON.parse(dl("recent","[]"));
   if(Array.isArray(stored))recentGames=[...new Set(stored.filter(id=>typeof id==="string"))].slice(0,4);
@@ -80,6 +81,17 @@ function setNav(){
 function specBadge(key){
   return '<span class="load load-'+key+'" title="'+esc(levelTips[key])+'"><span class="meter" aria-hidden="true"><i></i><i></i><i></i></span>'+levels[key]+'<span class="sr-only"> hardware demand estimate</span></span>';
 }
+function ageGuide(g){
+  // Unofficial genre/content guidance, not ESRB/PEGI or a verified age classification.
+  const text=(g.title+" "+g.genre+" "+(g.description||"")).toLowerCase();
+  if(/horror|survival horror|blood|gore|violent|shooter|combat|war|zombie|murder|killer|fnaf|doom|resident evil|silent hill/.test(text))return {label:"16+",reason:"Potentially intense or violent themes"};
+  if(/puzzle|platform|arcade|racing|sports|rhythm|idle|clicker|casual|music|kart|tetris/.test(text))return {label:"7+",reason:"Typically lighter gameplay themes"};
+  return {label:"13+",reason:"Content has not been individually verified"};
+}
+function ageBadge(g){
+ const rating=ageGuide(g);
+ return '<span class="age-guide" tabindex="0" aria-label="Unofficial age guidance '+rating.label+'" title="Unofficial age guidance: '+rating.label+' — '+esc(rating.reason)+'. Not an ESRB or PEGI rating.">'+rating.label+'<span class="age-tooltip">'+esc(rating.reason)+' · Unofficial estimate, not an ESRB/PEGI rating</span></span>';
+}
 function bookmark(id,compact=false,hero=false){
   const active=saved.has(id), name=byId.get(id)?.title || "game";
   return '<button type="button" data-save="'+esc(id)+'" aria-pressed="'+active+'" title="'+(active?"Remove from saved":"Save game")+'" aria-label="'+esc((active?"Remove ":"Save ")+name+(active?" from saved":""))+'" class="'+(compact?"save-mini":hero?"ghost-btn":"secondary-btn")+savedClass(id)+'">'+icon("bookmark")+(compact?"":"<span>"+bookmarkText(id)+"</span>")+'</button>';
@@ -106,7 +118,7 @@ function card(g, {rank=0,count=0}={}) {
   const health=healthReports[g.id];
   const healthBadge=health==="issue"?'<span class="qol-health" title="Personal flag on this device; not a verified outage">My flag</span>':"";
   const starts=rank && chartState==="live"?'<span class="poster-plays">'+playtime(count)+'</span>':'';
-  return '<article class="card"><a href="#/game/'+g.id+'" aria-label="'+title+'"><div class="cover">'+poster(g)+specBadge(g.load)+healthBadge+(rank?'<span class="rank">#'+rank+'</span>':'')+'</div><div class="card-copy"><span class="poster-genre">'+esc(g.genre)+'</span><h3>'+title+'</h3><div class="poster-numbers">'+playStatus(g)+starts+'</div></div></a>'+(qol.read("history",[]).some(h=>h.id===g.id)?'<span class="qol-visited" title="Played before">Played</span>':'')+bookmark(g.id,true)+'</article>';
+  return '<article class="card"><a href="#/game/'+g.id+'" aria-label="'+title+'"><div class="cover">'+poster(g)+specBadge(g.load)+ageBadge(g)+healthBadge+(rank?'<span class="rank">#'+rank+'</span>':'')+'</div><div class="card-copy"><span class="poster-genre">'+esc(g.genre)+'</span><h3>'+title+'</h3><div class="poster-numbers">'+playStatus(g)+starts+'</div></div></a>'+(qol.read("history",[]).some(h=>h.id===g.id)?'<span class="qol-visited" title="Played before">Played</span>':'')+bookmark(g.id,true)+'</article>';
 }
 const grid = (rows) => '<div class="grid">'+rows.map(g=>card(g)).join("")+'</div>';
 const titleBar = (tag,title,count,aside="") => '<div class="shelf-head"><div class="shelf-title"><'+tag+'>'+esc(title)+'</'+tag+'><span class="count" aria-label="'+count+' games">'+count+'</span></div>'+aside+'</div>';
@@ -190,6 +202,34 @@ async function submitTakedown(form){
 }
 function qolBar(){
   return '<div class="qol-bar"><button class="secondary-btn" data-action="random-game">'+icon("play")+' Surprise me</button><button class="secondary-btn" data-action="performance">'+icon("bolt")+' '+(performanceMode?"Normal visuals":"Low graphics")+'</button><a class="secondary-btn" href="#/history">'+icon("clock")+' Play history</a><a class="secondary-btn" href="#/updates">'+icon("info")+' Updates</a></div>';
+}
+function stopRoulette(){if(rouletteTimer!==null){clearTimeout(rouletteTimer);rouletteTimer=null;}rouletteWinner=null;}
+function randomGamePool(){return games.filter(g=>g.mode==="embed");}
+function rouletteView(){
+ stopRoulette();
+ const pool=randomGamePool();
+ if(!pool.length){toast("No playable games available");return;}
+ const winner=pool[Math.floor(Math.random()*pool.length)];
+ rouletteWinner=winner.id;
+ // Predetermine the winner so the reel always stops on the highlighted center card.
+ const count=34, chosen=27, reel=Array.from({length:count},(_,i)=>i===chosen?winner:pool[Math.floor(Math.random()*pool.length)]);
+ const tiles=reel.map(g=>'<div class="roulette-tile"><img src="'+posterAsset(g.id)+'" alt="" loading="lazy" decoding="async"><strong>'+esc(g.title)+'</strong></div>').join("");
+ displayDialog('<div class="roulette-panel"><div class="roulette-heading">'+icon("star")+'<h2 id="guide-title">Surprise me!</h2></div><p class="hint">Rolling through the game vault…</p><div class="roulette-window"><div class="roulette-marker" aria-hidden="true"></div><div class="roulette-reel">'+tiles+'</div></div><div class="roulette-result" aria-live="polite">Choosing your game…</div><div class="actions"><button class="secondary-btn" data-action="roulette-again" disabled>Roll again</button><button class="btn" data-action="roulette-play" disabled>Play game</button><button class="secondary-btn" data-action="close-guide">Close</button></div></div>');
+ guide.classList.remove("guided");
+ const reelEl=guide.querySelector(".roulette-reel");
+ const tileWidth=144, gap=12;
+ const distance=chosen*(tileWidth+gap);
+ // A fixed card width keeps the landing accurate across mobile and desktop.
+ const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches||performanceMode;
+ if(reduce){reelEl.style.transform='translateX(calc(50% - 72px - '+distance+'px))';}
+ else requestAnimationFrame(()=>requestAnimationFrame(()=>{if(guide.open&&rouletteWinner===winner.id){reelEl.style.transition='transform 4100ms cubic-bezier(.12,.68,.08,1)';reelEl.style.transform='translateX(calc(50% - 72px - '+distance+'px))';}}));
+ rouletteTimer=setTimeout(()=>{
+   rouletteTimer=null;
+   if(!guide.open||rouletteWinner!==winner.id)return;
+   const result=guide.querySelector(".roulette-result");
+   if(result)result.innerHTML='<h3>'+esc(winner.title)+'</h3><p>'+esc(winner.description||"A game from the Unlocked vault.")+'</p><div class="roulette-meta">'+specBadge(winner.load)+ageBadge(winner)+'</div>';
+   guide.querySelectorAll('[data-action="roulette-again"],[data-action="roulette-play"]').forEach(b=>b.disabled=false);
+ },reduce?80:4250);
 }
 function renderHistory(){
  const rows=qol.read("history",[]).map(h=>({h,g:byId.get(h.id)})).filter(x=>x.g);
@@ -336,11 +376,12 @@ function positionSpotlight(){
 function guidePage(){
   const [selector,title,body]=tourStops[tourStep];
   const target=$(selector);
-  target.scrollIntoView({block:"center",behavior:"instant"});
+  if(!target){tourStep=Math.min(tourStops.length-1,tourStep+1);return;}
+  target.scrollIntoView({block:"center",behavior:matchMedia("(prefers-reduced-motion: reduce)").matches||performanceMode?"instant":"smooth"});
   guide.classList.add("guided");
   const last=tourStep===tourStops.length-1;
   displayDialog('<span class="tour-frame" aria-hidden="true"></span><small>Quick tour · '+(tourStep+1)+' of '+tourStops.length+'</small><h2 id="guide-title">'+title+'</h2><p>'+body+'</p><div class="actions">'+btn("close-guide","End tour",null,"tour-skip")+btn(last?"close-guide":"next-guide",last?"Done":"Next",null,"btn")+'</div>');
-  positionSpotlight();
+  requestAnimationFrame(()=>requestAnimationFrame(positionSpotlight));
   guide.querySelector(".btn").focus({preventScroll:true});
 }
 function offerTour(){
@@ -348,7 +389,7 @@ function offerTour(){
   rememberTour();
   displayDialog('<h2 id="guide-title">Want a quick tour?</h2><p>See where to play featured games, request a favorite, and find games for your device.</p><div class="actions">'+btn("close-guide","No thanks",null,"tour-skip")+btn("tour","Show me around",null,"btn")+'</div>');
 }
-guide.addEventListener("close",()=>{guide.classList.remove("guided");guide.style.top="";});
+guide.addEventListener("close",()=>{stopRoulette();guide.classList.remove("guided");guide.style.top="";});
 window.addEventListener("resize",positionSpotlight);
 window.addEventListener("scroll",positionSpotlight,{passive:true});
 function showSpecs(){
@@ -363,7 +404,7 @@ function gameLayout(g){
   const displayLabel="Fullscreen";
   const exitLabel="Leave fullscreen";
   const stageImage=g.imported?posterAsset(g.id):relativeAsset(g.id);
-  main.innerHTML='<a class="back" href="#/library">'+icon("back")+'All games</a><h1 class="game-title">'+esc(g.title)+'</h1><div class="game-meta">'+specBadge(g.load)+'<span>'+esc(g.genre)+'</span>'+(g.edition?'<span class="edition">'+esc(g.edition)+'</span>':'')+playStatus(g)+'</div>'+
+  main.innerHTML='<a class="back" href="#/library">'+icon("back")+'All games</a><h1 class="game-title">'+esc(g.title)+'</h1><div class="game-meta">'+specBadge(g.load)+'<span>'+esc(g.genre)+'</span>'+ageBadge(g)+(g.edition?'<span class="edition">'+esc(g.edition)+'</span>':'')+playStatus(g)+'</div>'+
     '<div class="stage-slot"><div id="stage" class="stage centered"><div class="stage-art" style="background-image:url(\''+stageImage+'\')" ></div><div class="startbox" id="startbox"><p role="status">Preparing the player…</p></div><button type="button" class="icon-btn exit-stage" data-action="fullscreen" title="'+exitLabel+'" aria-label="'+exitLabel+'">'+icon("close")+'</button></div></div>'+
     '<div class="play-tools">'+btn("share-game","Share game","external")+btn("preview-game","Quick preview","info")+btn("health-game","Game status","info")+(g.mode==="embed"?btn("fullscreen",displayLabel,"expand"):"")+bookmark(g.id)+'<a class="secondary-btn report-link" href="'+reportUrl()+'">'+icon("bug")+'Report a bug</a></div><div id="key-area"></div>'+
     '<div class="details"><section class="pane"><h2>About this game</h2><p>'+esc(g.description || (g.mode==="embed"?"Browser build from the linked source project.":"Listed in the Ultimate Catalog of Web Game Ports."))+'</p><details><summary>Port details &amp; sources</summary><ul>'+g.sources.map((u,i)=>'<li><a target="_blank" rel="noopener noreferrer" href="'+esc(u)+'">'+esc(u.includes("github.com/")?u.replace("https://github.com/",""):new URL(u).hostname)+(g.sources.length>1?" · source "+(i+1):"")+'</a></li>').join("")+'</ul>'+(g.posterSource?'<a class="text-link" href="'+esc(g.posterSource)+'" target="_blank" rel="noopener noreferrer">Preview artwork</a>':'')+'<div id="other-ports"></div></details></section>'+
@@ -571,7 +612,7 @@ function setup(){
   document.addEventListener("keydown",e=>{
     if(e.key==="g" && e.altKey && !e.repeat){e.preventDefault();location.hash="#/library";}
      if(e.key==="s" && e.altKey && !e.repeat){e.preventDefault();location.hash="#/saved";}
-     if(e.key==="r" && e.altKey && !e.repeat && !["INPUT","TEXTAREA","SELECT","IFRAME"].includes(document.activeElement?.tagName)){e.preventDefault();const choices=games.filter(g=>g.mode==="embed");if(choices.length)location.hash="#/game/"+choices[Math.floor(Math.random()*choices.length)].id;}
+     if(e.key==="r" && e.altKey && !e.repeat && !["INPUT","TEXTAREA","SELECT","IFRAME"].includes(document.activeElement?.tagName)){e.preventDefault();const choices=games.filter(g=>g.mode==="embed");if(choices.length)rouletteView();}
      if(e.key==="/" && !guide.open && !["INPUT","TEXTAREA","SELECT","IFRAME"].includes(document.activeElement?.tagName)){e.preventDefault();search.focus();}
     if(e.key==="Escape"){$("#theme-panel").hidden=true;$("#theme-button").setAttribute("aria-expanded","false");}
   });
@@ -604,7 +645,9 @@ function setup(){
     }
     const action=e.target.closest("[data-action]")?.dataset.action;
     switch(action){
-      case "random-game":{const choices=games.filter(g=>g.mode==="embed");if(choices.length)location.hash="#/game/"+choices[Math.floor(Math.random()*choices.length)].id;break;}
+      case "random-game":rouletteView();break;
+       case "roulette-again":rouletteView();break;
+       case "roulette-play":if(rouletteWinner){const id=rouletteWinner;guide.close();location.hash="#/game/"+id;}break;
        case "performance":performanceMode=!performanceMode;qol.write("performance",performanceMode);document.documentElement.classList.toggle("low-graphics",performanceMode);if(current.page==="library")renderLibrary();break;
        case "share-game":qol.safeCopy(location.href).then(()=>toast("Game link copied")).catch(()=>displayDialog('<h2>Share this game</h2><p>'+esc(location.href)+'</p>'+btn("close-guide","Close",null)));break;
        case "health-game":{const g=byId.get(current.id);if(g)displayDialog('<h2>Game status: '+esc(g.title)+'</h2><p>Live automated game checks are not available. You can flag a problem on this device, or submit a bug report to the team.</p><div class="actions">'+btn("mark-issue","Mark issue","bug")+btn("clear-issue","Clear flag","check")+btn("close-guide","Close",null)+'</div>');break;}
