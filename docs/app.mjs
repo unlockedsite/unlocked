@@ -588,17 +588,57 @@ async function prepareGame(g, token, autoStart=false){
     $("#startbox").innerHTML='<p>'+esc(error.message)+'</p>'+btn("retry-game","Try again","play","btn");
   }
 }
-function endPlay(){clearInterval(sessionTicker);sessionTicker=null;if(playSession?.startedAt)hub.recordMinutes(playSession.id,Date.now()-playSession.startedAt);playSession=null;}
+function signalPresence(gameplay,state){
+ // Each game launch gets a random session ID. The backend hashes it before storage.
+ return fetch(SUBMISSION_API+"/v1/presence",{
+  method:"POST",mode:"cors",credentials:"omit",keepalive:state!=="active",
+  referrerPolicy:"no-referrer",headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({game:gameplay.id,session:gameplay.session,state})
+ }).catch(()=>{});
+}
+function scheduleHeartbeat(){
+ clearInterval(heartbeatTimer);heartbeatTimer=null;
+ if(!playSession?.registered)return;
+ const gameplay=playSession;
+ if(document.hidden){signalPresence(gameplay,"paused");return;}
+ signalPresence(gameplay,"active");
+ heartbeatTimer=setInterval(()=>{
+  if(playSession===gameplay&&!document.hidden)signalPresence(gameplay,"active");
+ },30000);
+}
+function endPlay(){
+ clearInterval(heartbeatTimer);heartbeatTimer=null;
+ clearInterval(sessionTicker);sessionTicker=null;
+ const previous=playSession;
+ playSession=null;
+ if(previous?.registered)signalPresence(previous,"left");
+ if(previous?.startedAt)hub.recordMinutes(previous.id,Date.now()-previous.startedAt);
+}
 function recordPlay(id){
-  recentGames=[id,...recentGames.filter(game=>game!==id)].slice(0,4);
-  saveValue("recent",JSON.stringify(recentGames));
-  
-  const gameplay={id,startedAt:Date.now()};
-  playSession=gameplay;
-  clearInterval(sessionTicker);
-  if(hub.preferences().showTimer){sessionTicker=setInterval(()=>{const target=document.querySelector("#hub-session-timer");if(!target||playSession!==gameplay)return;const seconds=Math.floor((Date.now()-gameplay.startedAt)/1000);target.textContent="Session "+Math.floor(seconds/60)+":"+String(seconds%60).padStart(2,"0");},1000);}
-
-
+ recentGames=[id,...recentGames.filter(game=>game!==id)].slice(0,4);
+ saveValue("recent",JSON.stringify(recentGames));
+ if(playSession)endPlay();
+ const gameplay={id,session:crypto.randomUUID(),registered:false,startedAt:Date.now()};
+ playSession=gameplay;
+ clearInterval(sessionTicker);
+ if(hub.preferences().showTimer){
+  sessionTicker=setInterval(()=>{
+   const target=document.querySelector("#hub-session-timer");
+   if(!target||playSession!==gameplay)return;
+   const seconds=Math.floor((Date.now()-gameplay.startedAt)/1000);
+   target.textContent="Session "+Math.floor(seconds/60)+":"+String(seconds%60).padStart(2,"0");
+  },1000);
+ }
+ // Analytics are best-effort: failed reporting never blocks the game.
+ fetch(SUBMISSION_API+"/v1/play/"+encodeURIComponent(id),{
+  method:"POST",mode:"cors",credentials:"omit",referrerPolicy:"no-referrer",
+  headers:{"Content-Type":"application/json"},body:JSON.stringify({session:gameplay.session})
+ }).then(response=>{
+  if(!response.ok)throw Error("Playtime service unavailable");
+  gameplay.registered=true;
+  if(playSession!==gameplay){signalPresence(gameplay,"left");return;}
+  scheduleHeartbeat();
+ }).catch(()=>{});
 }
 function startGame(g){
   if(!player || !currentLaunch || currentLaunch.id!==g.id)return;
