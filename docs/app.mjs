@@ -1,5 +1,6 @@
 import { icon } from "./icons.mjs?v=3";
 import { matches, normalize } from "./search.mjs";
+import * as qol from "./qol.mjs?v=1";
 import { chromeOS, createPlayer } from "./player.mjs?v=6";
 
 const API = "https://unlocked-arcade-service.persistingthoughts0.chatgpt.site";
@@ -31,6 +32,9 @@ let currentLaunch=null, topCache=null, currentReport="", searchMessage="", sendi
 let rankedCounts={}, weeklyCounts={}, rankingPeriod="all", weekStartsAt=null, activeCounts={}, chartState="loading", chartRequest=null, chartTimer;
 let playSession=null, heartbeatTimer, player=null, launchCatalog;
 let recentGames=[];
+let performanceMode=qol.read("performance",false);
+let healthReports=qol.read("health",{});
+let selectedFolder="All";
 try {
   const stored=JSON.parse(dl("recent","[]"));
   if(Array.isArray(stored))recentGames=[...new Set(stored.filter(id=>typeof id==="string"))].slice(0,4);
@@ -100,7 +104,7 @@ function moreButton(total) {
 function card(g, {rank=0,count=0}={}) {
   const title=esc(g.title);
   const starts=rank && chartState==="live"?'<span class="poster-plays">'+playtime(count)+'</span>':'';
-  return '<article class="card"><a href="#/game/'+g.id+'" aria-label="'+title+'"><div class="cover">'+poster(g)+specBadge(g.load)+(rank?'<span class="rank">#'+rank+'</span>':'')+'</div><div class="card-copy"><span class="poster-genre">'+esc(g.genre)+'</span><h3>'+title+'</h3><div class="poster-numbers">'+playStatus(g)+starts+'</div></div></a>'+bookmark(g.id,true)+'</article>';
+  return '<article class="card"><a href="#/game/'+g.id+'" aria-label="'+title+'"><div class="cover">'+poster(g)+specBadge(g.load)+(rank?'<span class="rank">#'+rank+'</span>':'')+'</div><div class="card-copy"><span class="poster-genre">'+esc(g.genre)+'</span><h3>'+title+'</h3><div class="poster-numbers">'+playStatus(g)+starts+'</div></div></a>'+(qol.read("history",[]).some(h=>h.id===g.id)?'<span class="qol-visited" title="Played before">Played</span>':'')+bookmark(g.id,true)+'</article>';
 }
 const grid = (rows) => '<div class="grid">'+rows.map(g=>card(g)).join("")+'</div>';
 const titleBar = (tag,title,count,aside="") => '<div class="shelf-head"><div class="shelf-title"><'+tag+'>'+esc(title)+'</'+tag+'><span class="count" aria-label="'+count+' games">'+count+'</span></div>'+aside+'</div>';
@@ -182,6 +186,17 @@ async function submitTakedown(form){
   }catch(error){if(navigation===token)status.textContent=error.message;}
   finally{button.disabled=false;}
 }
+function qolBar(){
+  return '<div class="qol-bar"><button class="secondary-btn" data-action="random-game">'+icon("play")+' Surprise me</button><button class="secondary-btn" data-action="performance">'+icon("bolt")+' '+(performanceMode?"Normal visuals":"Low graphics")+'</button><a class="secondary-btn" href="#/history">'+icon("back")+' Play history</a><a class="secondary-btn" href="#/updates">'+icon("info")+' Updates</a></div>';
+}
+function renderHistory(){
+ const rows=qol.read("history",[]).map(h=>({h,g:byId.get(h.id)})).filter(x=>x.g);
+ const receipts=qol.read("receipts",[]);
+ main.innerHTML='<section class="section-page"><h1>Play history</h1><p class="subcopy">Stored only on this device. Clearing it does not affect game saves.</p><div class="qol-bar">'+btn("clear-history","Clear history","close")+'</div><div class="qol-history">'+rows.map(({h,g})=>'<a href="#/game/'+g.id+'"><strong>'+esc(g.title)+'</strong><small>'+new Date(h.last).toLocaleDateString()+' · '+h.visits+' launches</small></a>').join("")+'</div><h2>My bug report receipts</h2><p class="hint">Submission receipts are stored locally. Live review status is not available yet.</p>'+receipts.map(r=>'<p class="hint">'+esc(r.game||"Website")+' · '+esc(r.receipt)+' · Submitted</p>').join("")+'</section>';
+}
+function renderUpdateHistory(){
+ main.innerHTML='<section class="section-page"><a class="back" href="#/library">'+icon("back")+'All games</a><h1>Update history</h1><div id="updates-feed"><p class="hint">Loading updates…</p></div></section>';loadUpdates();
+}
 function communityBar(){
   return '<div class="community-bar"><a class="join-discord" href="https://discord.gg/AezupBCtns" target="_blank" rel="noopener noreferrer">'+icon("discord")+'<span><small>Join us on</small><strong>Discord</strong></span>'+icon("forward")+'</a><a class="secondary-btn community-action community-request" href="#/requests">'+icon("plus")+'<span>Request a game</span>'+icon("forward")+'</a><a class="secondary-btn community-action community-takedown" href="#/takedown">'+icon("shield")+'<span>Takedown Request</span>'+icon("forward")+'</a><div class="community-online">'+presence("all")+'</div></div>';
 }
@@ -235,11 +250,11 @@ function chartPanel(){
 }
 function renderLibrary(){
   const searching=current.page==="search";
-  const full=searching ? games.filter(g=>!q || matches(g,q)) : games;
+  const full=searching ? games.filter(g=>!q || matches(g,q) || qol.searchScore(g,q)>0).sort((a,b)=>qol.searchScore(b,q)-qol.searchScore(a,q)||alphabetical(a,b)) : games;
   const rows=full.filter(g=>(!genre || g.genre===genre)&&(!level || g.load===level) && (availability==="all" || (g.mode==="embed")===(availability==="play")));
   const label=searching ? "Search results" : "Game library";
   const aside='<div class="shelf-aside"><span class="sort-label">A–Z</span></div>';
-  let html=searching?"":'<div class="spotlight">'+hero()+chartPanel()+'</div>'+communityBar()+continuePlaying()+'<section class="updates-panel" aria-labelledby="updates-title"><h2 id="updates-title">What’s new</h2><div id="updates-feed"><p class="hint" role="status">Loading updates…</p></div></section>';
+  let html=searching?"":'<div class="spotlight">'+hero()+chartPanel()+'</div>'+communityBar()+qolBar()+continuePlaying()+'<section class="updates-panel" aria-labelledby="updates-title"><h2 id="updates-title">What’s new</h2><div id="updates-feed"><p class="hint" role="status">Loading updates…</p></div></section>';
   html+=titleBar(searching?"h1":"h2",label,rows.length,aside)+filters();
   if(rows.length) html+=grid(rows.slice(0,visibleCount))+moreButton(rows.length);
   else if(full.length || !q) html+='<div class="empty">'+icon("filter")+'<h2>No games with those filters</h2><p>Clear filters to see every matching title.</p>'+btn("reset-filters","Clear filters","filter")+'</div>';
@@ -252,8 +267,8 @@ function renderLibrary(){
   if(!searching)loadUpdates();
 }
 function renderSaved() {
-  const rows=games.filter(g=>saved.has(g.id));
-  main.innerHTML='<section class="section-page">'+titleBar("h1","Saved games",rows.length)+(rows.length?grid(rows.slice(0,visibleCount))+moreButton(rows.length):'<div class="empty">'+icon("bookmark")+'<h2>Your saved shelf is empty</h2><p>Use the bookmark on a game to keep it here on this device.</p><a class="btn" href="#/library">Browse games</a></div>')+'</section>';
+  const groups=qol.folders();const rows=games.filter(g=>selectedFolder==="All"?saved.has(g.id):(groups[selectedFolder]||[]).includes(g.id));
+  main.innerHTML='<section class="section-page">'+titleBar("h1","Saved games",rows.length)+'<div class="qol-bar"><label>Folder <select id="folder-select"><option>All</option>'+Object.keys(groups).map(name=>'<option value="'+esc(name)+'" '+(selectedFolder===name?'selected':'')+'>'+esc(name)+'</option>').join("")+'</select></label>'+btn("new-folder","New folder","plus")+(selectedFolder!=="All"&&selectedFolder!=="Favorites"?btn("delete-folder","Delete folder","close"):"")+'</div>'+(rows.length?grid(rows.slice(0,visibleCount))+moreButton(rows.length):'<div class="empty">'+icon("bookmark")+'<h2>Your saved shelf is empty</h2><p>Use the bookmark on a game to keep it here on this device.</p><a class="btn" href="#/library">Browse games</a></div>')+'</section>';
 }
 function drawTop(){
   const ranks=currentRanks();
@@ -348,7 +363,7 @@ function gameLayout(g){
   const stageImage=g.imported?posterAsset(g.id):relativeAsset(g.id);
   main.innerHTML='<a class="back" href="#/library">'+icon("back")+'All games</a><h1 class="game-title">'+esc(g.title)+'</h1><div class="game-meta">'+specBadge(g.load)+'<span>'+esc(g.genre)+'</span>'+(g.edition?'<span class="edition">'+esc(g.edition)+'</span>':'')+playStatus(g)+'</div>'+
     '<div class="stage-slot"><div id="stage" class="stage centered"><div class="stage-art" style="background-image:url(\''+stageImage+'\')" ></div><div class="startbox" id="startbox"><p role="status">Preparing the player…</p></div><button type="button" class="icon-btn exit-stage" data-action="fullscreen" title="'+exitLabel+'" aria-label="'+exitLabel+'">'+icon("close")+'</button></div></div>'+
-    '<div class="play-tools">'+(g.mode==="embed"?btn("fullscreen",displayLabel,"expand"):"")+bookmark(g.id)+'<a class="secondary-btn report-link" href="'+reportUrl()+'">'+icon("bug")+'Report a bug</a></div><div id="key-area"></div>'+
+    '<div class="play-tools">'+btn("share-game","Share game","external")+btn("preview-game","Quick preview","info")+(g.mode==="embed"?btn("fullscreen",displayLabel,"expand"):"")+bookmark(g.id)+'<a class="secondary-btn report-link" href="'+reportUrl()+'">'+icon("bug")+'Report a bug</a></div><div id="key-area"></div>'+
     '<div class="details"><section class="pane"><h2>About this game</h2><p>'+esc(g.description || (g.mode==="embed"?"Browser build from the linked source project.":"Listed in the Ultimate Catalog of Web Game Ports."))+'</p><details><summary>Port details &amp; sources</summary><ul>'+g.sources.map((u,i)=>'<li><a target="_blank" rel="noopener noreferrer" href="'+esc(u)+'">'+esc(u.includes("github.com/")?u.replace("https://github.com/",""):new URL(u).hostname)+(g.sources.length>1?" · source "+(i+1):"")+'</a></li>').join("")+'</ul>'+(g.posterSource?'<a class="text-link" href="'+esc(g.posterSource)+'" target="_blank" rel="noopener noreferrer">Preview artwork</a>':'')+'<div id="other-ports"></div></details></section>'+
     '<section class="pane"><h2>Playing on a Chromebook</h2><p>'+esc(g.notes || "Chromebook performance varies by port and device.")+'</p><button class="text-link" data-action="specs">See the spec guide</button></section></div>';
   if(g.mode==="embed"){
@@ -439,7 +454,7 @@ function recordPlay(id){
 }
 function startGame(g){
   if(!player || !currentLaunch || currentLaunch.id!==g.id)return;
-  if(player.start(currentLaunch.url,$("#limit-resolution")?.checked)) recordPlay(g.id);
+  if(player.start(currentLaunch.url,$("#limit-resolution")?.checked)){recordPlay(g.id);qol.historyEntry(g);}
 }
 function renderReport(){
   const selected=byId.get(current.params.get("game")), page=current.params.get("from") || "report";
@@ -459,7 +474,7 @@ async function submitReport(form){
   const body={game:$("#report-game").value,page:form.dataset.from,kind:$("#kind").value,detail:$("#detail").value,device:$("#share-device").checked?deviceLabel():""};
   button.disabled=true;feedback("#report-result","Sending your report…");
   try{
-    const result=await api("/v1/reports",body);if(navigation!==token)return;
+    const result=await api("/v1/reports",body);if(navigation!==token)return;qol.trackReceipt(body.game,result.receipt);
     form.innerHTML='<h2>Report received</h2><p>Delivered to the arcade team on Discord.</p><p>'+esc(result.hint)+'</p><p class="hint">Receipt '+esc(result.receipt)+'</p><a class="btn" href="'+(body.game?"#/game/"+body.game:"#/library")+'">Back to '+(body.game?"game":"all games")+'</a>';
   }catch(e){if(navigation===token){feedback("#report-result",e.message);button.disabled=false;}}
 }
@@ -489,6 +504,8 @@ function route({scroll=true}={}){
   if(current.page==="library" || isSearch)renderLibrary();
   else if(current.page==="saved")renderSaved();
   else if(current.page==="top")drawTop();
+   else if(current.page==="history")renderHistory();
+   else if(current.page==="updates")renderUpdateHistory();
   else if(game){gameLayout(game);prepareGame(game,token,current.params.get("start")==="1");}
   else if(current.page==="requests")requestsPage();
   else if(current.page==="takedown")takedownPage();
@@ -498,6 +515,7 @@ function route({scroll=true}={}){
   scheduleChart();
   if(scroll){window.scrollTo(0,0);main.focus({preventScroll:true});}
   if(current.page==="library")offerTour();
+   document.documentElement.classList.toggle("low-graphics",performanceMode);
 }
 function searchView(value){
   const raw=value.slice(0,80), next=raw.trim();searchMessage="";
@@ -579,7 +597,14 @@ function setup(){
     }
     const action=e.target.closest("[data-action]")?.dataset.action;
     switch(action){
-      case "leave-and-report":guide.close();location.hash=reportUrl();break;
+      case "random-game":{const choices=games.filter(g=>g.mode==="embed");if(choices.length)location.hash="#/game/"+choices[Math.floor(Math.random()*choices.length)].id;break;}
+       case "performance":performanceMode=!performanceMode;qol.write("performance",performanceMode);document.documentElement.classList.toggle("low-graphics",performanceMode);if(current.page==="library")renderLibrary();break;
+       case "share-game":qol.safeCopy(location.href).then(()=>toast("Game link copied")).catch(()=>displayDialog('<h2>Share this game</h2><p>'+esc(location.href)+'</p>'+btn("close-guide","Close",null)));break;
+       case "preview-game":{const g=byId.get(current.id);if(g)displayDialog('<h2>'+esc(g.title)+'</h2><p>'+esc(g.description||"Browser game")+'</p><p>Genre: '+esc(g.genre)+' · Performance: '+esc(levels[g.load]||"Unknown")+'</p>'+btn("close-guide","Close",null));break;}
+       case "clear-history":qol.write("history",[]);renderHistory();break;
+       case "new-folder":{const name=prompt("New favorites folder name (up to 30 characters):")?.trim().slice(0,30);if(name&&!["All","__proto__","constructor","prototype"].includes(name)){qol.storeFolder(name,[]);selectedFolder=name;renderSaved();}break;}
+       case "delete-folder":qol.removeFolder(selectedFolder);selectedFolder="All";renderSaved();break;
+       case "leave-and-report":guide.close();location.hash=reportUrl();break;
       case "retry-updates":loadUpdates();break;
       case "tour":
         rememberTour();
@@ -602,7 +627,8 @@ function setup(){
     if(["availability","more-genres","demand"].includes(e.target.id))visibleCount=pageSize;
     if(e.target.id==="availability"){availability=e.target.value;renderLibrary();$("#availability").focus({preventScroll:true});}
     if(e.target.id==="more-genres"){genre=e.target.value;renderLibrary();$("#more-genres").focus({preventScroll:true});}
-    if(e.target.id==="demand"){level=e.target.value;renderLibrary();$("#demand").focus({preventScroll:true});}
+    if(e.target.id==="folder-select"){selectedFolder=e.target.value;renderSaved();}
+     if(e.target.id==="demand"){level=e.target.value;renderLibrary();$("#demand").focus({preventScroll:true});}
   });
   document.addEventListener("submit",async e=>{
     const form=e.target;
