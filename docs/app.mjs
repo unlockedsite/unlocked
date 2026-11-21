@@ -331,7 +331,7 @@ function renderLibrary(){
   const full=searching ? games.filter(g=>!q || matches(g,q) || qol.searchScore(g,q)>0).sort((a,b)=>qol.searchScore(b,q)-qol.searchScore(a,q)||alphabetical(a,b)) : games;
   let rows=full.filter(g=>(!genre || g.genre===genre)&&(!level || g.load===level) && (availability==="all" || (g.mode==="embed")===(availability==="play")));
  if(sortMode==="demand")rows.sort((a,b)=>(["low","medium","high"].indexOf(a.load)-["low","medium","high"].indexOf(b.load))||alphabetical(a,b));
- else if(sortMode==="recent")rows.sort((a,b)=>(qol.read("history",[]).find(x=>x.id===b.id)?.last||0)-(qol.read("history",[]).find(x=>x.id===a.id)?.last||0)||alphabetical(a,b));
+ else if(sortMode==="recent"){const dates=new Map(qol.read("history",[]).map(x=>[x.id,x.last]));rows.sort((a,b)=>(dates.get(b.id)||0)-(dates.get(a.id)||0)||alphabetical(a,b));}
  else if(sortMode==="popular")rows.sort((a,b)=>(rankedCounts[b.id]||0)-(rankedCounts[a.id]||0)||alphabetical(a,b));
   const label=searching ? "Search results" : "Game library";
   const aside='<div class="shelf-aside"><label class="sort-label">Sort <select id="hub-sort"><option value="az" '+(sortMode==="az"?"selected":"")+'>A–Z</option><option value="demand" '+(sortMode==="demand"?"selected":"")+'>Hardware demand</option><option value="popular" '+(sortMode==="popular"?"selected":"")+'>Popularity</option><option value="recent" '+(sortMode==="recent"?"selected":"")+'>Recently played</option></select></label></div>';
