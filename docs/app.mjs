@@ -97,7 +97,11 @@ try {
 } catch { /* Ignore invalid saved history. */ }
 
 
-const pageSize = 48;
+// Limit first-paint DOM work on Chromebooks and entry-level devices.
+const pageSize = /CrOS\b/i.test(navigator.userAgent) ||
+ (Number(navigator.deviceMemory||0)>0&&Number(navigator.deviceMemory)<=4) ||
+ (Number(navigator.hardwareConcurrency||0)>0&&Number(navigator.hardwareConcurrency)<=4)
+ ? 32 : 48;
 let visibleCount = pageSize;
 let availability = "play";
 const alphabetical = (a,b) => collate.compare(a.title,b.title);
