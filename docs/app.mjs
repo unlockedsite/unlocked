@@ -495,7 +495,12 @@ function updateTheme(value){
 }
 function setup(){
   document.addEventListener("animationend", e=>{
-    if (e.animationName==="feature-fill" && !e.target.closest(".feature-outgoing") && !document.hidden) nextFeature();
+    // Only an active bar may advance the carousel. Without this guard, an
+    // "Off" animation preset can complete in 1ms and rapidly rebuild the hero.
+    if(e.animationName!=="feature-fill" || document.hidden)return;
+    if(document.documentElement.dataset.motion==="off" || matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+    if(!e.target.closest(".feature-bar[data-state='current']") || e.target.closest(".feature-outgoing"))return;
+    nextFeature();
   });
   const pauseFeatures = () => document.documentElement.classList.toggle("feature-hidden",document.hidden);
   document.addEventListener("visibilitychange",pauseFeatures);
