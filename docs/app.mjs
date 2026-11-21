@@ -156,7 +156,7 @@ function updateCompare(){
  target.innerHTML='<div class="hub-feature-row">'+[a,b].map(g=>'<a class="hub-feature" href="#/game/'+esc(g.id)+'"><strong>'+esc(g.title)+'</strong><span>'+esc(g.genre)+' · '+esc(levels[g.load]||"Unknown")+' hardware demand</span><span>'+esc(g.description||"No description available")+'</span></a>').join("")+'</div>';
 }
 function qolBar(){
-  return '<div class="qol-bar"><button class="secondary-btn" data-action="random-game">'+icon("play")+' Surprise me</button><button class="secondary-btn" data-action="performance">'+icon("bolt")+' '+(performanceMode?"Normal visuals":"Low graphics")+'</button><a class="secondary-btn" href="#/history">'+icon("clock")+' Play history</a><a class="secondary-btn" href="#/updates">'+icon("info")+' Updates</a></div>';
+  return '<div class="qol-bar"><button class="secondary-btn" data-action="random-game">'+icon("play")+' Surprise me</button><button class="secondary-btn" data-action="performance">'+icon("bolt")+' '+(performanceMode?"Normal visuals":"Low graphics")+'</button><a class="secondary-btn" href="#/history">'+icon("clock")+' Play history</a><a class="secondary-btn" href="#/settings">'+icon("info")+' Settings</a></div>';
 }
 function stopRoulette(){if(rouletteTimer!==null){clearTimeout(rouletteTimer);rouletteTimer=null;}rouletteWinner=null;}
 function randomGamePool(){return games.filter(g=>g.mode==="embed");}
@@ -186,11 +186,7 @@ function rouletteView(){
    guide.querySelectorAll('[data-action="roulette-again"],[data-action="roulette-play"]').forEach(b=>b.disabled=false);
  },reduce?80:4250);
 }
-function renderHistory(){
- const rows=qol.read("history",[]).map(h=>({h,g:byId.get(h.id)})).filter(x=>x.g);
- const receipts=qol.read("receipts",[]);
- main.innerHTML='<section class="section-page"><h1>Play history</h1><p class="subcopy">Stored only on this device. Clearing it does not affect game saves.</p><div class="qol-bar">'+btn("clear-history","Clear history","close")+'</div><div class="qol-history">'+rows.map(({h,g})=>'<a href="#/game/'+g.id+'"><strong>'+esc(g.title)+'</strong><small>'+new Date(h.last).toLocaleDateString()+' · '+h.visits+' launches</small></a>').join("")+'</div><h2>My bug report receipts</h2><p class="hint">Submission receipts are stored locally. Live review status is not available yet.</p>'+receipts.map(r=>'<p class="hint">'+esc(r.game||"Website")+' · '+esc(r.receipt)+' · Submitted</p>').join("")+'</section>';
-}
+function renderHistory(){const rows=qol.read("history",[]).map(h=>({h,g:byId.get(h.id)})).filter(x=>x.g);main.innerHTML='<section class="section-page"><h1>Play history</h1><p class="subcopy">Stored on this device only.</p><div class="qol-bar">'+btn("clear-history","Clear history","close")+'</div><div class="qol-history">'+rows.map(({h,g})=>'<a href="#/game/'+esc(g.id)+'"><strong>'+esc(g.title)+'</strong><small>'+new Date(h.last).toLocaleDateString()+' · '+h.visits+' launches</small></a>').join("")+'</div></section>';}
 function communityBar(){return '<div class="community-bar"><a class="join-discord" href="https://discord.gg/AezupBCtns" target="_blank" rel="noopener noreferrer">'+icon("discord")+'<span><small>Join us on</small><strong>Discord</strong></span>'+icon("forward")+'</a></div>';}
 function rankingCounts(){const counts={};for(const h of qol.read("history",[]))counts[h.id]=Number(h.visits)||0;return counts;}
 function currentRanks(){const counts=rankingCounts();return games.filter(g=>g.mode==="embed").sort((a,b)=>(counts[b.id]||0)-(counts[a.id]||0)||alphabetical(a,b));}
@@ -253,7 +249,7 @@ function displayDialog(html){
 const tourStops = [
   [".spotlight .hero", "Featured games", "Geometry Dash, 60 Seconds!, and R.E.P.O. rotate here. Select a progress bar to switch games, or choose Play game to jump in."],
   [".community-bar", "Community", "Join the Unlocked Discord to suggest games or get help."],
-  [".qol-bar", "Surprise Me and quick tools", "Open a game roulette, switch to Low graphics, or view your play history and updates."],
+  [".qol-bar", "Surprise Me and quick tools", "Open a game roulette, switch to Low graphics, or view your play history and settings."],
   [".filters", "Find a game for your device", "Choose a genre or Chromebook spec to narrow the library. Low-demand games are the lightest to run."],
   [".grid", "Game ratings and details", "Hover over or focus an age badge for an unofficial estimate. Hardware-demand badges give approximate Chromebook requirements."]
 ];
