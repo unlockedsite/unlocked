@@ -7,9 +7,9 @@
   <meta name="description" content="Explore Unlocked, a browser arcade with fullscreen games, Chromebook performance guides, and a vault of favorites.">
   <title>Unlocked — Game vault</title>
   <link rel="icon" href="./assets/unlocked.png" type="image/png">
-  <link rel="stylesheet" href="./style.css?v=30">
+  <link rel="stylesheet" href="./style.css?v=32">
   <script src="./theme.js"></script>
-  <script type="module" src="./app.mjs?v=31"></script>
+  <script type="module" src="./app.mjs?v=32"></script>
 </head>
 <body>
   <a href="#content" class="skip">Skip to games</a>
@@ -18,7 +18,7 @@
       <a class="brand" aria-label="Unlocked home" href="#/library"><span class="brand-mark" aria-hidden="true"><i></i></span><span>UNLOCKED</span></a>
       <nav aria-label="Main navigation" class="primary-nav">
         <a href="#/library" data-page="library">All games</a>
-        <a href="#/top" data-page="top">Top games</a>
+        <a href="#/top" data-page="top">Most played</a>
         <a href="#/saved" data-page="saved">Saved</a>
       </nav>
       <form id="search-form" class="search-box" role="search">
@@ -39,10 +39,9 @@
     <div class="loading" role="status">Opening the game vault…</div>
     <noscript>Enable JavaScript to browse the arcade and launch a game.</noscript>
   </main>
-  <aside id="hub-dock" class="hub-dock" aria-label="Player account and settings"></aside>
   <footer class="wrap footer">
     <a class="footer-brand" href="#/library">UNLOCKED</a>
-    <nav aria-label="Help"><button data-action="tour">Quick tour</button><a href="#/report">Report a bug</a><a href="#/credits">Credits</a></nav>
+    <nav aria-label="Help"><button data-action="tour">Quick tour</button><a href="#/settings">Settings</a><a href="#/credits">Credits</a></nav>
   </footer>
   <dialog id="guide" aria-labelledby="guide-title"><div id="guide-body"></div></dialog>
   <div id="toast" role="status" aria-live="polite"></div>
