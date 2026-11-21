@@ -89,7 +89,7 @@ function poster(g) {
   return '<img src="'+posterAsset(g.id)+'" alt="" width="320" height="480" loading="lazy" decoding="async" referrerpolicy="no-referrer">';
 }
 function playStatus(g) {
-  return g.mode === "embed" ? '<span>Playable in browser</span>' : '<span>In-page play unavailable</span>';
+  return g.mode === "embed" ? '' : '<span>In-page play unavailable</span>';
 }
 function moreButton(total) {
   return total > visibleCount ? '<div class="more-games">'+btn("show-more","Show more games",null)+'</div>' : "";
