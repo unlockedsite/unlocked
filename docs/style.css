@@ -342,3 +342,9 @@ dialog .actions{justify-content:space-between;margin-top:1rem}
 .brand .brand-mark{width:3.15rem;height:3.15rem;flex:0 0 3.15rem;background-size:contain}
 @media(max-width:780px){.brand .brand-mark{width:2.65rem;height:2.65rem;flex-basis:2.65rem}}
 @media(max-width:540px){.brand .brand-mark{width:2.45rem;height:2.45rem;flex-basis:2.45rem}}
+
+/* Consistent action-button composition: icon and label stay together; arrow at far right. */
+.community-bar>a.join-discord,.community-bar>a.community-action{position:relative;justify-content:center;gap:.55rem;padding-left:1rem;padding-right:2.25rem}
+.community-bar>a.join-discord>.ico:first-child,.community-bar>a.community-action>.ico:first-child{flex:0 0 auto;width:1.36rem;height:1.36rem}
+.community-bar>a.join-discord>.ico:last-child,.community-bar>a.community-action>.ico:last-child{position:absolute;right:.8rem;top:50%;transform:translateY(-50%);width:.85rem;height:.85rem;flex:0 0 auto;color:#ffffffdc}
+.community-bar>a.join-discord>span,.community-bar>a.community-action>span{flex:0 1 auto;min-width:0}
