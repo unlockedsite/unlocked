@@ -509,3 +509,9 @@ body.player-fullscreen-open{overflow:hidden}
 /* Header Settings shortcut sits immediately left of Appearance. */
 .preferences .header-settings{display:inline-grid;place-items:center;text-decoration:none;flex:none}
 .preferences .header-settings .ico{width:1.2rem;height:1.2rem}
+
+/* Keep Settings and Appearance aligned as one compact header control group. */
+.mast .preferences{display:flex;align-items:center;justify-content:flex-end;gap:.45rem;min-width:max-content}
+.mast .preferences>.icon-btn{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;vertical-align:middle;box-sizing:border-box;color:var(--text)}
+.mast .preferences>.icon-btn .ico{display:block;width:1.2rem;height:1.2rem}
+@media(max-width:540px){.mast .preferences{gap:.35rem}}
