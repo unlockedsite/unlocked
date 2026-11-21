@@ -136,9 +136,6 @@ function nextFeature(index = (featureIndex + 1) % featured.length){
   if (refocus) slide.querySelector('.feature-bar[aria-pressed="true"]').focus({preventScroll:true});
 
 }
-function invite(){
-  return inviteHidden?"":'<aside class="tour-invite">'+icon("gamepad")+'<strong>First time in the vault?</strong><button class="tour-open" data-action="tour">Take the quick tour</button><button class="tour-skip" data-action="skip-tour">Skip</button></aside>';
-}
 function requestsPage(){
   main.innerHTML='<section class="narrow section-page"><a class="back" href="#/library">'+icon("back")+'All games</a><h1 class="panel-title">Request a game</h1><p class="subcopy">Suggest a game for the Unlocked library. Your request goes to the arcade team on Discord.</p><form class="form" id="request-form"><div class="field"><label for="request-title">Game title</label><input id="request-title" name="title" minlength="2" maxlength="80" required></div><button class="btn" type="submit">Send request</button><p class="feedback" role="status"></p></form></section>';
 }
@@ -190,7 +187,7 @@ function renderLibrary(){
   const full=searching ? games.filter(g=>!q || matches(g,q)) : games;
   const rows=full.filter(g=>(!genre || g.genre===genre)&&(!level || g.load===level) && (availability==="all" || (g.mode==="embed")===(availability==="play")));
   const label=searching ? "Search results" : "Game library";
-  const aside='<div class="shelf-aside">'+(searching?"":invite())+'<span class="sort-label">A–Z</span></div>';
+  const aside='<div class="shelf-aside"><span class="sort-label">A–Z</span></div>';
   let html=searching?"":'<div class="spotlight">'+hero()+chartPanel()+'</div>'+communityBar();
   html+=titleBar(searching?"h1":"h2",label,rows.length,aside)+filters();
   if(rows.length) html+=grid(rows.slice(0,visibleCount))+moreButton(rows.length);
@@ -250,18 +247,40 @@ function displayDialog(html){
   $("#guide-body").innerHTML=html;
   if(!guide.open)guide.showModal();
 }
-function guidePage(){
-  const steps=[
-    ["Find your game","Search by title or nickname. Filter by genre or Chromebook spec to narrow the vault."],
-    ["Pick a good fit","Low aims for 60 FPS. Medium aims for 30. High-demand ports may struggle on a Chromebook. These are estimates."],
-    ["Keep your favorites","Bookmark a game to save it here. Top games ranks games by total playtime, and the player has a fullscreen control."],
-    ["What’s your favorite game?","Search the vault for a favorite, or browse our arcade picks. Missing games can be requested from the results."]
-  ];
-  const [title,body]=steps[tourStep];
-  displayDialog('<div class="guide-steps" aria-label="Step '+(tourStep+1)+' of 4">'+steps.map((_,i)=>'<i class="'+(i<=tourStep?"on":"")+'"></i>').join("")+'</div><h2 id="guide-title">'+title+'</h2><p>'+body+'</p>'+
-    (tourStep===3?'<form class="guide-search" id="guide-search"><input aria-label="Favorite game title" placeholder="Favorite game" maxlength="80"><button class="btn">Search</button></form>':"")+
-    '<div class="actions"><button class="tour-skip" data-action="close-guide">'+(tourStep===3?"Done":"Skip tour")+'</button>'+btn(tourStep===3?"see-top":"next-guide",tourStep===3?"View top games":"Next",null,"btn")+'</div>');
+const tourStops = [
+  [".spotlight .hero", "Featured games", "Geometry Dash, 60 Seconds!, and R.E.P.O. rotate here. Select a progress bar to switch games, or choose Play game to jump in."],
+  [".community-bar", "Request a game", "Missing a favorite? Use Request a game beside Discord to send its title to the arcade team."],
+  [".filters", "Find a game for your device", "Choose a genre or Chromebook spec to narrow the library. Low-demand games are the lightest to run."]
+];
+function positionSpotlight(){
+  if(!guide.open || !guide.classList.contains("guided"))return;
+  const box=$(tourStops[tourStep][0])?.getBoundingClientRect();
+  if(!box)return;
+  const frame=guide.querySelector(".tour-frame");
+  Object.assign(frame.style,{top:box.top+"px",left:box.left+"px",width:box.width+"px",height:box.height+"px"});
+  const height=guide.offsetHeight;
+  const below=innerHeight-box.bottom, above=box.top;
+  const top=below>=height+12 || below>=above ? box.bottom+10 : box.top-height-10;
+  guide.style.top=Math.max(8,Math.min(innerHeight-height-8,top))+"px";
 }
+function guidePage(){
+  const [selector,title,body]=tourStops[tourStep];
+  const target=$(selector);
+  target.scrollIntoView({block:"center",behavior:"instant"});
+  guide.classList.add("guided");
+  const last=tourStep===tourStops.length-1;
+  displayDialog('<span class="tour-frame" aria-hidden="true"></span><small>Quick tour · '+(tourStep+1)+' of '+tourStops.length+'</small><h2 id="guide-title">'+title+'</h2><p>'+body+'</p><div class="actions">'+btn("close-guide","End tour",null,"tour-skip")+btn(last?"close-guide":"next-guide",last?"Done":"Next",null,"btn")+'</div>');
+  positionSpotlight();
+  guide.querySelector(".btn").focus({preventScroll:true});
+}
+function offerTour(){
+  if(inviteHidden)return;
+  rememberTour();
+  displayDialog('<h2 id="guide-title">Want a quick tour?</h2><p>See where to play featured games, request a favorite, and find games for your device.</p><div class="actions">'+btn("close-guide","No thanks",null,"tour-skip")+btn("tour","Show me around",null,"btn")+'</div>');
+}
+guide.addEventListener("close",()=>{guide.classList.remove("guided");guide.style.top="";});
+window.addEventListener("resize",positionSpotlight);
+window.addEventListener("scroll",positionSpotlight,{passive:true});
 function showSpecs(){
   displayDialog('<h2 id="guide-title">Chromebook spec guide</h2><dl class="spec-list">'+Object.keys(levels).map(k=>'<dt>'+specBadge(k)+'</dt><dd>'+levelTips[k]+'</dd>').join("")+'</dl><p>Estimates depend on your device, the scene, and the game’s graphics settings.</p>'+btn("close-guide","Got it",null,"btn"));
 }
@@ -293,7 +312,7 @@ async function getLaunch(id) {
   // Free releases ship their launch map alongside the catalog on Pages.
   // Gated releases omit the map and authorize each launch with the Worker.
   if (!launchCatalog) {
-    launchCatalog = fetch("./free-launches.json?v=8", {credentials:"omit",cache:"no-store"}).then(async response => {
+    launchCatalog = fetch("./free-launches.json?v=13", {credentials:"omit",cache:"no-store"}).then(async response => {
       if (response.status===404) return null;
       if (!response.ok) throw Error("Couldn’t load the launch catalog. Try again.");
       return response.json();
@@ -422,6 +441,7 @@ function route({scroll=true}={}){
   else main.innerHTML='<div class="empty"><h1>Page not found</h1><a class="btn" href="#/library">Browse games</a></div>';
   scheduleChart();
   if(scroll){window.scrollTo(0,0);main.focus({preventScroll:true});}
+  if(current.page==="library")offerTour();
 }
 function searchView(value){
   const raw=value.slice(0,80), next=raw.trim();searchMessage="";
@@ -487,9 +507,12 @@ function setup(){
     const footerBug=e.target.closest('.footer a[href="#/report"]');if(footerBug && current.page!=="report"){e.preventDefault();location.hash=reportUrl();}
     const action=e.target.closest("[data-action]")?.dataset.action;
     switch(action){
-      case "tour":tourStep=0;rememberTour();guidePage();break;
+      case "tour":
+        rememberTour();
+        if(current.page!=="library"){history.pushState(null,"","#/library");route();}
+        tourStep=0;guidePage();break;
       case "skip-tour":rememberTour();break;
-      case "next-guide":tourStep=Math.min(3,tourStep+1);guidePage();break;
+      case "next-guide":tourStep=Math.min(tourStops.length-1,tourStep+1);guidePage();break;
       case "close-guide":guide.close();break;
       case "see-top":guide.close();location.hash="#/top";break;
       case "specs":showSpecs();break;
@@ -516,9 +539,9 @@ function setup(){
   });
 }
 async function readJson(path){
-  const res=await fetch(path,{credentials:"omit"});if(!res.ok)throw Error("File unavailable");
+  const res=await fetch(path,{credentials:"omit",cache:"no-cache"});if(!res.ok)throw Error("File unavailable");
   return res.json();
 }
 setup();
-try {games=(await readJson("./games.json?v=8")).sort(alphabetical);byId=new Map(games.map(g=>[g.id,g]));route({scroll:false});}
+try {games=(await readJson("./games.json?v=13")).sort(alphabetical);byId=new Map(games.map(g=>[g.id,g]));route({scroll:false});}
 catch {main.innerHTML='<div class="empty"><h1>Couldn’t open the vault</h1><p>Reload this page to fetch the game catalog.</p><a class="btn" href="./">Reload</a></div>';}
