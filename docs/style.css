@@ -456,34 +456,7 @@ body.player-fullscreen-open{overflow:hidden}
 .card:focus-within{z-index:12}.card:focus-within .cover{overflow:visible}
 
 /* Discord-inspired local player dock. Fixed on desktop; not over game controls on mobile. */
-.hub-dock{position:fixed;left:14px;bottom:14px;z-index:65;display:flex;align-items:center;gap:.3rem;width:245px;max-width:calc(100vw - 28px);padding:.45rem;background:var(--surface);border:1px solid var(--line);border-radius:1rem;box-shadow:0 10px 32px #0006}
-.hub-dock-main{display:flex;align-items:center;gap:.65rem;flex:1;min-width:0;padding:.25rem;color:var(--text);text-decoration:none;border-radius:.6rem}
-.hub-dock-main:hover,.hub-dock-gear:hover{background:var(--raised)}
-.hub-dock-main span:not(.hub-avatar){display:flex;flex-direction:column;min-width:0}
-.hub-dock-main strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.86rem}
-.hub-dock-main small{color:var(--muted);font-size:.68rem}
-.hub-avatar{display:inline-grid;place-items:center;width:2.6rem;height:2.6rem;flex:0 0 2.6rem;border-radius:50%;background:linear-gradient(145deg,#5865f2,#2c3688);color:#fff;font-size:1.25rem;overflow:hidden;border:2px solid var(--player-accent,#ffd063)}
-.hub-avatar img{width:100%;height:100%;object-fit:cover}
-.hub-dock-gear{display:grid;place-items:center;width:2rem;height:2rem;border-radius:.6rem;color:var(--text);font-size:1.25rem;text-decoration:none}
 .hub-page{max-width:920px;margin-inline:auto}
-.hub-profile{border:1px solid var(--line);background:var(--surface);border-radius:1.2rem;overflow:hidden;margin:1.3rem 0}
-.hub-banner{height:150px;background:linear-gradient(115deg,#5865f2,#8e60e8)}
-.hub-profile-info{display:flex;align-items:center;gap:1rem;padding:0 1.3rem 1.2rem;flex-wrap:wrap}
-.hub-profile-info .hub-avatar{width:5.5rem;height:5.5rem;flex-basis:5.5rem;font-size:2.5rem;margin-top:-2.7rem;border-width:4px;border-color:var(--surface)}
-.hub-profile-info h2{margin:0}
-.hub-profile-info p{color:var(--muted);margin:.2rem 0}
-.hub-profile-info .secondary-btn{margin-left:auto}
-.hub-badges{display:flex;flex-wrap:wrap;gap:.45rem;padding:0 1.3rem 1.3rem}
-.hub-badge{font-size:.77rem;padding:.35rem .65rem;border:1px solid var(--line);border-radius:999px;color:var(--muted);background:var(--raised)}
-.hub-badge.earned{border-color:var(--player-accent,#ffd063);color:var(--text);background:var(--tint)}
-.hub-stat-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.7rem;margin:1.3rem 0}
-.hub-stat-row>div{display:flex;flex-direction:column;gap:.2rem;padding:1rem;background:var(--surface);border:1px solid var(--line);border-radius:.8rem}
-.hub-stat-row strong{font-size:1.5rem}.hub-stat-row span{font-size:.8rem;color:var(--muted)}
-.hub-challenges{display:grid;gap:.65rem;margin:1rem 0}
-.hub-challenge{display:flex;align-items:center;gap:.8rem;padding:.9rem 1rem;background:var(--surface);border:1px solid var(--line);border-radius:.7rem}
-.hub-challenge>span:first-child{font-size:1.3rem;color:var(--player-accent,#ffd063)}
-.hub-challenge>div{flex:1}.hub-challenge p{margin:.1rem 0;color:var(--muted);font-size:.8rem}
-.hub-challenge>span:last-child{font-size:.75rem;color:var(--muted)}
 .hub-settings{display:grid;gap:.8rem;padding:1.3rem;background:var(--surface);border:1px solid var(--line);border-radius:1rem;margin:1.2rem 0}
 .hub-settings label:not(.hub-check){display:grid;gap:.35rem;font-weight:700}
 .hub-settings input:not([type="checkbox"]),.hub-settings textarea,.hub-settings select{width:100%;padding:.7rem;border:1px solid var(--line);border-radius:.55rem;background:var(--bg);color:var(--text);font:inherit}
@@ -503,7 +476,7 @@ body.player-fullscreen-open{overflow:hidden}
 .hub-compact .card-copy{padding:.4rem}
 .hub-large{font-size:112.5%}
 .hub-contrast{--line:#8b9cb1;--muted:#bac5d6}
-@media(max-width:760px){.hub-dock{position:relative;bottom:auto;left:auto;margin:1rem auto;width:min(340px,calc(100% - 28px))}.hub-stat-row{grid-template-columns:repeat(2,1fr)}.hub-feature-row{grid-template-columns:1fr}}
+@media(max-width:760px){.hub-feature-row{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.hub-feature{transition:none}.hub-feature:hover{transform:none}}
 
 .hub-game-extras{margin:1.8rem 0;padding:1.2rem;background:var(--surface);border:1px solid var(--line);border-radius:1rem}
