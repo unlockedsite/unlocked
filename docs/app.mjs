@@ -221,8 +221,8 @@ function rouletteView(){
  const distance=chosen*(tileWidth+gap);
  // A fixed card width keeps the landing accurate across mobile and desktop.
  const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches||performanceMode;
- if(reduce){reelEl.style.transform='translateX(calc(50% - 72px - '+distance+'px))';}
- else requestAnimationFrame(()=>requestAnimationFrame(()=>{if(guide.open&&rouletteWinner===winner.id){reelEl.style.transition='transform 4100ms cubic-bezier(.12,.68,.08,1)';reelEl.style.transform='translateX(calc(50% - 72px - '+distance+'px))';}}));
+ if(reduce){reelEl.style.transform='translateX(calc(-72px - '+distance+'px))';}
+ else requestAnimationFrame(()=>requestAnimationFrame(()=>{if(guide.open&&rouletteWinner===winner.id){reelEl.style.transition='transform 4100ms cubic-bezier(.12,.68,.08,1)';reelEl.style.transform='translateX(calc(-72px - '+distance+'px))';}}));
  rouletteTimer=setTimeout(()=>{
    rouletteTimer=null;
    if(!guide.open||rouletteWinner!==winner.id)return;
@@ -360,7 +360,9 @@ function displayDialog(html){
 const tourStops = [
   [".spotlight .hero", "Featured games", "Geometry Dash, 60 Seconds!, and R.E.P.O. rotate here. Select a progress bar to switch games, or choose Play game to jump in."],
   [".community-bar", "Request a game", "Missing a favorite? Use Request a game beside Discord to send its title to the arcade team."],
-  [".filters", "Find a game for your device", "Choose a genre or Chromebook spec to narrow the library. Low-demand games are the lightest to run."]
+  [".qol-bar", "Surprise Me and quick tools", "Open a game roulette, switch to Low graphics, or view your play history and updates."],
+  [".filters", "Find a game for your device", "Choose a genre or Chromebook spec to narrow the library. Low-demand games are the lightest to run."],
+  [".grid", "Game ratings and details", "Hover over or focus an age badge for an unofficial estimate. Hardware-demand badges give approximate Chromebook requirements."]
 ];
 function positionSpotlight(){
   if(!guide.open || !guide.classList.contains("guided"))return;
@@ -376,11 +378,11 @@ function positionSpotlight(){
 function guidePage(){
   const [selector,title,body]=tourStops[tourStep];
   const target=$(selector);
-  if(!target){tourStep=Math.min(tourStops.length-1,tourStep+1);return;}
+  if(!target){guide.close();return;}
   target.scrollIntoView({block:"center",behavior:matchMedia("(prefers-reduced-motion: reduce)").matches||performanceMode?"instant":"smooth"});
   guide.classList.add("guided");
   const last=tourStep===tourStops.length-1;
-  displayDialog('<span class="tour-frame" aria-hidden="true"></span><small>Quick tour · '+(tourStep+1)+' of '+tourStops.length+'</small><h2 id="guide-title">'+title+'</h2><p>'+body+'</p><div class="actions">'+btn("close-guide","End tour",null,"tour-skip")+btn(last?"close-guide":"next-guide",last?"Done":"Next",null,"btn")+'</div>');
+  displayDialog('<span class="tour-frame" aria-hidden="true"></span><small>Quick tour · '+(tourStep+1)+' of '+tourStops.length+'</small><h2 id="guide-title">'+title+'</h2><p>'+body+'</p><div class="actions">'+btn("close-guide","End tour",null,"tour-skip")+(tourStep?btn("previous-guide","Back","back"):"")+btn(last?"close-guide":"next-guide",last?"Done":"Next",null,"btn")+'</div>');
   requestAnimationFrame(()=>requestAnimationFrame(positionSpotlight));
   guide.querySelector(".btn").focus({preventScroll:true});
 }
@@ -665,7 +667,8 @@ function setup(){
         if(current.page!=="library"){history.pushState(null,"","#/library");route();}
         tourStep=0;guidePage();break;
       case "skip-tour":rememberTour();break;
-      case "next-guide":tourStep=Math.min(tourStops.length-1,tourStep+1);guidePage();break;
+      case "previous-guide":tourStep=Math.max(0,tourStep-1);guidePage();break;
+       case "next-guide":tourStep=Math.min(tourStops.length-1,tourStep+1);guidePage();break;
       case "close-guide":guide.close();break;
       case "see-top":guide.close();location.hash="#/top";break;
       case "specs":showSpecs();break;
