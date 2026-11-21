@@ -103,8 +103,10 @@ function moreButton(total) {
 }
 function card(g, {rank=0,count=0}={}) {
   const title=esc(g.title);
+  const health=healthReports[g.id];
+  const healthBadge=health==="issue"?'<span class="qol-health" title="You marked this game as having issues">Reported issue</span>':"";
   const starts=rank && chartState==="live"?'<span class="poster-plays">'+playtime(count)+'</span>':'';
-  return '<article class="card"><a href="#/game/'+g.id+'" aria-label="'+title+'"><div class="cover">'+poster(g)+specBadge(g.load)+(rank?'<span class="rank">#'+rank+'</span>':'')+'</div><div class="card-copy"><span class="poster-genre">'+esc(g.genre)+'</span><h3>'+title+'</h3><div class="poster-numbers">'+playStatus(g)+starts+'</div></div></a>'+(qol.read("history",[]).some(h=>h.id===g.id)?'<span class="qol-visited" title="Played before">Played</span>':'')+bookmark(g.id,true)+'</article>';
+  return '<article class="card"><a href="#/game/'+g.id+'" aria-label="'+title+'"><div class="cover">'+poster(g)+specBadge(g.load)+healthBadge+(rank?'<span class="rank">#'+rank+'</span>':'')+'</div><div class="card-copy"><span class="poster-genre">'+esc(g.genre)+'</span><h3>'+title+'</h3><div class="poster-numbers">'+playStatus(g)+starts+'</div></div></a>'+(qol.read("history",[]).some(h=>h.id===g.id)?'<span class="qol-visited" title="Played before">Played</span>':'')+bookmark(g.id,true)+'</article>';
 }
 const grid = (rows) => '<div class="grid">'+rows.map(g=>card(g)).join("")+'</div>';
 const titleBar = (tag,title,count,aside="") => '<div class="shelf-head"><div class="shelf-title"><'+tag+'>'+esc(title)+'</'+tag+'><span class="count" aria-label="'+count+' games">'+count+'</span></div>'+aside+'</div>';
@@ -363,7 +365,7 @@ function gameLayout(g){
   const stageImage=g.imported?posterAsset(g.id):relativeAsset(g.id);
   main.innerHTML='<a class="back" href="#/library">'+icon("back")+'All games</a><h1 class="game-title">'+esc(g.title)+'</h1><div class="game-meta">'+specBadge(g.load)+'<span>'+esc(g.genre)+'</span>'+(g.edition?'<span class="edition">'+esc(g.edition)+'</span>':'')+playStatus(g)+'</div>'+
     '<div class="stage-slot"><div id="stage" class="stage centered"><div class="stage-art" style="background-image:url(\''+stageImage+'\')" ></div><div class="startbox" id="startbox"><p role="status">Preparing the player…</p></div><button type="button" class="icon-btn exit-stage" data-action="fullscreen" title="'+exitLabel+'" aria-label="'+exitLabel+'">'+icon("close")+'</button></div></div>'+
-    '<div class="play-tools">'+btn("share-game","Share game","external")+btn("preview-game","Quick preview","info")+(g.mode==="embed"?btn("fullscreen",displayLabel,"expand"):"")+bookmark(g.id)+'<a class="secondary-btn report-link" href="'+reportUrl()+'">'+icon("bug")+'Report a bug</a></div><div id="key-area"></div>'+
+    '<div class="play-tools">'+btn("share-game","Share game","external")+btn("preview-game","Quick preview","info")+btn("health-game","Game status","info")+(g.mode==="embed"?btn("fullscreen",displayLabel,"expand"):"")+bookmark(g.id)+'<a class="secondary-btn report-link" href="'+reportUrl()+'">'+icon("bug")+'Report a bug</a></div><div id="key-area"></div>'+
     '<div class="details"><section class="pane"><h2>About this game</h2><p>'+esc(g.description || (g.mode==="embed"?"Browser build from the linked source project.":"Listed in the Ultimate Catalog of Web Game Ports."))+'</p><details><summary>Port details &amp; sources</summary><ul>'+g.sources.map((u,i)=>'<li><a target="_blank" rel="noopener noreferrer" href="'+esc(u)+'">'+esc(u.includes("github.com/")?u.replace("https://github.com/",""):new URL(u).hostname)+(g.sources.length>1?" · source "+(i+1):"")+'</a></li>').join("")+'</ul>'+(g.posterSource?'<a class="text-link" href="'+esc(g.posterSource)+'" target="_blank" rel="noopener noreferrer">Preview artwork</a>':'')+'<div id="other-ports"></div></details></section>'+
     '<section class="pane"><h2>Playing on a Chromebook</h2><p>'+esc(g.notes || "Chromebook performance varies by port and device.")+'</p><button class="text-link" data-action="specs">See the spec guide</button></section></div>';
   if(g.mode==="embed"){
@@ -567,7 +569,10 @@ function setup(){
   window.addEventListener("pageshow",e=>{if(e.persisted){scheduleHeartbeat();scheduleChart();}});
   document.querySelector(".skip").addEventListener("click",e=>{e.preventDefault();main.focus();});
   document.addEventListener("keydown",e=>{
-    if(e.key==="/" && !guide.open && !["INPUT","TEXTAREA","SELECT","IFRAME"].includes(document.activeElement?.tagName)){e.preventDefault();search.focus();}
+    if(e.key==="g" && e.altKey && !e.repeat){e.preventDefault();location.hash="#/library";}
+     if(e.key==="s" && e.altKey && !e.repeat){e.preventDefault();location.hash="#/saved";}
+     if(e.key==="r" && e.altKey && !e.repeat && !["INPUT","TEXTAREA","SELECT","IFRAME"].includes(document.activeElement?.tagName)){e.preventDefault();const choices=games.filter(g=>g.mode==="embed");if(choices.length)location.hash="#/game/"+choices[Math.floor(Math.random()*choices.length)].id;}
+     if(e.key==="/" && !guide.open && !["INPUT","TEXTAREA","SELECT","IFRAME"].includes(document.activeElement?.tagName)){e.preventDefault();search.focus();}
     if(e.key==="Escape"){$("#theme-panel").hidden=true;$("#theme-button").setAttribute("aria-expanded","false");}
   });
   document.addEventListener("click",e=>{
@@ -602,6 +607,9 @@ function setup(){
       case "random-game":{const choices=games.filter(g=>g.mode==="embed");if(choices.length)location.hash="#/game/"+choices[Math.floor(Math.random()*choices.length)].id;break;}
        case "performance":performanceMode=!performanceMode;qol.write("performance",performanceMode);document.documentElement.classList.toggle("low-graphics",performanceMode);if(current.page==="library")renderLibrary();break;
        case "share-game":qol.safeCopy(location.href).then(()=>toast("Game link copied")).catch(()=>displayDialog('<h2>Share this game</h2><p>'+esc(location.href)+'</p>'+btn("close-guide","Close",null)));break;
+       case "health-game":{const g=byId.get(current.id);if(g)displayDialog('<h2>Game status: '+esc(g.title)+'</h2><p>Live automated game checks are not available. You can flag a problem on this device, or submit a bug report to the team.</p><div class="actions">'+btn("mark-issue","Mark issue","bug")+btn("clear-issue","Clear flag","check")+btn("close-guide","Close",null)+'</div>');break;}
+       case "mark-issue":healthReports[current.id]="issue";qol.write("health",healthReports);guide.close();toast("Flagged on this device");break;
+       case "clear-issue":delete healthReports[current.id];qol.write("health",healthReports);guide.close();toast("Local flag cleared");break;
        case "preview-game":{const g=byId.get(current.id);if(g)displayDialog('<h2>'+esc(g.title)+'</h2><p>'+esc(g.description||"Browser game")+'</p><p>Genre: '+esc(g.genre)+' · Performance: '+esc(levels[g.load]||"Unknown")+'</p>'+btn("close-guide","Close",null));break;}
        case "clear-history":qol.write("history",[]);renderHistory();break;
        case "new-folder":{const name=prompt("New favorites folder name (up to 30 characters):")?.trim().slice(0,30);if(name&&!["All","__proto__","constructor","prototype"].includes(name)){qol.storeFolder(name,[]);selectedFolder=name;renderSaved();}break;}
