@@ -1,4 +1,4 @@
-import { icon } from "./icons.mjs?v=2";
+import { icon } from "./icons.mjs?v=3";
 import { matches, normalize } from "./search.mjs";
 import { chromeOS, createPlayer } from "./player.mjs?v=6";
 
