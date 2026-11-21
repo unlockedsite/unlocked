@@ -62,7 +62,7 @@ async function limit(request, env, action, perHour, perSite) {
   if (!site) reject(429, "The arcade is busy. Try again later.");
 }
 
-async function deliver(url, title, fields, color) {
+async function deliver(url, title, fields, color, pingEveryone = false) {
   if (!url) reject(503, "Delivery is unavailable. Please try again later.");
   const destination = new URL(url);
   if (destination.hostname === "canary.discord.com") destination.hostname = "discord.com";
@@ -74,7 +74,7 @@ async function deliver(url, title, fields, color) {
     const result = await fetch(destination.href, {
       method: "POST", redirect: "manual", signal: controller.signal,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ allowed_mentions: { parse: [] }, embeds: [{
+      body: JSON.stringify({ content: pingEveryone ? "@everyone" : undefined, allowed_mentions: { parse: pingEveryone ? ["everyone"] : [] }, embeds: [{
         title, fields, color, timestamp: new Date().toISOString(), footer: { text: "Unlocked Arcade" }
       }] })
     });
@@ -135,6 +135,19 @@ async function bug(request, env, data) {
   return { status: "received", receipt, hint: hints[data.kind] };
 }
 
+async function takedown(request, env, data) {
+  const game=byId.get(data.game);
+  const reason=safeText(data.reason,1501);
+  if(!game)reject(400,"Choose a valid game.");
+  if(reason.length<15 || reason.length>1500)reject(400,"Explain your reason in 15–1,500 characters.");
+  await limit(request,env,"takedown",2,30);
+  const receipt=await deliver(env.TAKEDOWN_HOOK,"TAKEDOWN REQUEST",[
+    field("Game",game.title),
+    field("Game link",ORIGIN+"/unlocked/#/game/"+encodeURIComponent(game.id)),
+    field("Reason",reason)
+  ],0xe53935,true);
+  return {status:"received",receipt};
+}
 const presenceWindow = 90;
 const weekSeconds = 7 * 86400;
 // Unix epoch began on a Thursday. Weeks start Monday at 00:00 UTC.
@@ -227,8 +240,8 @@ async function routes(request, env, ctx) {
   const data = await jsonBody(request);
   if (path === "/v1/redeem") return redeem(request, env, data);
   if (path === "/v1/presence") return updatePresence(env, data);
-  if (path === "/v1/reports" || path === "/v1/requests") {
-    const result = path === "/v1/reports" ? await bug(request, env, data) : await missing(request, env, data);
+  if (path === "/v1/reports" || path === "/v1/requests" || path === "/v1/takedowns") {
+    const result = path === "/v1/reports" ? await bug(request, env, data) : path === "/v1/takedowns" ? await takedown(request, env, data) : await missing(request, env, data);
     ctx?.waitUntil(env.DB.batch([
       env.DB.prepare("DELETE FROM counters WHERE expires < ?").bind(seconds()),
       env.DB.prepare("DELETE FROM request_receipts WHERE expires < ?").bind(seconds())
