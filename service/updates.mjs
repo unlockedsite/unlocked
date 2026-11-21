@@ -21,7 +21,7 @@ export async function announce(id, env) {
     sha TEXT UNIQUE NOT NULL, receipt TEXT
   )`).run();
   const existing = await db.prepare(`SELECT receipt,version FROM ${releases} WHERE deployment=?`).bind(id).first();
-  if (existing) return Response.json({version:existing.version, delivered:!!existing.receipt}, {status:existing.receipt?200:503});
+  if (existing?.receipt) return Response.json({version:existing.version, delivered:!!existing.receipt}, {status:existing.receipt?200:503});
   const deployment = await github("/deployments/"+id);
   if (deployment.environment !== "github-pages" || deployment.ref !== "main" || !/^[0-9a-f]{40}$/.test(deployment.sha)) return Response.json({skipped:true});
   const statuses = await github("/deployments/"+id+"/statuses");
@@ -36,14 +36,22 @@ export async function announce(id, env) {
     const titles = diff.commits.map(c=>c.commit.message.split("\n")[0]).filter(s=>!/^Merge (pull request|branch|remote-tracking)/.test(s));
     notes = [...new Set(titles)].slice(-8).map(s=>"• "+s.slice(0,110)).join("\n") || "• Published the latest arcade changes.";
   }
-  const row = await db.prepare(`INSERT OR IGNORE INTO ${releases}(version,deployment,sha)
+  const row = existing || await db.prepare(`INSERT OR IGNORE INTO ${releases}(version,deployment,sha)
     SELECT COALESCE(MAX(version),0)+1,?,? FROM ${releases}
     HAVING COUNT(*)=COUNT(receipt) RETURNING version`).bind(id,sha).first();
   if (!row) return Response.json({busy:true},{status:503});
+  // A short claim lets a later workflow resume an interrupted delivery.
+  await db.prepare("CREATE TABLE IF NOT EXISTS arcade_announcement_claims (deployment TEXT PRIMARY KEY, until_time INTEGER NOT NULL)").run();
+  const claim = await db.prepare(`INSERT INTO arcade_announcement_claims VALUES (?,unixepoch()+600)
+    ON CONFLICT(deployment) DO UPDATE SET until_time=excluded.until_time
+    WHERE until_time<=unixepoch() RETURNING deployment`).bind(id).first();
+  if (!claim) return Response.json({busy:true},{status:503});
+  if ((await db.prepare(`SELECT receipt FROM ${releases} WHERE deployment=?`).bind(id).first())?.receipt)
+    return Response.json({duplicate:true});
   const version = "1."+row.version;
   const url = new URL(env.UPDATE_HOOK);
   url.searchParams.set("wait","true");
-  const result = await fetch(url, {method:"POST",redirect:"error",headers:{"Content-Type":"application/json"},body:JSON.stringify({
+  const result = await fetch(url, {method:"POST",redirect:"manual",headers:{"Content-Type":"application/json"},body:JSON.stringify({
     content:"<@&"+role+">",allowed_mentions:{parse:[],roles:[role]},
     embeds:[{title:"Unlocked | Update v"+version,url:arcade,color:0xFFD05B,
       description:notes,fields:[{name:"Play the update",value:"[Open Unlocked]("+arcade+") · [View changes](https://github.com/"+repository+"/commit/"+sha+")"}],

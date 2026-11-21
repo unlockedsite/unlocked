@@ -814,18 +814,6 @@
     "posterSource": "https://github.com/libretro-thumbnails/Nintendo_-_Nintendo_64/blob/ff0badea277f2d2d15e9008b04f1a0fd6abc40a3/Named_Boxarts/Blast%20Corps%20%28USA%29.png"
   },
   {
-    "id": "block-blast",
-    "title": "Block Blast",
-    "genre": "Arcade",
-    "mode": "embed",
-    "load": "low",
-    "sources": [
-      "https://github.com/SomeRandomFella/portsandrips/tree/master/blockblast-port"
-    ],
-    "imported": true,
-    "posterSource": "https://github.com/gn-math/covers/blob/67baf382659b6b386371fdb2f5c56bcc9b5174eb/6.png"
-  },
-  {
     "id": "bloodmoney",
     "title": "BLOODMONEY!",
     "genre": "Arcade",

@@ -294,3 +294,10 @@ dialog .actions{justify-content:space-between;margin-top:1rem}
 @media(prefers-reduced-motion:reduce){.feature-bar[aria-pressed=true] i{animation:feature-fill 6.5s steps(1,end) forwards!important}}
 
 #request-title{width:100%;font:inherit;color:inherit;background:var(--surface,transparent);border:1px solid var(--line,currentColor);border-radius:.5rem;padding:.8rem}
+
+#guide.guided{position:fixed;inset:auto 0 auto;margin:0 auto;overflow:visible;max-height:calc(100dvh - 1rem)}
+#guide.guided::backdrop{background:transparent}
+.tour-frame{position:fixed;border:2px solid #ffd05b;border-radius:12px;box-shadow:0 0 0 200vmax rgb(4 6 16 / .76);pointer-events:none;z-index:-1}
+#guide.guided #guide-body{isolation:isolate}
+#guide.guided .tour-frame{z-index:-2}
+#guide.guided #guide-body::before{content:"";position:absolute;inset:0;background:var(--surface);border-radius:inherit;z-index:-1}
