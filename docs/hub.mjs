@@ -8,9 +8,15 @@ export const preferences=()=>({...defaults,...store.read("preferences",{})});
 export function applySettings(){
  const p=preferences(),root=document.documentElement;
  const color=/^#[0-9a-f]{6}$/i.test(p.accent)?p.accent:defaults.accent;
- root.style.setProperty("--player-accent",color);
- root.style.setProperty("--accent",color);
- root.style.setProperty("--accent-text",color);
+ // Preserve original light/dark palette until a visitor selects a custom accent.
+ if(color.toLowerCase()===defaults.accent){for(const name of ["--player-accent","--accent","--accent-text","--focus","--tint"])root.style.removeProperty(name);}
+ else{
+  root.style.setProperty("--player-accent",color);
+  root.style.setProperty("--accent",color);
+  root.style.setProperty("--accent-text",color);
+  root.style.setProperty("--focus",color);
+  root.style.setProperty("--tint","color-mix(in srgb, "+color+" 14%, var(--surface))");
+ }
  root.style.setProperty("--custom-bg",/^#[0-9a-f]{6}$/i.test(p.background)?p.background:defaults.background);
  root.style.setProperty("--custom-radius",Math.min(24,Math.max(2,Number(p.radius)||12))+"px");
  root.style.setProperty("--glow-opacity",Math.min(1,Math.max(0,Number(p.glow)||0)/100));
