@@ -331,3 +331,9 @@ dialog .actions{justify-content:space-between;margin-top:1rem}
 .release-note ul{padding-left:1.3rem;margin:0 0 .8rem;color:var(--muted);line-height:1.6}
 @media(max-width:1050px){.recent-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:540px){.recent-grid{grid-template-columns:1fr}.recent-game img{width:4.5rem;height:4.5rem}.updates-panel{padding:.85rem}.chart-panel .ranking-tabs{margin:.5rem 0}}
+
+/* Uploaded Unlocked icon replaces the old CSS-drawn header mark. */
+.brand-mark{background:transparent url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAsCAMAAAAUyMtVAAAAkFBMVEWpjSLTryIqJBcvMkZfVyeNdSHezEhFMQ5iXUeuo0rdwisgFACBdEUAAAD81SYjJjT8yhoZHCz4zCIeIC/UigIAAADsqQjWlQcAAADxuBGvaQL96EowJBBLOAz+0R1sSAVxVQzEeAHkmwUAAAAPCgD+5DW0dgQEAwAUFBspGgBTRhIYFAVKSU1kWCmUaAaJVgKpFA/KAAAAMHRSTlP9/ez9+v3/9v3//7/9AP39/f39/f1t/f0t/f7+9vf9/f39/U+t/f6L/dH1uf39/v9+4FwRAAACYUlEQVR42t2Va5uaMBCFA4K6bVeSkJBEuS2giNf//+86k6Ar4Hbtx3Y+qM/DeT1nJiEh739Z5F8AtGxl/Tqgj8Hb21uYNfVrgAzmm+12u9nMyaGR+ltABpvtypZjjlNmAOhg4+QrzvkXzAA4/nByb3k6nZYEfLY2m/4CqAOXh8wirNmZu2xeJp8DvYEH4ji2hDPczEv5DNCBe04zlhZligjpidWhfgI0nut3ZXYJpSYD4HwbGU31BNCH+4TskAiLogXvLXLSToC2N/C4g7AVn/Z/Qqk/ATLb8C+cp2VIHMWH/A6UegRIbJAvcaKz2TIk3jmOWNjrc0Mv9QjwIfkqjG41O8FHam4GiRkDdQh6HkSDmhFvhenypEqKUaSjjd0LGbv7eNg/rSrVDZvWJY7yjIsVxWlR2GXDOuec5qaqLnIItOjtRU6vKFW9Ps4oVKWqbLTSPjqHNgkrUXNwqViZw6KratcMAdhGnBufxVAOWODvKNorABJVFXoIwCLwXFl9zHyP0jC2AMNERinhv08B6u2tnjH/HOAXICy0Buo63t5yBwAtMBN7rNSAgxIiHb9AdUlhu5gy3Q/0tp1EiHU7eeO6hHJ8SAaMbRkMMj0BZJlQV0Zdsn0P2ZaF+Jzpw9Zo1tUNsYy/Z37qgUElRFE/OzX8tRBVYm5QQi47Q+F1FUJ0z8+lpvj4+BDqk8lBjy0/zHR4CMiuWO8AUpiN42tt9Y8zHZ98dZsWayjLgNygvpB/PO7rZnFjEpSLS/P9hXJcXAHBdNBA88qVpWWXXYHYXRftq3ecbruu+/nkSiH/wT39GyDWhTqSfJS7AAAAAElFTkSuQmCC") center/contain no-repeat;transform:none;border-radius:0;box-shadow:none}
+.brand-mark i{display:none}
+.community-bar>a.community-action{gap:.55rem}
+.community-bar>a.community-action>.ico{width:1.15rem;height:1.15rem;flex-shrink:0}
