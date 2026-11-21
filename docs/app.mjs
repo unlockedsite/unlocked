@@ -738,7 +738,14 @@ function setup(){
   $("#search-form").addEventListener("submit",e=>{e.preventDefault();clearTimeout(searchDebounce);if(games.length)requestMissing();});
   window.addEventListener("hashchange",()=>route());
   
-  window.addEventListener("pagehide",e=>{if(!e.persisted)endPlay();});
+  document.addEventListener("visibilitychange",()=>{scheduleHeartbeat();scheduleChart();});
+  window.addEventListener("pagehide",e=>{
+   if(!e.persisted)endPlay();
+   else if(playSession?.registered)signalPresence(playSession,"paused");
+   clearInterval(heartbeatTimer);heartbeatTimer=null;
+   clearInterval(chartTimer);chartTimer=null;
+  });
+  window.addEventListener("pageshow",e=>{if(e.persisted){scheduleHeartbeat();scheduleChart();}});
   
   document.querySelector(".skip").addEventListener("click",e=>{e.preventDefault();main.focus();});
   document.addEventListener("keydown",e=>{
@@ -750,6 +757,8 @@ function setup(){
   });
   document.addEventListener("click",e=>{
     if(!e.target.closest(".preferences")){$("#theme-panel").hidden=true;$("#theme-button").setAttribute("aria-expanded","false");}
+    const period=e.target.closest("[data-period]");
+    if(period){rankingPeriod=period.dataset.period==="week"?"week":"all";visibleCount=pageSize;if(current.page==="top")drawTop();return;}
     const bar=e.target.closest("[data-feature]");
     if(bar){nextFeature(Number(bar.dataset.feature));return;}
     const add=e.target.closest("[data-add-folder]");if(add&&selectedFolder!=="All"){qol.storeFolder(selectedFolder,[...(qol.folders()[selectedFolder]||[]),add.dataset.addFolder]);add.remove();toast("Added to folder");return;}
@@ -798,7 +807,8 @@ function setup(){
       case "close-guide":{const completedTour=guide.classList.contains("guided") && tourStep===tourStops.length-1;guide.close();if(completedTour)window.scrollTo({top:0,behavior:performanceMode||window.matchMedia("(prefers-reduced-motion: reduce)").matches?"instant":"smooth"});break;}
       case "see-top":guide.close();location.hash="#/top";break;
       case "specs":showSpecs();break;
-      case "show-more":visibleCount+=pageSize;if(current.page==="top")drawTop();else if(current.page==="saved")renderSaved();else renderLibrary();break;
+      case "retry-global":chartState="loading";drawTop();refreshGlobalTop(true);break;
+       case "show-more":visibleCount+=pageSize;if(current.page==="top")drawTop();else if(current.page==="saved")renderSaved();else renderLibrary();break;
       case "reset-filters":genre="";level="";availability="all";visibleCount=pageSize;renderLibrary();break;
       
       case "start-game":startGame(byId.get(current.id));break;
@@ -824,7 +834,7 @@ function setup(){
     if(e.target.id==="availability"){availability=e.target.value;renderLibrary();$("#availability").focus({preventScroll:true});}
     if(e.target.id==="more-genres"){genre=e.target.value;renderLibrary();$("#more-genres").focus({preventScroll:true});}
     if(e.target.id==="folder-select"){selectedFolder=e.target.value;renderSaved();}
-     if(e.target.id==="hub-sort"){sortMode=e.target.value;renderLibrary();}
+     if(e.target.id==="hub-sort"){sortMode=e.target.value;renderLibrary();scheduleChart();}
      if(e.target.id==="compare-one"||e.target.id==="compare-two")updateCompare();
      if(e.target.id==="hub-import"){const file=e.target.files?.[0];if(file&&file.size<160000){file.text().then(text=>{if(!confirm("Import backup and replace matching local settings?"))return;hub.importData(text);location.reload();}).catch(()=>toast("Could not import backup"));}else if(file)toast("Backup file is too large");}
      if(e.target.id==="demand"){level=e.target.value;renderLibrary();$("#demand").focus({preventScroll:true});}
