@@ -252,6 +252,16 @@ dialog .actions{justify-content:space-between;margin-top:1rem}
 .presence{color:var(--muted);font-weight:650;font-variant-numeric:tabular-nums;white-space:nowrap;font-size:.81rem}
 .community-online .presence>.ico,.top-live .presence>.ico{color:var(--accent-text)}
 .top-live{gap:.9rem}.game-meta .presence{font-size:.9rem}.edition{padding-left:.6rem;border-left:1px solid var(--line)}
+/* Matching community actions: equal sizes and colored glow */
+.community-bar>a.join-discord,.community-bar>a.community-action{box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;width:clamp(12rem,22vw,17rem);min-height:3.6rem;padding:.65rem 1rem;border-radius:.65rem;font-weight:800;text-align:center;line-height:1.2;text-decoration:none;transition:background .18s,box-shadow .18s,transform .18s}
+.community-bar>a.join-discord{justify-content:space-around;background:#505be4;border:1px solid #6974ff;box-shadow:0 4px 22px #5865f25c,inset 0 1px #ffffff34}
+.community-bar>a.community-request{background:#168a49!important;color:#fff!important;border:1px solid #2dc875!important;box-shadow:0 4px 22px #18b85b65,inset 0 1px #ffffff2b!important}
+.community-bar>a.community-takedown{background:#c62828!important;color:#fff!important;border:1px solid #ed4848!important;box-shadow:0 4px 22px #e32d2d65,inset 0 1px #ffffff2b!important}
+.community-bar>a.community-request:hover,.community-bar>a.community-request:focus-visible{background:#12763e!important;box-shadow:0 5px 28px #18b85b88!important}
+.community-bar>a.community-takedown:hover,.community-bar>a.community-takedown:focus-visible{background:#af2020!important;box-shadow:0 5px 28px #e32d2d88!important}
+.community-bar>a.join-discord:hover,.community-bar>a.join-discord:focus-visible{box-shadow:0 5px 28px #5865f288}
+.community-bar>a.join-discord:hover,.community-bar>a.community-action:hover{transform:translateY(-1px)}
+@media(max-width:610px){.community-bar>a.join-discord,.community-bar>a.community-action{width:min(100%,17rem)}}
 .community-bar+.shelf-head{margin-top:1rem}
 .grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:clamp(.72rem,1.45vw,1.6rem)}
 .card{border:0;border-radius:.46rem;background:#171b2b;box-shadow:0 1px 3px #0002;isolation:isolate;transition:box-shadow .17s,transform .17s}
