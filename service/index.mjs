@@ -141,7 +141,8 @@ async function takedown(request, env, data) {
   if(!game)reject(400,"Choose a valid game.");
   if(reason.length<15 || reason.length>1500)reject(400,"Explain your reason in 15–1,500 characters.");
   await limit(request,env,"takedown",2,30);
-  const receipt=await deliver(env.TAKEDOWN_HOOK || env.REQUEST_HOOK,"TAKEDOWN REQUEST",[
+  // Takedown submissions intentionally use the same configured delivery secret as game requests.
+  const receipt=await deliver(env.REQUEST_HOOK,"TAKEDOWN REQUEST",[
     field("Game",game.title),
     field("Game link",ORIGIN+"/unlocked/#/game/"+encodeURIComponent(game.id)),
     field("Reason",reason)
