@@ -619,3 +619,10 @@ html{scrollbar-color:var(--accent) var(--bg);scrollbar-width:thin}
 @media(max-width:540px){.settings-colors{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.card .cover::before{display:none}:root.custom-cursor body::before{display:none}}
 .low-graphics .card .cover::before,.low-graphics.custom-cursor body::before{display:none}
+
+/* Apply wallpaper behind the interface, and scale rem-based UI globally. */
+:root.custom-wallpaper body{background-image:linear-gradient(#090d18bd,#090d18bd),var(--user-wallpaper);background-size:cover;background-position:center;background-attachment:fixed}
+:root.custom-wallpaper body::after{display:none}
+:root{font-size:calc(100% * var(--ui-scale))}
+:root .hub-page{zoom:1}
+:root .hub-discover,:root .library-page,:root .grid,:root .play-tools{font-size:inherit}
