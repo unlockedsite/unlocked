@@ -391,3 +391,5 @@ dialog .actions{justify-content:space-between;margin-top:1rem}
 .qol-history small{color:var(--muted)}
 .qol-folder-list{display:flex;flex-wrap:wrap;gap:.5rem;max-height:45vh;overflow:auto}
 .qol-visited{position:absolute;top:.4rem;left:.4rem;z-index:3;font-size:.65rem;font-weight:800;color:#fff;background:#225fa9;border-radius:.3rem;padding:.2rem .4rem;pointer-events:none}
+
+.qol-health{position:absolute;top:1.9rem;left:.4rem;z-index:3;font-size:.62rem;color:#fff;background:#a43127;padding:.18rem .4rem;border-radius:.3rem;pointer-events:none}
