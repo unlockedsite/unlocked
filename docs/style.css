@@ -1114,3 +1114,16 @@ body::before{display:none!important}
  .global-rankings .top-live{gap:.5rem}
  .global-rankings .ranking-tabs>.chip{flex:1 1 0}
 }
+
+/* Keep actual global playtime readable even when poster hover captions are hidden. */
+.global-rankings .global-playtime-badge{
+ position:absolute;left:.42rem;bottom:.42rem;z-index:5;
+ max-width:calc(100% - 3.1rem);
+ display:inline-flex;align-items:center;padding:.22rem .43rem;
+ border-radius:.4rem;border:1px solid #ffffff45;
+ background:#0c172bdc;color:#fff;
+ font-size:.69rem;font-weight:800;line-height:1.2;
+ font-variant-numeric:tabular-nums;white-space:nowrap;
+ pointer-events:none;
+}
+.global-rankings .global-leader-grid .card-copy{padding-bottom:2.5rem}
