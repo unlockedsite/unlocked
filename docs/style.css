@@ -377,3 +377,17 @@ dialog .actions{justify-content:space-between;margin-top:1rem}
 @media(prefers-reduced-motion:reduce){
   #content *,#content *::before,#content *::after,.community-bar *,#toast{animation:none!important;transition:none!important;scroll-behavior:auto!important}
 }
+
+/* Optional low-graphics mode: leaves embedded games untouched. */
+.low-graphics *:not(iframe),.low-graphics *::before,.low-graphics *::after{animation:none!important;transition:none!important;backdrop-filter:none!important;scroll-behavior:auto!important}
+.low-graphics .card:hover,.low-graphics .community-bar>a:hover{transform:none!important}
+.low-graphics .card:hover .cover img{transform:none!important}
+.qol-bar{display:flex;flex-wrap:wrap;align-items:center;gap:.65rem;margin:1rem 0 1.4rem}
+.qol-bar .secondary-btn{display:inline-flex;align-items:center;gap:.4rem;min-height:2.5rem}
+.qol-bar label{display:flex;align-items:center;gap:.5rem;font-weight:700}
+.qol-bar select{background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:.5rem;padding:.55rem}
+.qol-history{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,15rem),1fr));gap:.75rem;margin:1.2rem 0 2rem}
+.qol-history a{display:flex;flex-direction:column;gap:.35rem;border:1px solid var(--line);background:var(--surface);border-radius:.7rem;padding:1rem;color:var(--text)}
+.qol-history small{color:var(--muted)}
+.qol-folder-list{display:flex;flex-wrap:wrap;gap:.5rem;max-height:45vh;overflow:auto}
+.qol-visited{position:absolute;top:.4rem;left:.4rem;z-index:3;font-size:.65rem;font-weight:800;color:#fff;background:#225fa9;border-radius:.3rem;padding:.2rem .4rem;pointer-events:none}
