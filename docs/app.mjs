@@ -1,4 +1,4 @@
-import { icon } from "./icons.mjs?v=3";
+import { icon } from "./icons.mjs?v=4";
 import { matches, normalize } from "./search.mjs";
 import * as qol from "./qol.mjs?v=1";
 import { chromeOS, createPlayer } from "./player.mjs?v=7";
@@ -189,7 +189,7 @@ async function submitTakedown(form){
   finally{button.disabled=false;}
 }
 function qolBar(){
-  return '<div class="qol-bar"><button class="secondary-btn" data-action="random-game">'+icon("play")+' Surprise me</button><button class="secondary-btn" data-action="performance">'+icon("bolt")+' '+(performanceMode?"Normal visuals":"Low graphics")+'</button><a class="secondary-btn" href="#/history">'+icon("back")+' Play history</a><a class="secondary-btn" href="#/updates">'+icon("info")+' Updates</a></div>';
+  return '<div class="qol-bar"><button class="secondary-btn" data-action="random-game">'+icon("play")+' Surprise me</button><button class="secondary-btn" data-action="performance">'+icon("bolt")+' '+(performanceMode?"Normal visuals":"Low graphics")+'</button><a class="secondary-btn" href="#/history">'+icon("clock")+' Play history</a><a class="secondary-btn" href="#/updates">'+icon("info")+' Updates</a></div>';
 }
 function renderHistory(){
  const rows=qol.read("history",[]).map(h=>({h,g:byId.get(h.id)})).filter(x=>x.g);
