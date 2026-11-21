@@ -131,9 +131,10 @@ function moreButton(total) {
 function card(g, {rank=0,count=0}={}) {
   const title=esc(g.title);
   const health=healthReports[g.id];
+  const age=ageGuide(g);
   const healthBadge=health==="issue"?'<span class="qol-health" title="Personal flag on this device; not a verified outage">My flag</span>':"";
   const starts=false?'<span class="poster-plays">'+playtime(count)+'</span>':'';
-  return '<article class="card" data-title-letter="'+esc(g.title.trim().charAt(0).toUpperCase())+'"><a href="#/game/'+g.id+'" aria-label="'+title+'"><div class="cover">'+poster(g)+specBadge(g.load)+ageBadge(g)+healthBadge+(rank?'<span class="rank">#'+rank+'</span>':'')+'</div><div class="card-copy"><span class="poster-genre">'+esc(g.genre)+'</span><h3>'+title+'</h3><div class="poster-numbers">'+playStatus(g)+starts+'</div></div></a>'+(playedIds.has(g.id)?'<span class="qol-visited" title="Played before">Played</span>':'')+bookmark(g.id,true)+'</article>';
+  return '<article class="card" data-title-letter="'+esc(g.title.trim().charAt(0).toUpperCase())+'"><a href="#/game/'+g.id+'" aria-label="'+title+'"><div class="cover">'+poster(g)+specBadge(g.load)+ageBadge(g)+healthBadge+(rank?'<span class="rank">#'+rank+'</span>':'')+'</div><div class="card-copy"><span class="poster-genre">'+esc(g.genre)+'</span><h3>'+title+'</h3><div class="poster-numbers">'+playStatus(g)+starts+'</div></div></a>'+(playedIds.has(g.id)?'<span class="qol-visited" title="Played before">Played</span>':'')+bookmark(g.id,true)+'<span class="age-card-tooltip" role="tooltip">'+esc(age.reason)+' · Unofficial '+esc(age.label)+' guidance, not ESRB/PEGI</span></article>';
 }
 const grid = (rows) => '<div class="grid">'+rows.map(g=>card(g)).join("")+'</div>';
 const titleBar = (tag,title,count,aside="") => '<div class="shelf-head"><div class="shelf-title"><'+tag+'>'+esc(title)+'</'+tag+'><span class="count" aria-label="'+count+' games">'+count+'</span></div>'+aside+'</div>';
@@ -189,8 +190,17 @@ function updateCompare(){
  if(!a||!b){target.textContent="Choose two playable games.";return;}
  target.innerHTML='<div class="hub-feature-row">'+[a,b].map(g=>'<a class="hub-feature" href="#/game/'+esc(g.id)+'"><strong>'+esc(g.title)+'</strong><span>'+esc(g.genre)+' · '+esc(levels[g.load]||"Unknown")+' hardware demand</span><span>'+esc(g.description||"No description available")+'</span></a>').join("")+'</div>';
 }
+function syncSettingSlider(input){
+ if(!input)return;
+ const min=Number(input.min)||0,max=Number(input.max)||100,value=Number(input.value);
+ const percent=max>min?Math.max(0,Math.min(100,(value-min)/(max-min)*100)):0;
+ input.style.setProperty("--range-progress",percent+"%");
+ const out=document.getElementById("out-"+input.name);
+ if(out)out.value=input.value;
+}
+function syncAllSettingSliders(){document.querySelectorAll('#hub-settings input[type="range"]').forEach(syncSettingSlider);}
 function qolBar(){
-  return '<div class="qol-bar"><button class="secondary-btn" data-action="random-game">'+icon("play")+' Surprise me</button><button class="secondary-btn" data-action="performance">'+icon("bolt")+' '+(performanceMode?"Normal visuals":"Low graphics")+'</button><a class="secondary-btn" href="#/history">'+icon("clock")+' Play history</a><a class="secondary-btn" href="#/settings">'+icon("info")+' Settings</a></div>';
+  return '<div class="qol-bar"><button class="secondary-btn" data-action="random-game">'+icon("play")+' Surprise me</button><a class="secondary-btn" href="#/history">'+icon("clock")+' Play history</a><a class="secondary-btn" href="#/settings">'+icon("info")+' Settings</a></div>';
 }
 function stopRoulette(){if(rouletteTimer!==null){clearTimeout(rouletteTimer);rouletteTimer=null;}rouletteWinner=null;}
 function randomGamePool(){return games.filter(g=>g.mode==="embed");}
@@ -303,7 +313,7 @@ function displayDialog(html){
 const tourStops = [
   [".spotlight .hero", "Featured games", "Geometry Dash, 60 Seconds!, and R.E.P.O. rotate here. Select a progress bar to switch games, or choose Play game to jump in."],
   [".community-bar", "Community", "Join Discord, request a game, or submit a takedown request."],
-  [".qol-bar", "Surprise Me and quick tools", "Open a game roulette, switch to Low graphics, or view your play history and settings."],
+  [".qol-bar", "Surprise Me and quick tools", "Open the game roulette, view your play history, or adjust settings."],
   [".filters", "Find a game for your device", "Choose a genre or Chromebook spec to narrow the library. Low-demand games are the lightest to run."],
   [".grid", "Game ratings and details", "Hover over or focus an age badge for an unofficial estimate. Hardware-demand badges give approximate Chromebook requirements."]
 ];
@@ -348,7 +358,7 @@ function gameLayout(g){
     '<div class="stage-slot"><div id="stage" class="stage centered"><div class="stage-art" style="background-image:url(\''+stageImage+'\')" ></div><div class="startbox" id="startbox">' + arcadeMascot("Preparing the player…") + '</div><button type="button" class="icon-btn exit-stage" data-action="fullscreen" title="'+exitLabel+'" aria-label="'+exitLabel+'">'+icon("close")+'</button></div></div>'+
     '<div class="play-tools">'+(hub.preferences().showTimer?'<span class="hub-timer" id="hub-session-timer" aria-label="Current session duration">Session 0:00</span>':"")+btn("share-game","Share game","external")+btn("preview-game","Quick preview","info")+btn("health-game","Game status","info")+(g.mode==="embed"?btn("fullscreen",displayLabel,"expand"):"")+bookmark(g.id)+'</div><div id="key-area"></div>'+
     '<div class="details"><section class="pane"><h2>About this game</h2><p>'+esc(g.description || (g.mode==="embed"?"Browser build from the linked source project.":"Listed in the Ultimate Catalog of Web Game Ports."))+'</p><details><summary>Port details &amp; sources</summary><ul>'+g.sources.map((u,i)=>'<li><a target="_blank" rel="noopener noreferrer" href="'+esc(u)+'">'+esc(u.includes("github.com/")?u.replace("https://github.com/",""):new URL(u).hostname)+(g.sources.length>1?" · source "+(i+1):"")+'</a></li>').join("")+'</ul>'+(g.posterSource?'<a class="text-link" href="'+esc(g.posterSource)+'" target="_blank" rel="noopener noreferrer">Preview artwork</a>':'')+'<div id="other-ports"></div></details></section>'+
-    '<section class="pane"><h2>Playing on a Chromebook</h2><p>'+esc(g.notes || "Chromebook performance varies by port and device.")+'</p><button class="text-link" data-action="specs">See the spec guide</button><details><summary>Controls & troubleshooting</summary><p>Click or tap inside the game to focus it. Keyboard and controller support depend on the individual port and have not been verified for every game.</p><p>Try Escape to leave native fullscreen. If input stops responding, reload the game. On Chromebooks, use Low graphics to reduce website effects.</p></details></section></div><section class="hub-game-extras"><h2>Similar games</h2>'+grid(hub.similar(g,games))+'<h2>My game notes</h2><p class="hint">Private notes saved only on this browser.</p><textarea id="hub-game-note" rows="4" maxlength="1200" placeholder="Your notes about this game…">'+esc(hub.notes(g.id))+'</textarea><div class="qol-bar">'+btn("save-note","Save note","check")+'</div><p class="hint">Session playtime: '+hub.minutes(g.id)+' minutes tracked (approximate).</p></section>';
+    '<section class="pane"><h2>Playing on a Chromebook</h2><p>'+esc(g.notes || "Chromebook performance varies by port and device.")+'</p><button class="text-link" data-action="specs">See the spec guide</button><details><summary>Controls & troubleshooting</summary><p>Click or tap inside the game to focus it. Keyboard and controller support depend on the individual port and have not been verified for every game.</p><p>Try Escape to leave native fullscreen. If input stops responding, reload the game. On Chromebooks, choose the Performance preset in Settings to reduce website effects.</p></details></section></div><section class="hub-game-extras"><h2>Similar games</h2>'+grid(hub.similar(g,games))+'<h2>My game notes</h2><p class="hint">Private notes saved only on this browser.</p><textarea id="hub-game-note" rows="4" maxlength="1200" placeholder="Your notes about this game…">'+esc(hub.notes(g.id))+'</textarea><div class="qol-bar">'+btn("save-note","Save note","check")+'</div><p class="hint">Session playtime: '+hub.minutes(g.id)+' minutes tracked (approximate).</p></section>';
   if(g.mode==="embed"){
     $(".play-tools [data-action=fullscreen]").disabled=true;
     player=createPlayer($("#stage"),g.title,scheduleChart,toast);
@@ -431,7 +441,7 @@ function route({scroll=true}={}){
   else if(current.page==="top")drawTop();
    else if(current.page==="history")renderHistory();
    
-   else if(current.page==="settings"){main.innerHTML=hub.renderSettings();navigator.storage?.persisted?.().then(ok=>{const el=document.querySelector("#storage-status");if(el)el.textContent=ok?"Persistent site storage is enabled. Clearing site data can still erase saves.":"Local data saves normally, but persistent storage has not been granted.";}).catch(()=>{});}
+   else if(current.page==="settings"){main.innerHTML=hub.renderSettings();syncAllSettingSliders();navigator.storage?.persisted?.().then(ok=>{const el=document.querySelector("#storage-status");if(el)el.textContent=ok?"Persistent site storage is enabled. Clearing site data can still erase saves.":"Local data saves normally, but persistent storage has not been granted.";}).catch(()=>{});}
    else if(current.page==="compare")comparePage();
    
    
@@ -548,13 +558,20 @@ function setup(){
       case "fullscreen":player?.toggle();break;
     }
   });
-  document.addEventListener("change",e=>{
+  document.addEventListener("input",e=>{
+   const input=e.target;
+   if(!input.matches?.('#hub-settings input[type="range"]'))return;
+   syncSettingSlider(input);
+   if(input.name==="radius")document.documentElement.style.setProperty("--custom-radius",input.value+"px");
+   if(input.name==="glow")document.documentElement.style.setProperty("--glow-opacity",String(Number(input.value)/100));
+ });
+ document.addEventListener("change",e=>{
     if(["availability","more-genres","demand"].includes(e.target.id))visibleCount=pageSize;
     if(e.target.closest("#hub-settings")&&e.target.name==="preset"){
       const form=e.target.form,presets={performance:{motion:"off",cursor:false,glow:0},balanced:{motion:"normal",cursor:false,glow:35},visual:{motion:"enhanced",cursor:true,glow:75}};
-      const p=presets[e.target.value];if(p){form.elements.motion.value=p.motion;form.elements.cursor.checked=p.cursor;form.elements.glow.value=p.glow;form.querySelector("#out-glow").value=p.glow;}
+      const p=presets[e.target.value];if(p){form.elements.motion.value=p.motion;form.elements.cursor.checked=p.cursor;form.elements.glow.value=p.glow;syncSettingSlider(form.elements.glow);}
     }
-    if(e.target.closest("#hub-settings")&&e.target.type==="range"){const out=document.getElementById("out-"+e.target.name);if(out)out.value=e.target.value;}
+    if(e.target.closest("#hub-settings")&&e.target.type==="range"){syncSettingSlider(e.target);}
 
     if(e.target.id==="availability"){availability=e.target.value;renderLibrary();$("#availability").focus({preventScroll:true});}
     if(e.target.id==="more-genres"){genre=e.target.value;renderLibrary();$("#more-genres").focus({preventScroll:true});}
