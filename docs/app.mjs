@@ -268,7 +268,7 @@ function renderLibrary(){
 }
 function renderSaved() {
   const groups=qol.folders();const rows=games.filter(g=>selectedFolder==="All"?saved.has(g.id):(groups[selectedFolder]||[]).includes(g.id));
-  main.innerHTML='<section class="section-page">'+titleBar("h1","Saved games",rows.length)+'<div class="qol-bar"><label>Folder <select id="folder-select"><option>All</option>'+Object.keys(groups).map(name=>'<option value="'+esc(name)+'" '+(selectedFolder===name?'selected':'')+'>'+esc(name)+'</option>').join("")+'</select></label>'+btn("new-folder","New folder","plus")+(selectedFolder!=="All"&&selectedFolder!=="Favorites"?btn("delete-folder","Delete folder","close"):"")+'</div>'+(rows.length?grid(rows.slice(0,visibleCount))+moreButton(rows.length):'<div class="empty">'+icon("bookmark")+'<h2>Your saved shelf is empty</h2><p>Use the bookmark on a game to keep it here on this device.</p><a class="btn" href="#/library">Browse games</a></div>')+'</section>';
+  main.innerHTML='<section class="section-page">'+titleBar("h1","Saved games",rows.length)+'<div class="qol-bar"><label>Folder <select id="folder-select"><option>All</option>'+Object.keys(groups).map(name=>'<option value="'+esc(name)+'" '+(selectedFolder===name?'selected':'')+'>'+esc(name)+'</option>').join("")+'</select></label>'+btn("new-folder","New folder","plus")+(selectedFolder!=="All"?btn("add-to-folder","Add saved games","plus"):"")+(selectedFolder!=="All"&&selectedFolder!=="Favorites"?btn("delete-folder","Delete folder","close"):"")+'</div>'+(rows.length?'<div class="qol-bar">'+(selectedFolder==="All"?"":rows.map(g=>'<button class="secondary-btn" data-folder-remove="'+esc(g.id)+'">Remove '+esc(g.title)+'</button>').join(""))+'</div>'+grid(rows.slice(0,visibleCount))+moreButton(rows.length):'<div class="empty">'+icon("bookmark")+'<h2>Your saved shelf is empty</h2><p>Use the bookmark on a game to keep it here on this device.</p><a class="btn" href="#/library">Browse games</a></div>')+'</section>';
 }
 function drawTop(){
   const ranks=currentRanks();
@@ -574,7 +574,9 @@ function setup(){
     if(!e.target.closest(".preferences")){$("#theme-panel").hidden=true;$("#theme-button").setAttribute("aria-expanded","false");}
     const bar=e.target.closest("[data-feature]");
     if(bar){nextFeature(Number(bar.dataset.feature));return;}
-    const save=e.target.closest("[data-save]");if(save){rememberGame(save.dataset.save);return;}
+    const add=e.target.closest("[data-add-folder]");if(add&&selectedFolder!=="All"){qol.storeFolder(selectedFolder,[...(qol.folders()[selectedFolder]||[]),add.dataset.addFolder]);add.remove();toast("Added to folder");return;}
+     const remove=e.target.closest("[data-folder-remove]");if(remove&&selectedFolder!=="All"){qol.storeFolder(selectedFolder,(qol.folders()[selectedFolder]||[]).filter(id=>id!==remove.dataset.folderRemove));renderSaved();return;}
+     const save=e.target.closest("[data-save]");if(save){rememberGame(save.dataset.save);return;}
     const filter=e.target.closest("[data-genre]");if(filter){genre=filter.dataset.genre;visibleCount=pageSize;renderLibrary();document.querySelector('[data-genre="'+genre+'"]')?.focus({preventScroll:true});return;}
     const link=e.target.closest("a[data-page],a.brand");
     if(link && link.getAttribute("href")==="#/library"){genre="";level="";if(current.page==="library")renderLibrary();}
@@ -603,6 +605,7 @@ function setup(){
        case "preview-game":{const g=byId.get(current.id);if(g)displayDialog('<h2>'+esc(g.title)+'</h2><p>'+esc(g.description||"Browser game")+'</p><p>Genre: '+esc(g.genre)+' · Performance: '+esc(levels[g.load]||"Unknown")+'</p>'+btn("close-guide","Close",null));break;}
        case "clear-history":qol.write("history",[]);renderHistory();break;
        case "new-folder":{const name=prompt("New favorites folder name (up to 30 characters):")?.trim().slice(0,30);if(name&&!["All","__proto__","constructor","prototype"].includes(name)){qol.storeFolder(name,[]);selectedFolder=name;renderSaved();}break;}
+       case "add-to-folder":{const available=games.filter(g=>saved.has(g.id)&&!(qol.folders()[selectedFolder]||[]).includes(g.id));if(!available.length){toast("No additional saved games to add");break;}displayDialog('<h2>Add to '+esc(selectedFolder)+'</h2><div class="qol-folder-list">'+available.map(g=>'<button class="secondary-btn" data-add-folder="'+esc(g.id)+'">'+esc(g.title)+'</button>').join("")+'</div>'+btn("close-guide","Done",null));break;}
        case "delete-folder":qol.removeFolder(selectedFolder);selectedFolder="All";renderSaved();break;
        case "leave-and-report":guide.close();location.hash=reportUrl();break;
       case "retry-updates":loadUpdates();break;
