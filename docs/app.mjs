@@ -492,13 +492,14 @@ function scheduleHeartbeat(){
 function endPlay(){
   clearInterval(heartbeatTimer);
   if(playSession?.registered)signalPresence(playSession,"left");
+  if(playSession?.startedAt)hub.recordMinutes(playSession.id,Date.now()-playSession.startedAt);
   playSession=null;
 }
 function recordPlay(id){
   recentGames=[id,...recentGames.filter(game=>game!==id)].slice(0,4);
   saveValue("recent",JSON.stringify(recentGames));
   topCache=null;
-  const gameplay={id,session:crypto.randomUUID(),registered:false};
+  const gameplay={id,session:crypto.randomUUID(),registered:false,startedAt:Date.now()};
   playSession=gameplay;
   clearInterval(chartTimer);
   api("/v1/play/"+id,{session:gameplay.session}).then(()=>{
@@ -563,7 +564,7 @@ function route({scroll=true}={}){
    else if(current.page==="profile")main.innerHTML=hub.renderProfile(saved.size);
    else if(current.page==="settings")main.innerHTML=hub.renderSettings();
    else if(current.page==="updates")renderUpdateHistory();
-  else if(game){gameLayout(game);prepareGame(game,token,current.params.get("start")==="1");}
+  else if(game){gameLayout(game);hub.recordView(game.id);prepareGame(game,token,current.params.get("start")==="1");}
   else if(current.page==="requests")requestsPage();
   else if(current.page==="takedown")takedownPage();
   else if(current.page==="report")renderReport();
@@ -573,6 +574,7 @@ function route({scroll=true}={}){
   if(scroll){window.scrollTo(0,0);main.focus({preventScroll:true});}
   if(current.page==="library")offerTour();
    hub.applySettings();
+   const dock=document.querySelector("#hub-dock");if(dock)dock.innerHTML=hub.dock();
    document.documentElement.classList.toggle("low-graphics",performanceMode);
 }
 function searchView(value){
@@ -707,7 +709,7 @@ function setup(){
   });
   document.addEventListener("submit",async e=>{
     const form=e.target;
-    if(form.id==="hub-settings"){e.preventDefault();hub.settingsFromForm(form);toast("Settings saved");route({scroll:false});return;}
+    if(form.id==="hub-settings"){e.preventDefault();hub.settingsFromForm(form);try{await hub.uploadProfileImage(form.elements.avatarFile.files?.[0],"avatar");await hub.uploadProfileImage(form.elements.bannerFile.files?.[0],"banner");toast("Settings saved");route({scroll:false});}catch(err){toast(err.message||"Image upload failed");}return;}
      if(form.id==="guide-search"){e.preventDefault();const str=form.querySelector("input").value.trim();if(str){guide.close();searchView(str);search.focus();}return;}
     if(form.id==="request-form"){e.preventDefault();submitGameRequest(form);return;}
     if(form.id==="takedown-form"){e.preventDefault();submitTakedown(form);return;}
