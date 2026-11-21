@@ -505,3 +505,8 @@ body.player-fullscreen-open{overflow:hidden}
 .hub-contrast{--line:#8b9cb1;--muted:#bac5d6}
 @media(max-width:760px){.hub-dock{position:relative;bottom:auto;left:auto;margin:1rem auto;width:min(340px,calc(100% - 28px))}.hub-stat-row{grid-template-columns:repeat(2,1fr)}.hub-feature-row{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.hub-feature{transition:none}.hub-feature:hover{transform:none}}
+
+.hub-game-extras{margin:1.8rem 0;padding:1.2rem;background:var(--surface);border:1px solid var(--line);border-radius:1rem}
+.hub-game-extras>h2{margin:1rem 0 .7rem}
+.hub-game-extras textarea{display:block;width:100%;max-width:750px;min-height:100px;padding:.8rem;border:1px solid var(--line);border-radius:.6rem;background:var(--bg);color:var(--text);font:inherit;resize:vertical}
+.hub-game-extras .grid{margin-bottom:1.2rem}
