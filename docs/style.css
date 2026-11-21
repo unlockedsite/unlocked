@@ -497,3 +497,11 @@ body.player-fullscreen-open{overflow:hidden}
 .hub-feature-play svg{width:1rem;height:1rem}
 @media(max-width:760px){.hub-feature-row{grid-template-columns:1fr}.hub-feature{min-height:155px}.hub-feature-art{flex-basis:34%}.hub-feature-copy{padding:1rem}}
 @media(max-width:420px){.hub-feature{min-height:142px}.hub-feature-copy strong{font-size:1.2rem}.hub-feature-copy>span{font-size:.76rem}}
+
+/* Restored Discord request and takedown forms */
+#request-form,#takedown-form{display:grid;gap:.85rem;max-width:680px;margin:1.4rem 0;padding:1.4rem;background:var(--surface);border:1px solid var(--line);border-radius:1rem}
+#request-form label,#takedown-form label{font-weight:750}
+#request-form input,#takedown-form select,#takedown-form textarea{box-sizing:border-box;display:block;width:100%;padding:.8rem .9rem;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:.6rem;font:inherit}
+#takedown-form textarea{resize:vertical;min-height:135px}
+#request-form .btn,#takedown-form .btn{justify-self:start}
+#request-form .feedback,#takedown-form .feedback{min-height:1.4em;margin:0;color:var(--muted)}
