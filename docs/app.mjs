@@ -33,6 +33,13 @@ function launchCinematic(anchor,game){
  const anim=clone.animate([{opacity:.95,transform:"scale(1)",borderRadius:"12px"},{opacity:.5,transform:"scale(1.1)",borderRadius:"22px",offset:.55},{opacity:0,transform:"translateY(-14px) scale(1.24)",borderRadius:"26px"}],{duration:430,easing:"cubic-bezier(.2,.7,.2,1)",fill:"forwards"});
  anim.finished.then(()=>clone.remove(),()=>clone.remove());
 }
+function applyAdaptiveMode(){
+ // Preserve all core features; skip only expensive visual effects on low-power devices.
+ const opts=hub.preferences(),visuallyEnhanced=opts.preset==="visual"||opts.motion==="enhanced";
+ const memory=Number(navigator.deviceMemory||0),cores=Number(navigator.hardwareConcurrency||0);
+ const lowPower=/CrOS\b/i.test(navigator.userAgent) || (memory>0&&memory<=4) || (cores>0&&cores<=4) || !!navigator.connection?.saveData;
+ document.documentElement.classList.toggle("device-lite",lowPower&&!visuallyEnhanced);
+}
 function initAmbientGlow(){
  // Only follow the cursor when users explicitly enable it.
  // Updating the full document on every pointer movement caused costly repaints.
@@ -162,7 +169,7 @@ function filters(){
 function hero(){
   const g = byId.get(featured[featureIndex]);
   const image = "./assets/featured/"+g.id+".webp";
-  const bars = featured.map((id,i)=>'<button type="button" class="feature-bar" data-feature="'+i+'" aria-label="Show '+esc(byId.get(id).title)+'" aria-pressed="'+(i===featureIndex)+'"><span><i></i></span></button>').join("");
+  const bars = featured.map((id,i)=>'<button type="button" class="feature-bar" data-feature="'+i+'" data-state="'+(i<featureIndex?"done":i===featureIndex?"current":"upcoming")+'" aria-label="Show '+esc(byId.get(id).title)+'" aria-pressed="'+(i===featureIndex)+'"><span><i></i></span></button>').join("");
   return '<section class="hero" aria-label="Featured game"><img class="hero-bg" src="'+image+'" alt=""><div class="hero-body"><div class="eyebrow feature-tag">'+icon("star")+'Featured game</div><h1>'+esc(g.title)+'</h1><p>'+esc(g.description || "Gather supplies and guide your family through life in a fallout shelter.")+'</p><div class="actions"><a class="btn" href="#/game/'+g.id+'?start=1">'+icon("play")+'Play game</a>'+bookmark(g.id,false,true)+'</div></div><div class="feature-bars" role="group" aria-label="Featured games">'+bars+'</div></section>';
 }
 function nextFeature(index = (featureIndex + 1) % featured.length){
@@ -173,7 +180,7 @@ function nextFeature(index = (featureIndex + 1) % featured.length){
   old.querySelector(".feature-outgoing")?.remove();
   old.insertAdjacentHTML("afterend", hero());
   const slide = old.nextElementSibling;
-  if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches || document.documentElement.classList.contains("device-lite")) {
     old.remove();
   } else {
     old.inert = true;
@@ -181,7 +188,7 @@ function nextFeature(index = (featureIndex + 1) % featured.length){
     old.classList.add("feature-outgoing");
     Object.assign(old.style, {position:"absolute", inset:"0", minHeight:"0", zIndex:"2", pointerEvents:"none", border:"0"});
     slide.append(old);
-    const fade = old.animate([{opacity:1},{opacity:0}], {duration:700, easing:"ease-in-out", fill:"forwards"});
+    const fade = old.animate([{opacity:1},{opacity:0}], {duration:260, easing:"ease-out", fill:"forwards"});
     fade.finished.then(()=>old.remove(), ()=>old.remove());
   }
   if (refocus) slide.querySelector('.feature-bar[aria-pressed="true"]').focus({preventScroll:true});
@@ -466,7 +473,7 @@ function route({scroll=true}={}){
   if(scroll){window.scrollTo(0,0);main.focus({preventScroll:true});}
   if(current.page==="library")offerTour();
    hub.applySettings();
-   
+   applyAdaptiveMode();
    document.documentElement.classList.toggle("low-graphics",performanceMode);
 }
 function searchView(value){
@@ -497,8 +504,12 @@ function setup(){
   updateTheme(document.documentElement.dataset.theme || "system");
   $("#theme-button").addEventListener("click",()=>{const panel=$("#theme-panel");panel.hidden=!panel.hidden;$("#theme-button").setAttribute("aria-expanded",String(!panel.hidden));if(!panel.hidden)$("#theme").focus();});
   $("#theme").addEventListener("change",e=>{saveValue("theme",e.target.value);updateTheme(e.target.value);$("#theme-panel").hidden=true;$("#theme-button").setAttribute("aria-expanded","false");$("#theme-button").focus();});
-  search.addEventListener("input",()=>{if(games.length)searchView(search.value);});
-  $("#search-form").addEventListener("submit",e=>{e.preventDefault();if(games.length)requestMissing();});
+  let searchDebounce;
+   search.addEventListener("input",()=>{
+     clearTimeout(searchDebounce);
+     searchDebounce=setTimeout(()=>{if(games.length)searchView(search.value);},105);
+   });
+  $("#search-form").addEventListener("submit",e=>{e.preventDefault();clearTimeout(searchDebounce);if(games.length)requestMissing();});
   window.addEventListener("hashchange",()=>route());
   
   window.addEventListener("pagehide",e=>{if(!e.persisted)endPlay();});
