@@ -4,7 +4,6 @@ import * as qol from "./qol.mjs?v=1";
 import * as hub from "./hub.mjs?v=2";
 import { chromeOS, createPlayer } from "./player.mjs?v=7";
 
-const API = "https://unlocked-arcade-service.persistingthoughts0.chatgpt.site";
 const $ = selector => document.querySelector(selector);
 const main = $("#content"), search = $("#search"), guide = $("#guide");
 const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -28,10 +27,10 @@ function savedIds() {
 const saved = savedIds();
 let games = [], byId = new Map(), genre = "", level = "", q = "", navigation = 0;
 let current = {page:"library",id:"",params:new URLSearchParams()}, tourStep=0, toastTimer;
-let ticket=dl("session","",true), inviteHidden=dl("tour","")==="seen";
-let currentLaunch=null, topCache=null, currentReport="", searchMessage="", sendingSearch="", lastSearchKey="";
-let rankedCounts={}, weeklyCounts={}, rankingPeriod="all", weekStartsAt=null, activeCounts={}, chartState="loading", chartRequest=null, chartTimer;
-let playSession=null, heartbeatTimer, player=null, launchCatalog;
+let inviteHidden=dl("tour","")==="seen";
+let currentLaunch=null, searchMessage="";
+
+let playSession=null, player=null, launchCatalog;
 let recentGames=[];
 let performanceMode=qol.read("performance",false);
 let healthReports=qol.read("health",{});
@@ -44,8 +43,8 @@ try {
   const stored=JSON.parse(dl("recent","[]"));
   if(Array.isArray(stored))recentGames=[...new Set(stored.filter(id=>typeof id==="string"))].slice(0,4);
 } catch { /* Ignore invalid saved history. */ }
-let updateNotes=null, updatesRequest=null, updatesFetchedAt=0;
-const receivedQueries = new Set();
+
+
 const pageSize = 48;
 let visibleCount = pageSize;
 let availability = "play";
@@ -55,20 +54,6 @@ const savedClass = id => saved.has(id) ? " active-save" : "";
 const feedback = (selector, msg) => {const tag=$(selector);if(tag) tag.textContent=msg;};
 const btn = (action, label, glyph, cls="secondary-btn") => '<button type="button" class="'+cls+'" data-action="'+action+'">'+(glyph?icon(glyph):"")+esc(label)+'</button>';
 
-class NetworkError extends Error {
-  constructor(status, message) {super(message);this.status=status;}
-}
-async function api(path, body) {
-  const headers = {}, options = {headers, credentials:"omit", referrerPolicy:"no-referrer", signal:AbortSignal.timeout(14000)};
-  if(body !== undefined){options.method="POST";headers["Content-Type"]="application/json";options.body=JSON.stringify(body);}
-  if(ticket && (/^\/v1\/(?:launch|play)\//).test(path)) headers.Authorization="Bearer "+ticket;
-  let res;
-  try {res=await fetch(API+path,options);} catch {throw new NetworkError(0,"Couldn’t reach the arcade service. Check your connection and try again.");}
-  let data;
-  try {data=await res.json();} catch {throw new NetworkError(res.status,"The arcade service couldn’t complete this request.");}
-  if(!res.ok) throw new NetworkError(res.status,data.error || "Please try again later.");
-  return data;
-}
 function toast(msg){clearTimeout(toastTimer);$("#toast").textContent=msg;toastTimer=setTimeout(()=>{$("#toast").textContent="";},2400);}
 function readRoute(){
   const [path,query=""] = location.hash.slice(1).replace(/^\//,"").split("?");
@@ -100,19 +85,11 @@ function bookmark(id,compact=false,hero=false){
   const active=saved.has(id), name=byId.get(id)?.title || "game";
   return '<button type="button" data-save="'+esc(id)+'" aria-pressed="'+active+'" title="'+(active?"Remove from saved":"Save game")+'" aria-label="'+esc((active?"Remove ":"Save ")+name+(active?" from saved":""))+'" class="'+(compact?"save-mini":hero?"ghost-btn":"secondary-btn")+savedClass(id)+'">'+icon("bookmark")+(compact?"":"<span>"+bookmarkText(id)+"</span>")+'</button>';
 }
-function activeText(id) {
-  if(chartState!=="live")return "—";
-  const count=id==="all" ? Object.values(activeCounts).reduce((total,n)=>total+n,0) : (activeCounts[id] || 0);
-  return count.toLocaleString();
-}
-function presence(id) {
-  return '<span class="presence" title="Game sessions active on Unlocked in the last 90 seconds">'+icon("users")+'<span data-active="'+id+'">'+activeText(id)+'</span> playing now</span>';
-}
 function poster(g) {
   return '<img src="'+posterAsset(g.id)+'" alt="" width="320" height="480" loading="lazy" decoding="async" referrerpolicy="no-referrer">';
 }
 function playStatus(g) {
-  return g.mode === "embed" ? presence(g.id) : '<span>In-page play unavailable</span>';
+  return g.mode === "embed" ? '<span>Playable in browser</span>' : '<span>In-page play unavailable</span>';
 }
 function moreButton(total) {
   return total > visibleCount ? '<div class="more-games">'+btn("show-more","Show more games",null)+'</div>' : "";
@@ -163,46 +140,6 @@ function nextFeature(index = (featureIndex + 1) % featured.length){
   }
   if (refocus) slide.querySelector('.feature-bar[aria-pressed="true"]').focus({preventScroll:true});
 
-}
-function requestsPage(){
-  main.innerHTML='<section class="narrow section-page"><a class="back" href="#/library">'+icon("back")+'All games</a><h1 class="panel-title">Request a game</h1><p class="subcopy">Suggest a game for the Unlocked library. Your request goes to the arcade team on Discord.</p><form class="form" id="request-form"><div class="field"><label for="request-title">Game title</label><input id="request-title" name="title" minlength="2" maxlength="80" required></div><button class="btn" type="submit">Send request</button><p class="feedback" role="status"></p></form></section>';
-}
-async function submitGameRequest(form){
-  const input=form.elements.title, button=form.querySelector("button"), status=form.querySelector("[role=status]");
-  if(button.disabled)return;
-  const query=input.value.trim();
-  if(query.length<2){status.textContent="Enter at least two characters.";input.focus();return;}
-  button.disabled=true;
-  status.textContent="Sending request…";
-  try{
-    const result=await api("/v1/requests",{query});
-    if(result.status==="received"){
-      receivedQueries.add(normalize(query));
-      status.textContent="Request received for "+query+".";
-      form.reset();
-    }else if(result.status==="found"){
-      status.textContent=query+" already has a match in the catalog.";
-    }else{throw Error("Couldn’t confirm delivery. Try again.");}
-  }catch(error){status.textContent=error.message;}
-  finally{button.disabled=false;}
-}
-function takedownPage(){
-  const selected=byId.get(current.params.get("game"));
-  const options=games.map(g=>'<option value="'+esc(g.id)+'"'+(g===selected?' selected':'')+'>'+esc(g.title)+'</option>').join("");
-  main.innerHTML='<section class="narrow section-page"><a class="back" href="#/library">'+icon("back")+'All games</a><h1 class="panel-title">Takedown Request</h1><p class="subcopy">Request a review or removal of a game. Please explain your concern clearly. Submitting a request does not automatically remove content.</p><form class="form" id="takedown-form"><div class="field"><label for="takedown-game">Game to review</label><select id="takedown-game" required><option value="">Select a game</option>'+options+'</select></div><div class="field"><label for="takedown-reason">Reason for takedown</label><textarea id="takedown-reason" minlength="15" maxlength="1500" required placeholder="Explain why this game should be removed (for example, copyright ownership, licensing, or harmful content)."></textarea></div><p class="hint">Requests are reviewed by the Unlocked team. For formal copyright notices, include your contact details and proof of ownership in your explanation or contact the site owner directly.</p><button class="btn danger-btn" type="submit">Submit takedown request</button><p id="takedown-result" class="feedback" role="status" aria-live="polite"></p></form></section>';
-}
-async function submitTakedown(form){
-  if(!form.reportValidity())return;
-  const button=form.querySelector('button[type="submit"]'), status=$("#takedown-result"), token=navigation;
-  if(button.disabled)return;
-  button.disabled=true;status.textContent="Sending takedown request…";
-  try{
-    const result=await api("/v1/takedowns",{game:$("#takedown-game").value,reason:$("#takedown-reason").value.trim()});
-    if(navigation!==token)return;
-    if(result.status!=="received")throw Error("Delivery was not confirmed.");
-    form.reset();status.textContent="Takedown request received. Receipt: "+result.receipt+". The team will review it.";
-  }catch(error){if(navigation===token)status.textContent=error.message;}
-  finally{button.disabled=false;}
 }
 function extraTools(){return '<div class="qol-bar hub-extra-tools"><a class="secondary-btn" href="#/compare">'+icon("grid")+' Compare games</a><a class="secondary-btn" href="#/notifications">'+icon("info")+' Notifications</a><button class="secondary-btn" data-action="random-genre">'+icon("star")+' Random genre</button></div>'}
 function comparePage(){
@@ -258,67 +195,14 @@ function renderHistory(){
  const receipts=qol.read("receipts",[]);
  main.innerHTML='<section class="section-page"><h1>Play history</h1><p class="subcopy">Stored only on this device. Clearing it does not affect game saves.</p><div class="qol-bar">'+btn("clear-history","Clear history","close")+'</div><div class="qol-history">'+rows.map(({h,g})=>'<a href="#/game/'+g.id+'"><strong>'+esc(g.title)+'</strong><small>'+new Date(h.last).toLocaleDateString()+' · '+h.visits+' launches</small></a>').join("")+'</div><h2>My bug report receipts</h2><p class="hint">Submission receipts are stored locally. Live review status is not available yet.</p>'+receipts.map(r=>'<p class="hint">'+esc(r.game||"Website")+' · '+esc(r.receipt)+' · Submitted</p>').join("")+'</section>';
 }
-function renderUpdateHistory(){
- main.innerHTML='<section class="section-page"><a class="back" href="#/library">'+icon("back")+'All games</a><h1>Update history</h1><div id="updates-feed"><p class="hint">Loading updates…</p></div></section>';loadUpdates();
-}
-function communityBar(){
-  return '<div class="community-bar"><a class="join-discord" href="https://discord.gg/AezupBCtns" target="_blank" rel="noopener noreferrer">'+icon("discord")+'<span><small>Join us on</small><strong>Discord</strong></span>'+icon("forward")+'</a><a class="secondary-btn community-action community-request" href="#/requests">'+icon("plus")+'<span>Request a game</span>'+icon("forward")+'</a><a class="secondary-btn community-action community-takedown" href="#/takedown">'+icon("shield")+'<span>Takedown Request</span>'+icon("forward")+'</a><div class="community-online">'+presence("all")+'</div></div>';
-}
-function rankingCounts(){return rankingPeriod==="week"?weeklyCounts:rankedCounts;}
-function currentRanks(){
-  const counts=rankingCounts();
-  return games.filter(g=>g.mode==="embed" && (rankingPeriod!=="week" || counts[g.id]>0)).sort((a,b)=>(counts[b.id]||0)-(counts[a.id]||0)||alphabetical(a,b));
-}
-function rankingTabs(){
-  return '<div class="ranking-tabs" role="group" aria-label="Ranking period">'+[["all","All time"],["week","This week"]].map(([value,label])=>'<button type="button" class="chip" data-period="'+value+'" aria-pressed="'+(rankingPeriod===value)+'">'+label+'</button>').join("")+'</div>';
-}
+function communityBar(){return '<div class="community-bar"><a class="join-discord" href="https://discord.gg/AezupBCtns" target="_blank" rel="noopener noreferrer">'+icon("discord")+'<span><small>Join us on</small><strong>Discord</strong></span>'+icon("forward")+'</a></div>';}
+function rankingCounts(){const counts={};for(const h of qol.read("history",[]))counts[h.id]=Number(h.visits)||0;return counts;}
+function currentRanks(){const counts=rankingCounts();return games.filter(g=>g.mode==="embed").sort((a,b)=>(counts[b.id]||0)-(counts[a.id]||0)||alphabetical(a,b));}
+function rankingTabs(){return "";}
 function continuePlaying(){
   const recent=recentGames.map(id=>byId.get(id)).filter(g=>g?.mode==="embed");
   if(!recent.length)return "";
   return '<section class="continue-playing" aria-labelledby="continue-title"><div class="shelf-head"><h2 id="continue-title">Continue Playing</h2></div><div class="recent-grid">'+recent.map(g=>'<a class="recent-game" href="#/game/'+g.id+'?start=1">'+poster(g)+'<span><strong>'+esc(g.title)+'</strong><small>Play again</small></span>'+icon("play")+'</a>').join("")+'</div></section>';
-}
-function renderUpdates(){
-  const container=$("#updates-feed");
-  if(!container || !updateNotes)return;
-  container.innerHTML=updateNotes.length?updateNotes.map((release,i)=>'<details class="release-note" '+(i===0?'open':'')+'><summary><strong>Update v'+esc(release.version)+'</strong>'+(release.published?'<time datetime="'+esc(release.published)+'">'+esc(new Date(release.published).toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"}))+'</time>':"")+'</summary><ul>'+release.notes.split("\n").filter(Boolean).map(note=>'<li>'+esc(note.replace(/^•\s*/,""))+'</li>').join("")+'</ul></details>').join(""):'<p class="hint">Release notes will appear here after the next update.</p>';
-}
-function loadUpdates(){
-  renderUpdates();
-  if(updatesRequest || (updateNotes && Date.now()-updatesFetchedAt<60000))return;
-  updatesRequest=api("/v1/updates").then(data=>{
-    if(!Array.isArray(data.updates))throw Error("Updates unavailable");
-    updateNotes=data.updates;
-    updatesFetchedAt=Date.now();
-    if(updateNotes.length && hub.profile().notifications){
-      const version=String(updateNotes[0].version||"");
-      const seen=dl("lastUpdate","");
-      if(version && seen && seen!==version && !guide.open && current.page==="library"){
-        displayDialog('<h2 id="guide-title">What’s new in Unlocked v'+esc(version)+'</h2><p>'+esc(String(updateNotes[0].notes||"").slice(0,500))+'</p><div class="actions"><a class="secondary-btn" href="#/updates">All updates</a>'+btn("close-guide","Got it",null,"btn")+'</div>');
-      }
-      if(version)saveValue("lastUpdate",version);
-    }
-    renderUpdates();
-  }).catch(()=>{
-    if(!updateNotes && $("#updates-feed"))$("#updates-feed").innerHTML='<p class="hint">Couldn’t load the update notes.</p>'+btn("retry-updates","Try again",null);
-  }).finally(()=>{updatesRequest=null;});
-}
-function playtime(seconds){
-  if (seconds < 60) return seconds+"s played";
-  const minutes = Math.floor(seconds/60);
-  return minutes < 60 ? minutes+"m played" : Math.floor(minutes/60)+"h "+minutes%60+"m played";
-
-}
-function chartStatus(){
-  if(chartState==="live") return '<span class="live-state"><i aria-hidden="true"></i>Live</span>';
-  return '<span class="quiet-state">'+(chartState==="loading"?"Updating":"Arcade picks")+'</span>';
-}
-function chartPanel(){
-  const ranks=currentRanks().filter(g=>!featured.includes(g.id)).slice(0,3);
-  return '<aside class="chart-panel" id="home-chart" aria-label="Top games"><div class="chart-title"><h2>'+icon("trophy")+'Top games</h2>'+chartStatus()+'</div>'+rankingTabs()+'<ol class="mini-chart">'+ranks.map((g,i)=>{
-    const plays=Number(rankingCounts()[g.id])||0;
-    const countText=chartState==="live"?'<span class="chart-plays">'+playtime(plays)+'</span>':"";
-    return '<li><a href="#/game/'+g.id+'"><span class="position">'+String(i+1).padStart(2,"0")+'</span><img src="'+(g.imported?posterAsset(g.id):relativeAsset(g.id))+'" alt="" width="96" height="62" decoding="async"><span class="chart-copy"><strong>'+esc(g.title)+'</strong><small><span class="chart-genre">'+esc(g.genre)+(countText?' · ':'')+'</span>'+countText+'</small></span></a></li>';
-  }).join("")+'</ol>'+(!ranks.length?'<p class="hint">No playtime recorded this week yet.</p>':"")+'<a class="chart-all" href="#/top">'+icon("grid")+'Full rankings</a></aside>';
 }
 function hubHighlights(){
  const f=hub.featured(games),recommend=hub.recommended(games,saved),collections=hub.collections(games),discovered=hub.discovered(games);
@@ -351,34 +235,8 @@ function renderSaved() {
   const groups=qol.folders();const rows=games.filter(g=>selectedFolder==="All"?saved.has(g.id):(groups[selectedFolder]||[]).includes(g.id));
   main.innerHTML='<section class="section-page">'+titleBar("h1","Saved games",rows.length)+'<div class="qol-bar"><label>Folder <select id="folder-select"><option>All</option>'+Object.keys(groups).map(name=>'<option value="'+esc(name)+'" '+(selectedFolder===name?'selected':'')+'>'+esc(name)+'</option>').join("")+'</select></label>'+btn("new-folder","New folder","plus")+(selectedFolder!=="All"?btn("add-to-folder","Add saved games","plus"):"")+(selectedFolder!=="All"&&selectedFolder!=="Favorites"?btn("delete-folder","Delete folder","close"):"")+'</div>'+(rows.length?'<div class="qol-bar">'+(selectedFolder==="All"?"":rows.map(g=>'<button class="secondary-btn" data-folder-remove="'+esc(g.id)+'">Remove '+esc(g.title)+'</button>').join(""))+'</div>'+grid(rows.slice(0,visibleCount))+moreButton(rows.length):'<div class="empty">'+icon("bookmark")+'<h2>Your saved shelf is empty</h2><p>Use the bookmark on a game to keep it here on this device.</p><a class="btn" href="#/library">Browse games</a></div>')+'</section>';
 }
-function drawTop(){
-  const ranks=currentRanks();
-  main.innerHTML='<section class="section-page"><div class="shelf-head"><div><h1>Top games</h1><p class="subcopy">Ranked by total time played across the arcade.</p></div><div class="top-live">'+chartStatus()+presence("all")+'</div></div>'+
-    rankingTabs()+(rankingPeriod==="week"?'<p class="ranking-note hint">'+(weekStartsAt?'Week of '+esc(new Date(weekStartsAt*1000).toLocaleDateString(undefined,{month:"short",day:"numeric",timeZone:"UTC"}))+' · ':"")+'Resets Monday at 00:00 UTC.</p>':"")+(!ranks.length?'<p class="hint">No playtime recorded this week yet.</p>':"")+
-    (chartState==="offline"?'<p class="hint">Live counts are unavailable. The chart will retry automatically.</p>':"")+
-    '<div class="grid">'+ranks.slice(0,visibleCount).map((g,i)=>card(g,{rank:i+1,count:Number(rankingCounts()[g.id])||0})).join("")+'</div>'+moreButton(ranks.length)+'</section>';
-}
-function refreshChart(force=false){
-  if(document.hidden || (playSession || player?.expanded()) || !["library","top","search","saved","game"].includes(current.page) || (topCache && !force && Date.now()-topCache.time<20000)) return;
-  if(chartRequest)return chartRequest;
-  const previousState=chartState,previousCounts=JSON.stringify([rankedCounts,weeklyCounts,weekStartsAt]);
-  chartRequest=api("/v1/top").then(({playtimeSeconds:plays,weeklyPlaytimeSeconds:weekly,weekStartsAt:start,active})=>{
-    if(!plays || !active || typeof plays!=="object" || typeof active!=="object")throw Error("Chart unavailable");
-    rankedCounts=plays;weeklyCounts=weekly || {};weekStartsAt=start;activeCounts=active;topCache={time:Date.now()};chartState="live";
-  }).catch(()=>{chartState="offline";}).finally(()=>{
-    chartRequest=null;
-    document.querySelectorAll("[data-active]").forEach(el=>{el.textContent=activeText(el.dataset.active);});
-    if(previousState===chartState && previousCounts===JSON.stringify([rankedCounts,weeklyCounts,weekStartsAt]))return;
-    if(current.page==="top")drawTop();
-    if(current.page==="library" && $("#home-chart"))$("#home-chart").outerHTML=chartPanel();
-  });
-  return chartRequest;
-}
-function scheduleChart(){
-  clearInterval(chartTimer);
-  if(document.hidden || (playSession || player?.expanded()) || !["library","top","search","saved","game"].includes(current.page))return;
-  refreshChart();chartTimer=setInterval(()=>refreshChart(true),30000);
-}
+function drawTop(){const ranks=currentRanks();main.innerHTML='<section class="section-page"><h1>Most played on this device</h1><p class="subcopy">Based on launches stored in this browser, not a global leaderboard.</p>'+grid(ranks.slice(0,visibleCount))+moreButton(ranks.length)+'</section>';}
+function scheduleChart(){}
 function redrawSavedButtons(id){
   if(current.page==="saved"){renderSaved();return;}
   document.querySelectorAll('[data-save="'+id+'"]').forEach(el=>{
@@ -436,11 +294,6 @@ window.addEventListener("scroll",positionSpotlight,{passive:true});
 function showSpecs(){
   displayDialog('<h2 id="guide-title">Chromebook spec guide</h2><dl class="spec-list">'+Object.keys(levels).map(k=>'<dt>'+specBadge(k)+'</dt><dd>'+levelTips[k]+'</dd>').join("")+'</dl><p>Estimates depend on your device, the scene, and the game’s graphics settings.</p>'+btn("close-guide","Got it",null,"btn"));
 }
-function reportUrl(){
-  const p=new URLSearchParams({from:current.page});
-  if(current.page==="game")p.set("game",current.id);
-  return "#/report?"+p;
-}
 function gameLayout(g){
   const displayLabel="Fullscreen";
   const exitLabel="Leave fullscreen";
@@ -460,20 +313,7 @@ function safeGameUrl(value) {
   if(u.protocol!=="https:" && u.origin!==location.origin)throw Error("Invalid game link.");
   return u.href;
 }
-async function getLaunch(id) {
-  // Free releases ship their launch map alongside the catalog on Pages.
-  // Gated releases omit the map and authorize each launch with the Worker.
-  if (!launchCatalog) {
-    launchCatalog = fetch("./free-launches.json?v=13", {credentials:"omit",cache:"no-store"}).then(async response => {
-      if (response.status===404) return null;
-      if (!response.ok) throw Error("Couldn’t load the launch catalog. Try again.");
-      return response.json();
-    }).catch(error => {launchCatalog=null;throw error;});
-  }
-  const catalog = await launchCatalog;
-  if (catalog && Object.hasOwn(catalog,id)) return catalog[id];
-  return api("/v1/launch/"+id,{});
-}
+async function getLaunch(id){if(!launchCatalog)launchCatalog=readJson("./free-launches.json?v=13").catch(e=>{launchCatalog=null;throw e});const catalog=await launchCatalog;if(!Object.hasOwn(catalog,id))throw Error("No published browser launch link for this game.");return catalog[id];}
 async function prepareGame(g, token, autoStart=false){
   if(g.mode!=="embed"){
     $("#startbox").innerHTML='<strong>In-page play unavailable</strong><p>'+esc(g.unavailable)+'</p>'+(g.sources.length?'<a class="secondary-btn" target="_blank" rel="noopener noreferrer" href="'+esc(g.sources[0])+'">View source</a>':"");
@@ -504,26 +344,7 @@ async function prepareGame(g, token, autoStart=false){
     }
   }
 }
-function signalPresence(gameplay,state){
-  return fetch(API+"/v1/presence",{
-    method:"POST",mode:"cors",credentials:"omit",keepalive:state!=="active",referrerPolicy:"no-referrer",
-    headers:{"Content-Type":"application/json"},body:JSON.stringify({game:gameplay.id,session:gameplay.session,state})
-  }).catch(()=>{});
-}
-function scheduleHeartbeat(){
-  clearInterval(heartbeatTimer);
-  if(!playSession?.registered)return;
-  if(document.hidden){signalPresence(playSession,"paused");return;}
-  const gameplay=playSession;
-  signalPresence(gameplay,"active");
-  heartbeatTimer=setInterval(()=>signalPresence(gameplay,"active"),30000);
-}
-function endPlay(){
-  clearInterval(heartbeatTimer);clearInterval(sessionTicker);sessionTicker=null;
-  if(playSession?.registered)signalPresence(playSession,"left");
-  if(playSession?.startedAt)hub.recordMinutes(playSession.id,Date.now()-playSession.startedAt);
-  playSession=null;
-}
+function endPlay(){clearInterval(sessionTicker);sessionTicker=null;if(playSession?.startedAt)hub.recordMinutes(playSession.id,Date.now()-playSession.startedAt);playSession=null;}
 function recordPlay(id){
   recentGames=[id,...recentGames.filter(game=>game!==id)].slice(0,4);
   saveValue("recent",JSON.stringify(recentGames));
@@ -542,28 +363,6 @@ function recordPlay(id){
 function startGame(g){
   if(!player || !currentLaunch || currentLaunch.id!==g.id)return;
   if(player.start(currentLaunch.url,$("#limit-resolution")?.checked)){recordPlay(g.id);qol.historyEntry(g);playedIds.add(g.id);hub.recordActivity(g.id);}
-}
-function renderReport(){
-  const selected=byId.get(current.params.get("game")), page=current.params.get("from") || "report";
-  const from=["game","library","saved","top"].includes(page)?page:"report";
-  const option=(value,label,choose=false)=>'<option '+(choose?"selected ":"")+'value="'+esc(value)+'">'+esc(label)+'</option>';
-  main.innerHTML='<section class="narrow section-page"><a class="back" href="'+(selected?"#/game/"+selected.id:"#/library")+'">'+icon("back")+(selected?esc(selected.title):"All games")+'</a><h1 class="panel-title">Report a bug</h1><p class="subcopy">Tell the arcade team what happened and how to reproduce it.</p><form class="form" id="report-form" data-from="'+from+'"><div class="row"><div class="field"><label for="report-game">Game or page</label><span class="selectbox"><select id="report-game">'+option("","Arcade website")+games.map(g=>option(g.id,g.title,g===selected)).join("")+'</select>'+icon("chevron")+'</span></div><div class="field"><label for="kind">Issue type</label><span class="selectbox"><select id="kind">'+Object.entries(categories).map(([k,v])=>option(k,v)).join("")+'</select>'+icon("chevron")+'</span></div></div><div class="field"><label for="detail">What happened?</label><textarea id="detail" placeholder="What did you click, what did you expect, and what happened instead?" minlength="10" maxlength="1000" required></textarea></div><div class="field"><label class="check"><input id="share-device" type="checkbox" checked> Include my browser and operating system</label><p class="hint">This sends your report, game, and arcade page to the team’s Discord.</p></div><button class="btn" type="submit">'+icon("bug")+'Send report</button><p id="report-result" class="feedback" role="status" aria-live="polite">'+esc(currentReport)+'</p></form></section>';
-}
-function deviceLabel(){
-  const ua=navigator.userAgent, os=/CrOS/.test(ua)?"ChromeOS":/Android/.test(ua)?"Android":/iPad|iPhone|iPod/.test(ua) || (/Macintosh/.test(ua)&&navigator.maxTouchPoints>1)?"iOS":/Windows/.test(ua)?"Windows":/Mac/.test(ua)?"macOS":/Linux/.test(ua)?"Linux":"Other";
-  const engine=[["Edge",/Edg(?:A|iOS)?\/(\d+)/],["Firefox",/(?:Firefox|FxiOS)\/(\d+)/],["Chrome",/(?:Chrome|CriOS)\/(\d+)/],["Safari",/Version\/(\d+).*Safari/]].map(([name,re])=>[name,ua.match(re)?.[1]]).find(([,version])=>version);
-  return os+" · "+(engine?engine.join(" "):"Other");
-}
-async function submitReport(form){
-  if(!form.reportValidity()) return;
-  const token=navigation, button=form.querySelector("button[type=submit]");
-  if(button.disabled)return;
-  const body={game:$("#report-game").value,page:form.dataset.from,kind:$("#kind").value,detail:$("#detail").value,device:$("#share-device").checked?deviceLabel():""};
-  button.disabled=true;feedback("#report-result","Sending your report…");
-  try{
-    const result=await api("/v1/reports",body);if(navigation!==token)return;qol.trackReceipt(body.game,result.receipt);
-    form.innerHTML='<h2>Report received</h2><p>Delivered to the arcade team on Discord.</p><p>'+esc(result.hint)+'</p><p class="hint">Receipt '+esc(result.receipt)+'</p><a class="btn" href="'+(body.game?"#/game/"+body.game:"#/library")+'">Back to '+(body.game?"game":"all games")+'</a>';
-  }catch(e){if(navigation===token){feedback("#report-result",e.message);button.disabled=false;}}
 }
 async function showCredits(token){
   main.innerHTML='<section class="narrow section-page"><a class="back" href="#/library">'+icon("back")+'All games</a><h1 class="panel-title">Credits</h1><p class="subcopy">Game art belongs to the artists and publishers listed below. Each game page links to its port.</p><div id="credits-list" class="pane">Loading credits…</div></section>';
@@ -619,21 +418,7 @@ function searchView(value){
   else if(location.hash!==hash)history.pushState(null,"",hash);
   route({scroll:false});search.value=raw;
 }
-async function requestMissing(){
-  const term=search.value.trim(),key=normalize(term);
-  if(!term)return;
-  if(current.page!=="search" || q!==term)searchView(term);
-  if(games.some(g=>matches(g,term))) {genre="";level="";availability="all";visibleCount=pageSize;renderLibrary();return;}
-  if(!key){searchMessage="Enter a game title with at least two letters or numbers.";renderLibrary();return;}
-  if(receivedQueries.has(key) || sendingSearch===key)return;
-  lastSearchKey=key;sendingSearch=key;searchMessage="";renderLibrary();
-  try{
-    const result=await api("/v1/requests",{query:term});
-    if(result.status==="received")receivedQueries.add(key);
-    else if(lastSearchKey===key)searchMessage="That title is already in the vault. Refresh to see the latest catalog.";
-  }catch(e){if(lastSearchKey===key)searchMessage=e.message;}
-  finally{if(sendingSearch===key)sendingSearch="";if(current.page==="search" && normalize(q)===key)renderLibrary();}
-}
+function requestMissing(){if(games.length)searchView(search.value.trim());}
 function updateTheme(value){
   if(value==="system")delete document.documentElement.dataset.theme;
   else document.documentElement.dataset.theme=value;
