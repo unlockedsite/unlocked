@@ -466,8 +466,27 @@ function renderSaved() {
   const groups=qol.folders();const rows=games.filter(g=>selectedFolder==="All"?saved.has(g.id):(groups[selectedFolder]||[]).includes(g.id));
   main.innerHTML='<section class="section-page">'+titleBar("h1","Saved games",rows.length)+'<div class="qol-bar"><label>Folder <select id="folder-select"><option>All</option>'+Object.keys(groups).map(name=>'<option value="'+esc(name)+'" '+(selectedFolder===name?'selected':'')+'>'+esc(name)+'</option>').join("")+'</select></label>'+btn("new-folder","New folder","plus")+(selectedFolder!=="All"?btn("add-to-folder","Add saved games","plus"):"")+(selectedFolder!=="All"&&selectedFolder!=="Favorites"?btn("delete-folder","Delete folder","close"):"")+'</div>'+(rows.length?'<div class="qol-bar">'+(selectedFolder==="All"?"":rows.map(g=>'<button class="secondary-btn" data-folder-remove="'+esc(g.id)+'">Remove '+esc(g.title)+'</button>').join(""))+'</div>'+grid(rows.slice(0,visibleCount))+moreButton(rows.length):'<div class="empty">'+icon("bookmark")+'<h2>Your saved shelf is empty</h2><p>Use the bookmark on a game to keep it here on this device.</p><a class="btn" href="#/library">Browse games</a></div>')+'</section>';
 }
-function drawTop(){const ranks=currentRanks();main.innerHTML='<section class="section-page"><h1>Most played on this device</h1><p class="subcopy">Based on launches stored in this browser, not a global leaderboard.</p>'+grid(ranks.slice(0,visibleCount))+moreButton(ranks.length)+'</section>';}
-function scheduleChart(){}
+function drawTop(){
+ const ranks=chartState==="live"?currentRanks():[];
+ const live=chartState==="live";
+ const status=live?'<span class="live-state"><i aria-hidden="true"></i>Live</span><span class="global-online">'+icon("users")+' '+globalOnlineTotal().toLocaleString()+' playing now</span>':
+ '<span class="quiet-state">'+(chartState==="loading"?"Connecting":"Offline")+'</span>';
+ const note=rankingPeriod==="week" ?
+ '<p class="ranking-note hint">'+(weekStartsAt?'Week of '+esc(new Date(weekStartsAt*1000).toLocaleDateString(undefined,{month:"short",day:"numeric",timeZone:"UTC"}))+' · ':"")+'Resets Monday at 00:00 UTC.</p>':"";
+ const content=chartState==="loading"?'<div class="empty" role="status"><h2>Loading global rankings…</h2><p>Checking playtime across Unlocked.</p></div>':
+ chartState==="offline"?'<div class="empty" role="status"><h2>Global leaderboard unavailable</h2><p>Unable to reach the arcade statistics service. No local counts are shown as global results.</p>'+btn("retry-global","Try again","refresh")+'</div>':
+ !ranks.length?'<div class="empty"><h2>No recorded playtime yet</h2><p>Global playtime will appear as games are played and the service records sessions.</p></div>':
+ '<div class="grid global-leader-grid">'+ranks.slice(0,visibleCount).map((g,i)=>card(g,{rank:i+1,count:rankingCounts()[g.id]||0})).join("")+'</div>'+moreButton(ranks.length);
+ main.innerHTML='<section class="section-page global-rankings"><div class="shelf-head global-rank-head"><div><h1>Global playtime leaderboard</h1><p class="subcopy">Ranked by time spent playing across Unlocked, not just this device.</p></div><div class="top-live">'+status+'</div></div>'+
+ rankingTabs()+note+content+'</section>';
+}
+function scheduleChart(){
+ clearInterval(chartTimer);chartTimer=null;
+ const needsGlobal=current.page==="top"||(["library","search"].includes(current.page)&&sortMode==="popular");
+ if(!needsGlobal||document.hidden)return;
+ refreshGlobalTop();
+ chartTimer=setInterval(()=>{if(!document.hidden)refreshGlobalTop(true);},RANKING_REFRESH_MS);
+}
 function redrawSavedButtons(id){
   if(current.page==="saved"){renderSaved();return;}
   document.querySelectorAll('[data-save="'+id+'"]').forEach(el=>{
@@ -607,7 +626,7 @@ function route({scroll=true}={}){
   if(guide.open)guide.close();
   const game=current.page==="game" && byId.get(current.id);
   setGameAtmosphere(game);
-  const titles={requests:"Request a game",takedown:"Takedown Request",settings:"Settings",compare:"Compare games",library:"Game vault",top:"Most played locally",saved:"Saved games",credits:"Credits",search:"Search"};
+  const titles={requests:"Request a game",takedown:"Takedown Request",settings:"Settings",compare:"Compare games",library:"Game vault",top:"Global playtime leaderboard",saved:"Saved games",credits:"Credits",search:"Search"};
   document.title=(game?.title || titles[current.page] || "Page not found")+" · Unlocked";
   if(current.page==="library" || isSearch)renderLibrary();
   else if(current.page==="saved")renderSaved();
