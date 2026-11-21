@@ -719,5 +719,5 @@ async function readJson(path){
   return res.json();
 }
 setup();
-try {games=(await readJson("./games.json?v=13")).sort(alphabetical);byId=new Map(games.map(g=>[g.id,g]));route({scroll:false});}
+try {games=(await readJson("./games.json?v=14")).sort(alphabetical);byId=new Map(games.map(g=>[g.id,g]));route({scroll:false});}
 catch {main.innerHTML='<div class="empty"><h1>Couldn’t open the vault</h1><p>Reload this page to fetch the game catalog.</p><a class="btn" href="./">Reload</a></div>';}
