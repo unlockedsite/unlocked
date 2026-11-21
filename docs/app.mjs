@@ -183,7 +183,7 @@ async function submitTakedown(form){
   finally{button.disabled=false;}
 }
 function communityBar(){
-  return '<div class="community-bar"><a class="join-discord" href="https://discord.gg/AezupBCtns" target="_blank" rel="noopener noreferrer">'+icon("discord")+'<span><small>Join us on</small><strong>Discord</strong></span>'+icon("forward")+'</a><a class="secondary-btn community-action community-request" href="#/requests">icon("plus")+<span>Request a game</span></a><a class="secondary-btn community-action community-takedown" href="#/takedown">icon("shield")+<span>Takedown Request</span></a><div class="community-online">'+presence("all")+'</div></div>';
+  return '<div class="community-bar"><a class="join-discord" href="https://discord.gg/AezupBCtns" target="_blank" rel="noopener noreferrer">'+icon("discord")+'<span><small>Join us on</small><strong>Discord</strong></span>'+icon("forward")+'</a><a class="secondary-btn community-action community-request" href="#/requests">'+icon("plus")+'<span>Request a game</span></a><a class="secondary-btn community-action community-takedown" href="#/takedown">'+icon("shield")+'<span>Takedown Request</span></a><div class="community-online">'+presence("all")+'</div></div>';
 }
 function rankingCounts(){return rankingPeriod==="week"?weeklyCounts:rankedCounts;}
 function currentRanks(){
