@@ -1,7 +1,7 @@
 import { icon } from "./icons.mjs?v=5";
 import { matches, normalize } from "./search.mjs";
 import * as qol from "./qol.mjs?v=1";
-import * as hub from "./hub.mjs?v=4";
+import * as hub from "./hub.mjs?v=5";
 import { chromeOS, createPlayer } from "./player.mjs?v=7";
 
 const $ = selector => document.querySelector(selector);
@@ -133,7 +133,7 @@ function card(g, {rank=0,count=0}={}) {
   const health=healthReports[g.id];
   const healthBadge=health==="issue"?'<span class="qol-health" title="Personal flag on this device; not a verified outage">My flag</span>':"";
   const starts=false?'<span class="poster-plays">'+playtime(count)+'</span>':'';
-  return '<article class="card"><a href="#/game/'+g.id+'" aria-label="'+title+'"><div class="cover">'+poster(g)+specBadge(g.load)+ageBadge(g)+healthBadge+(rank?'<span class="rank">#'+rank+'</span>':'')+'</div><div class="card-copy"><span class="poster-genre">'+esc(g.genre)+'</span><h3>'+title+'</h3><div class="poster-numbers">'+playStatus(g)+starts+'</div></div></a>'+(playedIds.has(g.id)?'<span class="qol-visited" title="Played before">Played</span>':'')+bookmark(g.id,true)+'</article>';
+  return '<article class="card" data-title-letter="'+esc(g.title.trim().charAt(0).toUpperCase())+'"><a href="#/game/'+g.id+'" aria-label="'+title+'"><div class="cover">'+poster(g)+specBadge(g.load)+ageBadge(g)+healthBadge+(rank?'<span class="rank">#'+rank+'</span>':'')+'</div><div class="card-copy"><span class="poster-genre">'+esc(g.genre)+'</span><h3>'+title+'</h3><div class="poster-numbers">'+playStatus(g)+starts+'</div></div></a>'+(playedIds.has(g.id)?'<span class="qol-visited" title="Played before">Played</span>':'')+bookmark(g.id,true)+'</article>';
 }
 const grid = (rows) => '<div class="grid">'+rows.map(g=>card(g)).join("")+'</div>';
 const titleBar = (tag,title,count,aside="") => '<div class="shelf-head"><div class="shelf-title"><'+tag+'>'+esc(title)+'</'+tag+'><span class="count" aria-label="'+count+' games">'+count+'</span></div>'+aside+'</div>';
@@ -265,6 +265,8 @@ function renderLibrary(){
   const aside='<div class="shelf-aside"><label class="sort-label">Sort <select id="hub-sort"><option value="az" '+(sortMode==="az"?"selected":"")+'>A–Z</option><option value="demand" '+(sortMode==="demand"?"selected":"")+'>Hardware demand</option><option value="popular" '+(sortMode==="popular"?"selected":"")+'>Popularity</option><option value="recent" '+(sortMode==="recent"?"selected":"")+'>Recently played</option></select></label></div>';
   let html=searching?"":'<div class="spotlight">'+hero()+'</div>'+communityBar()+qolBar()+hubHighlights()+continuePlaying();
   html+=titleBar(searching?"h1":"h2",label,rows.length,aside)+filters();
+  if(!searching){const letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");const available=new Set(rows.map(g=>g.title.trim().charAt(0).toUpperCase()));html+='<nav class="alphabet-jump" aria-label="Jump to game by letter"><span>A–Z</span>'+letters.map(letter=>'<button type="button" data-jump-letter="'+letter+'" '+(available.has(letter)?"":'disabled aria-disabled="true"')+'>'+letter+'</button>').join("")+'</nav>';}
+
   if(rows.length) html+=grid(rows.slice(0,visibleCount))+moreButton(rows.length);
   else if(full.length || !q) html+='<div class="empty">'+icon("filter")+'<h2>No games with those filters</h2><p>Clear filters to see every matching title.</p>'+btn("reset-filters","Clear filters","filter")+'</div>';
   else {
@@ -496,6 +498,7 @@ function setup(){
      const remove=e.target.closest("[data-folder-remove]");if(remove&&selectedFolder!=="All"){qol.storeFolder(selectedFolder,(qol.folders()[selectedFolder]||[]).filter(id=>id!==remove.dataset.folderRemove));renderSaved();return;}
      const save=e.target.closest("[data-save]");if(save){rememberGame(save.dataset.save);return;}
     const filter=e.target.closest("[data-genre]");if(filter){genre=filter.dataset.genre;visibleCount=pageSize;renderLibrary();document.querySelector('[data-genre="'+genre+'"]')?.focus({preventScroll:true});return;}
+    const jump=e.target.closest("[data-jump-letter]");if(jump&&!jump.disabled){const letter=jump.dataset.jumpLetter;visibleCount=games.length;renderLibrary();const target=[...document.querySelectorAll(".card[data-title-letter]")].find(el=>el.dataset.titleLetter===letter);if(target){target.scrollIntoView({behavior:performanceMode||matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"center"});target.querySelector("a")?.focus({preventScroll:true});}return;}
     const launchLink=e.target.closest('.card>a[href^="#/game/"]');
     if(launchLink){const id=decodeURIComponent(launchLink.getAttribute("href").split("/game/")[1]?.split("?")[0]||"");const game=byId.get(id);if(game)launchCinematic(launchLink,game);}
     const link=e.target.closest("a[data-page],a.brand");
@@ -504,6 +507,10 @@ function setup(){
     switch(action){
       case "random-genre":{const genres=[...new Set(games.filter(g=>g.mode==="embed").map(g=>g.genre))];if(genres.length){genre=genres[Math.floor(Math.random()*genres.length)];availability="play";location.hash="#/library";if(current.page==="library")renderLibrary();toast("Random genre: "+genre);}break;}
        case "persist-storage":{const el=document.querySelector("#storage-status");if(!el)break;if(!navigator.storage?.persist){el.textContent="This browser does not offer persistent storage requests. Existing local settings still save normally.";break;}navigator.storage.persist().then(granted=>{if(el.isConnected)el.textContent=granted?"Persistent storage granted for this site. Clearing browser data can still erase saves.":"The browser did not grant persistent storage. Your local settings still save, but site data may be cleared by the browser.";}).catch(()=>{if(el.isConnected)el.textContent="Unable to request persistent storage on this browser.";});break;}
+       case "remove-wallpaper":hub.savePreferences({wallpaper:""});toast("Wallpaper removed");route({scroll:false});break;
+       case "reset-appearance":hub.savePreferences({accent:"#ffd063",background:"#0d1118",radius:12,glow:35,wallpaper:"",preset:"balanced"});toast("Appearance reset");route({scroll:false});break;
+       case "reset-performance":hub.savePreferences({motion:"normal",cursor:false,preset:"balanced"});toast("Performance preferences reset");route({scroll:false});break;
+       case "reset-accessibility":hub.savePreferences({uiScale:100,compact:false,contrast:false,largeText:false,showTimer:true});toast("Accessibility preferences reset");route({scroll:false});break;
        case "save-note":hub.saveNote(current.id,document.querySelector("#hub-game-note")?.value||"");toast("Note saved locally");break;
        case "export-data":hub.downloadBackup();toast("Backup downloaded");break;
        case "import-data":document.querySelector("#hub-import")?.click();break;
@@ -543,6 +550,12 @@ function setup(){
   });
   document.addEventListener("change",e=>{
     if(["availability","more-genres","demand"].includes(e.target.id))visibleCount=pageSize;
+    if(e.target.closest("#hub-settings")&&e.target.name==="preset"){
+      const form=e.target.form,presets={performance:{motion:"off",cursor:false,glow:0},balanced:{motion:"normal",cursor:false,glow:35},visual:{motion:"enhanced",cursor:true,glow:75}};
+      const p=presets[e.target.value];if(p){form.elements.motion.value=p.motion;form.elements.cursor.checked=p.cursor;form.elements.glow.value=p.glow;form.querySelector("#out-glow").value=p.glow;}
+    }
+    if(e.target.closest("#hub-settings")&&e.target.type==="range"){const out=document.getElementById("out-"+e.target.name);if(out)out.value=e.target.value;}
+
     if(e.target.id==="availability"){availability=e.target.value;renderLibrary();$("#availability").focus({preventScroll:true});}
     if(e.target.id==="more-genres"){genre=e.target.value;renderLibrary();$("#more-genres").focus({preventScroll:true});}
     if(e.target.id==="folder-select"){selectedFolder=e.target.value;renderSaved();}
@@ -555,7 +568,7 @@ function setup(){
     const form=e.target;
     if(form.id==="request-form"){e.preventDefault();await submitCommunityForm(form,"/v1/requests",{query:form.elements.query.value.trim()});return;}
     if(form.id==="takedown-form"){e.preventDefault();await submitCommunityForm(form,"/v1/takedowns",{game:form.elements.game.value,reason:form.elements.reason.value.trim()});return;}
-    if(form.id==="hub-settings"){e.preventDefault();hub.settingsFromForm(form);toast("Settings saved");route({scroll:false});return;}
+    if(form.id==="hub-settings"){e.preventDefault();const file=document.getElementById("wallpaper-file")?.files?.[0];if(file){if(file.size>750000||!["image/png","image/jpeg","image/webp"].includes(file.type)){toast("Choose a JPG, PNG or WebP under 750 KB");return;}try{const wallpaper=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(file)});hub.savePreferences({wallpaper});}catch{toast("Could not read wallpaper");return;}}hub.settingsFromForm(form);toast("Settings saved");route({scroll:false});return;}
      if(form.id==="guide-search"){e.preventDefault();const str=form.querySelector("input").value.trim();if(str){guide.close();searchView(str);search.focus();}return;}
     
     
