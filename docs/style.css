@@ -348,3 +348,6 @@ dialog .actions{justify-content:space-between;margin-top:1rem}
 .community-bar>a.join-discord>.ico:first-child,.community-bar>a.community-action>.ico:first-child{flex:0 0 auto;width:1.36rem;height:1.36rem}
 .community-bar>a.join-discord>.ico:last-child,.community-bar>a.community-action>.ico:last-child{position:absolute;right:.8rem;top:50%;transform:translateY(-50%);width:.85rem;height:.85rem;flex:0 0 auto;color:#ffffffdc}
 .community-bar>a.join-discord>span,.community-bar>a.community-action>span{flex:0 1 auto;min-width:0}
+
+/* Always place live player count on its own centered row below all action buttons. */
+.community-bar>.community-online{flex:0 0 100%;width:100%;box-sizing:border-box;display:flex;justify-content:center;align-items:center;padding:0;margin:.25rem 0 0;border:0}
