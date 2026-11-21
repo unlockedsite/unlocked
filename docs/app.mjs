@@ -1,4 +1,4 @@
-import { icon } from "./icons.mjs?v=4";
+import { icon } from "./icons.mjs?v=5";
 import { matches, normalize } from "./search.mjs";
 import * as qol from "./qol.mjs?v=1";
 import * as hub from "./hub.mjs?v=4";
