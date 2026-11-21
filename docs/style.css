@@ -515,3 +515,26 @@ body.player-fullscreen-open{overflow:hidden}
 .mast .preferences>.icon-btn{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;vertical-align:middle;box-sizing:border-box;color:var(--text)}
 .mast .preferences>.icon-btn .ico{display:block;width:1.2rem;height:1.2rem}
 @media(max-width:540px){.mast .preferences{gap:.35rem}}
+
+/* Unlocked visual polish: GPU-friendly hover, game glow, cursor ambience and mascot. */
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.35;background:radial-gradient(340px circle at var(--cursor-x,50%) var(--cursor-y,28%),rgba(112,117,246,.10),transparent 74%);transition:opacity .2s}
+.mast,main,footer{position:relative}
+.game-atmosphere .stage-slot{position:relative;isolation:isolate}
+.game-atmosphere .stage-slot::before{content:"";position:absolute;inset:-18px;border-radius:28px;background:radial-gradient(ellipse at 50% 40%,var(--game-glow,#ffd063),transparent 67%);opacity:.13;filter:blur(28px);z-index:-1;pointer-events:none}
+.game-atmosphere .game-title{text-shadow:0 0 34px color-mix(in srgb,var(--game-glow,#ffd063) 28%,transparent)}
+.card .cover img{transition:transform .48s cubic-bezier(.2,.75,.2,1),filter .48s ease;will-change:auto}
+@media(hover:hover) and (prefers-reduced-motion:no-preference){
+ .card:hover .cover img,.card:focus-within .cover img{transform:scale(1.075);filter:saturate(1.14) brightness(1.07)}
+ .card:hover .cover::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(135deg,rgba(255,255,255,.08),transparent 48%)}
+}
+.launch-cinematic{position:fixed;z-index:9999;object-fit:cover;pointer-events:none;box-shadow:0 0 44px var(--launch-glow,#ffd063);transform-origin:center;contain:paint}
+.arcade-mascot{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;font-size:.82rem;font-weight:750;color:var(--text);margin:.35rem auto .8rem;text-align:center}
+.arcade-mascot-face{position:relative;width:54px;height:45px;border-radius:16px 16px 14px 14px;background:linear-gradient(150deg,#ffdf82,#f5a833);border:3px solid #3a2c1e;box-shadow:0 5px 0 #b57627,0 9px 20px #0004;display:flex;align-items:center;justify-content:center;gap:12px;animation:mascot-float 2.2s ease-in-out infinite}
+.arcade-mascot-face i{width:7px;height:10px;border-radius:50%;background:#32251c}
+.arcade-mascot-face b{position:absolute;bottom:8px;left:21px;width:10px;height:5px;border:2px solid #32251c;border-top:0;border-radius:0 0 10px 10px}
+@keyframes mascot-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.low-graphics body::before{display:none}
+.low-graphics .game-atmosphere .stage-slot::before{display:none}
+.low-graphics .card .cover img{filter:none!important;transform:none!important}
+@media(pointer:coarse){body::before{display:none}}
+@media(prefers-reduced-motion:reduce){body::before{display:none}.arcade-mascot-face{animation:none}.card .cover img{transition:none!important;transform:none!important}.launch-cinematic{display:none}}
